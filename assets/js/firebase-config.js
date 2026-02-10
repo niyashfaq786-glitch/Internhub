@@ -8,12 +8,12 @@ import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth
  * (Firebase Console → Project Settings → Your apps → Web app).
  */
 const firebaseConfig = {
-  apiKey: "PASTE_HERE",
-  authDomain: "PASTE_HERE",
-  projectId: "PASTE_HERE",
-  storageBucket: "PASTE_HERE",
-  messagingSenderId: "PASTE_HERE",
-  appId: "PASTE_HERE"
+  apiKey: "AIzaSyCut36kO_jCWOijtvUFj19b0lkFEpUM7ZY",
+  authDomain: "internhub-309f2.firebaseapp.com",
+  projectId: "internhub-309f2",
+  storageBucket: "internhub-309f2.firebasestorage.app",
+  messagingSenderId: "436295440111",
+  appId: "1:436295440111:web:93775102753eea9bd3ad1a"
 };
 
 // Main app (normal auth session: admin OR student)
