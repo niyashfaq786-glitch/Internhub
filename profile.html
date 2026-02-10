@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Profile | InternHub</title>
+  <link rel="stylesheet" href="assets/css/main.css" />
+</head>
+<body class="container">
+  <h1>Student Profile</h1>
+
+  <div class="card">
+    <p><small>Profile updates are saved securely to Firestore (student can edit own profile).</small></p>
+    <p id="who"></p>
+
+    <label>Branch</label>
+    <input id="branch" />
+
+    <label>College</label>
+    <input id="college" />
+
+    <label>Skills (comma separated)</label>
+    <input id="skills" placeholder="html, css, javascript" />
+
+    <label>Resume Link (Google Drive link)</label>
+    <input id="resume" placeholder="https://drive.google.com/..." />
+
+    <label>Photo Link (Google Drive image link)</label>
+    <input id="photo" placeholder="https://drive.google.com/..." />
+
+    <div class="actions">
+      <button class="btn" id="btnSaveLocal">Save Profile</button>
+<a class="btn secondary" href="dashboard.html">Back</a>
+    </div>
+
+    <p id="msg"></p>
+  </div>
+
+  <script type="module" src="assets/js/profile.js"></script>
+</body>
+</html>

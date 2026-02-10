@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Student Login | InternHub</title>
+  <link rel="stylesheet" href="assets/css/main.css" />
+</head>
+<body class="container">
+  <h1>Student Login</h1>
+  <p><small>No registration. Students are created by Admin Excel upload only.</small></p>
+
+  <div class="card">
+    <label>Student ID</label>
+    <input id="student_id" placeholder="S101" />
+    <label>Password</label>
+    <input id="password" type="password" placeholder="••••••••" />
+    <div class="actions">
+      <button class="btn" id="btnLogin">Login</button>
+      <a class="btn secondary" href="home.html">Back Home</a>
+    </div>
+    <p id="msg"></p>
+  </div>
+
+  <script type="module" src="assets/js/student-auth.js"></script>
+</body>
+</html>
