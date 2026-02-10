@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Manage Admin Requests | InternHub</title>
+  <link rel="stylesheet" href="../assets/css/main.css" />
+</head>
+<body class="container">
+  <h1>Admin Requests</h1>
+
+  <div class="card">
+    <p><small>Free-mode: approval means you manually create the admin in Firebase Authentication and add UID in Firestore admins with status ACTIVE.</small></p>
+    <div class="actions">
+      <a class="btn secondary" href="admin-dashboard.html">Back</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Pending Requests</h2>
+    <div id="list"></div>
+    <p id="msg"></p>
+  </div>
+
+  <script type="module" src="../assets/js/manage-admins.js"></script>
+</body>
+</html>

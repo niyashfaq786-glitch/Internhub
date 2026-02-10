@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin Request | InternHub</title>
+  <link rel="stylesheet" href="../assets/css/main.css" />
+</head>
+<body class="container">
+  <h1>Request Admin Access</h1>
+  <div class="card">
+    <label>Name</label><input id="name" />
+    <label>Email</label><input id="email" type="email" />
+    <label>Organization</label><input id="org" />
+    <label>Reason</label><input id="reason" />
+    <div class="actions">
+      <button class="btn" id="btnReq">Submit Request</button>
+      <a class="btn secondary" href="admin-login.html">Back</a>
+    </div>
+    <p id="msg"></p>
+  </div>
+
+  <script type="module">
+    import { db } from "../assets/js/firebase-config.js";
+    import { $ } from "../assets/js/utils.js";
+    import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+    $("btnReq").addEventListener("click", async () => {
+      $("msg").textContent = "";
+      try {
+        const payload = {
+          name: $("name").value.trim(),
+          email: $("email").value.trim(),
+          organization: $("org").value.trim(),
+          reason: $("reason").value.trim(),
+          status: "PENDING",
+          createdAt: serverTimestamp()
+        };
+        await addDoc(collection(db, "admin_requests"), payload);
+        $("msg").textContent = "Request submitted. Wait for approval.";
+      } catch (e) {
+        $("msg").textContent = e.message || "Failed";
+      }
+    });
+  </script>
+</body>
+</html>
