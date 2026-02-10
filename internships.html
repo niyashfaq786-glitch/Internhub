@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Internships | InternHub</title>
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container nav-wrapper">
+    <a class="logo" href="home.html"><i class="fa-solid fa-graduation-cap"></i> InternHub</a>
+    <nav class="nav-links">
+      <a href="home.html">Home</a>
+      <a  href="dashboard.html">Dashboard</a>
+      <a class="active" href="opportunities.html">Opportunities</a>
+      <a  href="apply.html">My Applications</a>
+      <a  href="profile.html">Profile</a>
+    </nav>
+    <div class="nav-actions">
+      <a class="btn secondary sm" href="dashboard.html"><i class="fa-solid fa-arrow-left"></i> Back</a>
+    </div>
+  </div>
+</header>
+
+<main class="dashboard-layout">
+
+<aside class="sidebar">
+  <div class="sidebar-title">Student Hub</div>
+  <ul class="sidebar-menu">
+    <li  onclick="location.href='dashboard.html'"><i class="fa-solid fa-house"></i> Dashboard</li>
+    <li class="active" onclick="location.href='opportunities.html'"><i class="fa-solid fa-briefcase"></i> Opportunities</li>
+    <li  onclick="location.href='apply.html'"><i class="fa-solid fa-file-contract"></i> My Applications</li>
+    <li  onclick="location.href='profile.html'"><i class="fa-solid fa-user"></i> Profile</li>
+    <li onclick="location.href='home.html'"><i class="fa-solid fa-right-from-bracket"></i> Exit</li>
+  </ul>
+</aside>
+
+<section class="main-content">
+
+<div class="page-title">
+  <div>
+    <h2>Internships</h2>
+    <div class="page-subtitle">Internship opportunities (Diploma-focused).</div>
+  </div>
+  <div class="search-row">
+    <input id="q" placeholder="Search internships..." />
+    <button class="btn sm" id="btnSearch"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+  </div>
+</div>
+<div class="card">
+  <div id="list" class="job-grid"></div>
+</div>
+
+</section>
+</main>
+<script type="module" src="assets/js/opportunities-pages.js"></script>
+</body>
+</html>

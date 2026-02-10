@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Apply | InternHub</title>
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container nav-wrapper">
+    <a class="logo" href="home.html"><i class="fa-solid fa-graduation-cap"></i> InternHub</a>
+    <nav class="nav-links">
+      <a href="home.html">Home</a>
+      <a  href="dashboard.html">Dashboard</a>
+      <a  href="opportunities.html">Opportunities</a>
+      <a class="active" href="apply.html">My Applications</a>
+      <a  href="profile.html">Profile</a>
+    </nav>
+    <div class="nav-actions">
+      <a class="btn secondary sm" href="dashboard.html"><i class="fa-solid fa-arrow-left"></i> Back</a>
+    </div>
+  </div>
+</header>
+
+<main class="dashboard-layout">
+
+<aside class="sidebar">
+  <div class="sidebar-title">Student Hub</div>
+  <ul class="sidebar-menu">
+    <li  onclick="location.href='dashboard.html'"><i class="fa-solid fa-house"></i> Dashboard</li>
+    <li  onclick="location.href='opportunities.html'"><i class="fa-solid fa-briefcase"></i> Opportunities</li>
+    <li class="active" onclick="location.href='apply.html'"><i class="fa-solid fa-file-contract"></i> My Applications</li>
+    <li  onclick="location.href='profile.html'"><i class="fa-solid fa-user"></i> Profile</li>
+    <li onclick="location.href='home.html'"><i class="fa-solid fa-right-from-bracket"></i> Exit</li>
+  </ul>
+</aside>
+
+<section class="main-content">
+
+<div class="page-title">
+  <div>
+    <h2 id="oppTitle">Apply</h2>
+    <div class="page-subtitle">Confirm and submit your application.</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="actions">
+    <button class="btn accent" id="btnApply"><i class="fa-solid fa-paper-plane"></i> Apply Now</button>
+    <a class="btn secondary" href="opportunities.html"><i class="fa-solid fa-arrow-left"></i> Back to List</a>
+  </div>
+  <p id="msg" class="mt-2 muted"></p>
+</div>
+
+<div class="card mt-4">
+  <h3 style="color:var(--secondary);margin-bottom:10px;">My Applications</h3>
+  <div id="apps"></div>
+</div>
+
+</section>
+</main>
+<script type="module" src="assets/js/apply.js"></script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Student Login | InternHub</title>
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container nav-wrapper">
+    <a class="logo" href="home.html"><i class="fa-solid fa-graduation-cap"></i> InternHub</a>
+    <nav class="nav-links">
+      <a href="home.html">Home</a>
+      <a href="home.html#features">Features</a>
+      <a class="active" href="student-login.html">Student Login</a>
+      <a href="admin/admin-login.html">Admin Login</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <div class="nav-actions">
+      <a class="btn secondary sm" href="admin/admin-login.html"><i class="fa-solid fa-user-shield"></i> Admin</a>
+    </div>
+  </div>
+</header>
+
+<main class="auth-wrap">
+  <div class="container">
+    <div class="card auth-card">
+      <h1>Student Login</h1>
+      <p>No registration. Student accounts are created by Admin (Excel upload).</p>
+
+      <div class="form-row">
+        <div>
+          <label for="student_id">Student ID</label>
+          <input id="student_id" placeholder="Enter Student ID (Example: S102)" autocomplete="username">
+        </div>
+        <div>
+          <label for="password">Password</label>
+          <input id="password" type="password" placeholder="••••••••" autocomplete="current-password">
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn" id="btnLogin"><i class="fa-solid fa-right-to-bracket"></i> Login</button>
+        <a class="btn secondary" href="home.html"><i class="fa-solid fa-arrow-left"></i> Back Home</a>
+      </div>
+
+      <p id="msg" class="mt-2 muted"></p>
+
+      <div class="mt-4">
+        <div class="card soft">
+          <strong>Tip:</strong> You only type your <b>Student ID</b> (Example: <b>S101</b>). You do <b>not</b> need to type <b>@internhub.com</b>.
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script type="module" src="assets/js/firebase-config.js"></script>
+<script type="module" src="assets/js/student-auth.js"></script>
+</body>
+</html>
