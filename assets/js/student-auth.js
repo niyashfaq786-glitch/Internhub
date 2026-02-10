@@ -13,6 +13,7 @@ document.getElementById("btnLogin").addEventListener("click", async () => {
 
     // ✅ important
     localStorage.setItem("role", "student");
+    window.location.href = "dashboard.html";
 
     // ✅ go to student dashboard
     window.location.href = "dashboard.html";
