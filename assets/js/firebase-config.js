@@ -13,7 +13,7 @@ const firebaseConfig = {
   projectId: "internhub-309f2",
   storageBucket: "internhub-309f2.firebasestorage.app",
   messagingSenderId: "436295440111",
-  appId: "1:436295440111:web:93775102753eea9bd3ad1a"
+  appId: "1:436295440111:web:93775102753eea9bd3ad1a",
 };
 
 // Main app (normal auth session: admin OR student)
