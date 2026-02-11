@@ -1,0 +1,79 @@
+Paste these in Firebase Console → Firestore Database → Rules, then Publish.
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function adminDoc() {
+      return get(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    function isAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+        && adminDoc().data.status == "ACTIVE";
+    }
+
+    function isSuper() {
+      return isAdmin() && adminDoc().data.role == "SUPER";
+    }
+
+    function sameCollege(collegeId) {
+      return isSuper() || (adminDoc().data.college_id != "" && adminDoc().data.college_id == collegeId);
+    }
+
+    function sameDept(dept) {
+      return isSuper() || (adminDoc().data.department != "" && lower(adminDoc().data.department) == lower(dept));
+    }
+
+    // Admins: only admins can read/write admin documents
+    match /admins/{uid} {
+      allow read, write: if isAdmin();
+    }
+
+    // Students:
+    // - SUPER admin: all
+    // - Normal admin: only own college_id + department (branch)
+    // - Student: only own document (uid match)
+    match /students/{studentId} {
+      allow read, update, delete: if (isAdmin() && sameCollege(resource.data.college_id) && sameDept(resource.data.branch))
+        || (request.auth != null && resource.data.uid == request.auth.uid);
+
+      allow create: if isAdmin()
+        && sameCollege(request.resource.data.college_id)
+        && sameDept(request.resource.data.branch);
+    }
+
+    // Opportunities: public read, admin write (scoped)
+    match /opportunities/{id} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin()
+        && sameCollege(request.resource.data.college_id)
+        && sameDept(request.resource.data.department);
+    }
+
+    // Admin requests: anyone can create request; admin can read/update/delete
+    match /admin_requests/{id} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Applications:
+    // - Student can create + read their own applications
+    // - Admin can read/update applications in their scope
+    match /applications/{appId} {
+      allow create: if request.auth != null
+        && request.resource.data.student_uid == request.auth.uid;
+
+      allow read: if isAdmin()
+        && sameCollege(resource.data.college_id)
+        && sameDept(resource.data.student_branch)
+        || (request.auth != null && resource.data.student_uid == request.auth.uid);
+
+      allow update, delete: if isAdmin()
+        && sameCollege(resource.data.college_id)
+        && sameDept(resource.data.student_branch)
+        || (request.auth != null && resource.data.student_uid == request.auth.uid);
+    }
+  }
+}

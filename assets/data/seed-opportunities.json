@@ -1,0 +1,5 @@
+[
+  { "title":"Diploma Web Developer Internship", "type":"internship", "deadline":"2026-03-10", "qualification":"Diploma", "branch":"CSE", "tags":"html css javascript", "source":"Admin" },
+  { "title":"Diploma Mechanical Internship (Workshop)", "type":"internship", "deadline":"2026-03-20", "qualification":"Diploma", "branch":"MECH", "tags":"cad solidworks", "source":"Admin" },
+  { "title":"Diploma Scholarship – Merit Support", "type":"scholarship", "deadline":"2026-04-01", "qualification":"Diploma", "branch":"Any", "tags":"merit scholarship", "source":"Admin" }
+]

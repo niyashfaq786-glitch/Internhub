@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Manage Students | InternHub</title>
+  <link rel="stylesheet" href="../assets/css/main.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container nav-wrapper">
+    <a class="logo" href="../home.html"><i class="fa-solid fa-graduation-cap"></i> InternHub</a>
+    <nav class="nav-links">
+      <a href="../home.html">Home</a>
+      <a  href="admin-dashboard.html">Admin Dashboard</a>
+      <a  href="upload-students.html">Upload Students</a>
+      <a class='active' href="manage-students.html">Manage Students</a>
+      <a  href="manage-admins.html">Manage Admins</a>
+    </nav>
+    <div class="nav-actions">
+      <a class="btn secondary sm" href="../student-login.html"><i class="fa-solid fa-user-graduate"></i> Student</a>
+    </div>
+  </div>
+</header>
+
+<main class="dashboard-layout">
+
+<aside class="sidebar" style="background:#1e293b;">
+  <div class="sidebar-title">AdminHub</div>
+  <ul class="sidebar-menu">
+    <li  onclick="location.href='admin-dashboard.html'"><i class="fa-solid fa-chart-line"></i> Dashboard</li>
+    <li  onclick="location.href='upload-students.html'"><i class="fa-solid fa-file-arrow-up"></i> Upload Students</li>
+    <li class="active" onclick="location.href='manage-students.html'"><i class="fa-solid fa-users"></i> Manage Students</li>
+    <li  onclick="location.href='manage-admins.html'"><i class="fa-solid fa-user-shield"></i> Admin Requests</li>
+    <li onclick="location.href=\'admin-profile.html\'"><i class="fa-solid fa-id-badge"></i> Admin Profile</li>
+    <li onclick="logoutAdmin()"><i class="fa-solid fa-right-from-bracket"></i> Exit</li>
+  </ul>
+</aside>
+
+
+<section class="main-content">
+
+<div class="page-title">
+  <div>
+    <h2>Manage Students</h2>
+    <div class="page-subtitle">Filter, manage validity, activate/deactivate, and send credentials.</div>
+  </div>
+  <div class="search-row" style="flex-wrap:wrap; gap:10px;">
+    <input id="q" placeholder="Search: ID / Name / Email..." style="min-width:220px;" />
+    <select id="fStatus" class="input" style="min-width:160px;">
+      <option value="">All Status</option>
+      <option value="ACTIVE">ACTIVE</option>
+      <option value="INACTIVE">INACTIVE</option>
+    </select>
+    <select id="fDept" class="input" style="min-width:180px;">
+      <option value="">All Departments</option>
+    </select>
+    <input id="fValidTo" type="date" class="input" style="min-width:170px;" title="Valid to on/before" />
+    <button class="btn sm" id="btnRefresh"><i class="fa-solid fa-arrows-rotate"></i> Refresh</button>
+  </div>
+</div>
+
+<div class="card">
+  <div class="muted mb-2" id="scopeHint"></div>
+  <div id="list"></div>
+  <p id="msg" class="mt-2 muted"></p>
+</div>
+
+<div class="card" style="margin-top:16px;">
+  <h3 style="margin-bottom:10px;">Add Student (Manual)</h3>
+  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px;">
+    <div>
+      <label class="muted">Student ID</label>
+      <input id="m_student_id" class="input" placeholder="S101" />
+    </div>
+    <div>
+      <label class="muted">Name</label>
+      <input id="m_name" class="input" placeholder="Arun" />
+    </div>
+    <div>
+      <label class="muted">Password</label>
+      <input id="m_password" class="input" placeholder="Student@123" />
+    </div>
+    <div>
+      <label class="muted">Department / Branch</label>
+      <input id="m_branch" class="input" placeholder="CSE" />
+    </div>
+    <div>
+      <label class="muted">College</label>
+      <input id="m_college" class="input" placeholder="Your Polytechnic College" />
+    </div>
+    <div>
+      <label class="muted">Personal Email (for credentials)</label>
+      <input id="m_email" class="input" placeholder="student@gmail.com (optional)" />
+    </div>
+    <div>
+      <label class="muted">Valid From</label>
+      <input id="m_valid_from" type="date" class="input" />
+    </div>
+    <div>
+      <label class="muted">Valid To</label>
+      <input id="m_valid_to" type="date" class="input" />
+    </div>
+  </div>
+  <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;">
+    <button class="btn" id="btnAddStudent"><i class="fa-solid fa-user-plus"></i> Create Student</button>
+    <button class="btn secondary" id="btnSendEmailHelp"><i class="fa-solid fa-envelope"></i> Email credentials (setup)</button>
+  </div>
+  <p class="muted mt-2">
+    Note: Email sending needs Firebase Cloud Function (safe). This project includes the function template in <b>/functions</b>.
+  </p>
+  <p id="m_msg" class="mt-2 muted"></p>
+</div>
+
+</section>
+
+</main>
+<script type="module" src="../assets/js/admin-logout.js"></script>
+<script type="module" src="../assets/js/manage-students.js"></script>
+</body>
+</html>

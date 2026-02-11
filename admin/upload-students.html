@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Upload Students | InternHub</title>
+  <link rel="stylesheet" href="../assets/css/main.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container nav-wrapper">
+    <a class="logo" href="../home.html"><i class="fa-solid fa-graduation-cap"></i> InternHub</a>
+    <nav class="nav-links">
+      <a href="../home.html">Home</a>
+      <a  href="admin-dashboard.html">Admin Dashboard</a>
+      <a class='active' href="upload-students.html">Upload Students</a>
+      <a  href="manage-students.html">Manage Students</a>
+      <a  href="manage-admins.html">Manage Admins</a>
+    </nav>
+    <div class="nav-actions">
+      <a class="btn secondary sm" href="../student-login.html"><i class="fa-solid fa-user-graduate"></i> Student</a>
+    </div>
+  </div>
+</header>
+
+<main class="dashboard-layout">
+
+<aside class="sidebar" style="background:#1e293b;">
+  <div class="sidebar-title">AdminHub</div>
+  <ul class="sidebar-menu">
+    <li  onclick="location.href='admin-dashboard.html'"><i class="fa-solid fa-chart-line"></i> Dashboard</li>
+    <li class="active" onclick="location.href='upload-students.html'"><i class="fa-solid fa-file-arrow-up"></i> Upload Students</li>
+    <li  onclick="location.href='manage-students.html'"><i class="fa-solid fa-users"></i> Manage Students</li>
+    <li  onclick="location.href='manage-admins.html'"><i class="fa-solid fa-user-shield"></i> Admin Requests</li>
+    <li onclick="location.href=\'admin-profile.html\'"><i class="fa-solid fa-id-badge"></i> Admin Profile</li>
+    <li onclick="logoutAdmin()"><i class="fa-solid fa-right-from-bracket"></i> Exit</li>
+  </ul>
+</aside>
+
+<section class="main-content">
+
+<div class="page-title">
+  <div>
+    <h2>Upload Students (Excel)</h2>
+    <div class="page-subtitle">Upload an Excel file to create/update student accounts (with valid dates).</div>
+  </div>
+</div>
+
+<div class="card">
+  <label for="file">Choose Excel (.xlsx)</label>
+  <input id="file" type="file" accept=".xlsx,.xls" />
+
+  <div class="actions">
+    <button class="btn" id="btnUpload"><i class="fa-solid fa-upload"></i> Upload</button>
+    <a class="btn secondary" href="admin-dashboard.html"><i class="fa-solid fa-arrow-left"></i> Back</a>
+  </div>
+
+  <p id="msg" class="mt-2 muted"></p>
+
+  <div class="mt-4 card soft">
+    <b>Excel Columns:</b> student_id, name, password, branch, college, valid_from, valid_to (YYYY-MM-DD)
+  </div>
+</div>
+
+</section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script type="module" src="../assets/js/admin-logout.js"></script>
+<script type="module" src="../assets/js/admin-students.js"></script>
+</body>
+</html>

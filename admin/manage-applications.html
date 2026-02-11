@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>InternHub Admin - Applications</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/admin.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">InternHub <span>Admin</span></div>
+    <div class="top-actions">
+      <a class="btn secondary" href="admin-dashboard.html">Dashboard</a>
+      <button class="btn" id="btnLogout">Logout</button>
+    </div>
+  </header>
+
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <a class="side-link" href="admin-dashboard.html">Overview</a>
+      <a class="side-link" href="upload-students.html">Upload Students</a>
+      <a class="side-link" href="manage-students.html">Manage Students</a>
+      <a class="side-link" href="manage-admins.html">Admin Approvals</a>
+      <a class="side-link" href="manage-opportunities.html">Opportunities</a>
+      <a class="side-link active" href="manage-applications.html">Applications</a>
+    </aside>
+
+    <main class="admin-main">
+      <h1>Application Tracker (Admin)</h1>
+      <p class="muted">View all student applications (SUBMITTED / SHORTLISTED / REJECTED / HIRED).</p>
+
+      
+<div class="card">
+  <div class="grid-2" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:10px;">
+    <input id="q" class="input" placeholder="Search by student/company/title..." />
+    <select id="fStatus" class="input">
+      <option value="">All Status</option>
+      <option>SUBMITTED</option>
+      <option>SHORTLISTED</option>
+      <option>REJECTED</option>
+      <option>HIRED</option>
+      <option>APPROVED</option>
+      <option>SELECTED</option>
+      <option>PENDING</option>
+    </select>
+    <select id="fType" class="input">
+      <option value="">All Types</option>
+      <option value="INTERNSHIP">INTERNSHIP</option>
+      <option value="SCHOLARSHIP">SCHOLARSHIP</option>
+    </select>
+    <select id="fDept" class="input">
+      <option value="">All Departments</option>
+    </select>
+    <button class="btn" id="btnRefresh"><i class="fa-solid fa-arrows-rotate"></i> Refresh</button>
+  </div>
+  <div id="list" class="list" style="margin-top:12px;"></div>
+</div>
+
+    </main>
+  </div>
+
+  <script type="module" src="../assets/js/admin-applications.js"></script>
+</body>
+</html>

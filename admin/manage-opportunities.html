@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>InternHub Admin - Manage Opportunities</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/admin.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">InternHub <span>Admin</span></div>
+    <div class="top-actions">
+      <a class="btn secondary" href="admin-dashboard.html">Dashboard</a>
+      <button class="btn" id="btnLogout">Logout</button>
+    </div>
+  </header>
+
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <a class="side-link" href="admin-dashboard.html">Overview</a>
+      <a class="side-link" href="upload-students.html">Upload Students</a>
+      <a class="side-link" href="manage-students.html">Manage Students</a>
+      <a class="side-link" href="manage-admins.html">Admin Approvals</a>
+      <a class="side-link active" href="manage-opportunities.html">Opportunities</a>
+      <a class="side-link" href="manage-applications.html">Applications</a>
+    </aside>
+
+    <main class="admin-main">
+      <h1>Manage Opportunities</h1>
+      <p class="muted">Add internships/scholarships with validity dates. Expired opportunities can be cleaned up.</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>Add Opportunity</h3>
+          <div class="form">
+            <label>Type</label>
+            <select id="type" class="input">
+              <option>Internship</option>
+              <option>Scholarship</option>
+            </select>
+
+            <label>Title</label>
+            <input id="title" class="input" placeholder="e.g., Software Intern" />
+
+            <label>Company</label>
+            <input id="company" class="input" placeholder="e.g., Google" />
+
+            <label>Qualification</label>
+            <input id="qualification" class="input" value="Diploma" />
+
+            <label>Location</label>
+            <input id="location" class="input" placeholder="Remote / City" />
+
+            <label>Tags (comma separated)</label>
+            <input id="tags" class="input" placeholder="Python, SQL, IT" />
+
+            <div class="grid-2">
+              <div>
+                <label>Valid From (YYYY-MM-DD)</label>
+                <input id="valid_from" class="input" placeholder="2026-02-10" />
+              </div>
+              <div>
+                <label>Valid To (YYYY-MM-DD)</label>
+                <input id="valid_to" class="input" placeholder="2026-06-10" />
+              </div>
+            </div>
+
+            <button class="btn" id="btnAdd">Add</button>
+            <div id="msg" class="muted" style="margin-top:10px;"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Cleanup</h3>
+          <p class="muted">This will delete expired opportunity documents from Firestore.</p>
+          <button class="btn danger" id="btnCleanup">Delete Expired Opportunities</button>
+          <div id="cleanupMsg" class="muted" style="margin-top:10px;"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:18px;">
+        <h3>All Opportunities</h3>
+        <div id="list" class="list"></div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module" src="../assets/js/admin-opportunities.js"></script>
+</body>
+</html>

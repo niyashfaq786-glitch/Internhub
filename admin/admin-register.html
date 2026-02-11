@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Request Admin Access | InternHub</title>
+  <link rel="stylesheet" href="../assets/css/main.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container nav-wrapper">
+    <a class="logo" href="../home.html"><i class="fa-solid fa-graduation-cap"></i> InternHub</a>
+    <nav class="nav-links">
+      <a href="../home.html">Home</a>
+      <a href="../student-login.html">Student Login</a>
+      <a class="active" href="admin-register.html">Admin Request</a>
+      <a href="admin-login.html">Admin Login</a>
+    </nav>
+    <div class="nav-actions">
+      <a class="btn secondary sm" href="admin-login.html"><i class="fa-solid fa-arrow-left"></i> Back</a>
+    </div>
+  </div>
+</header>
+
+<main class="auth-wrap">
+  <div class="container">
+    <div class="card auth-card">
+      <h1>Request Admin Access</h1>
+      <p>Submit your details. An existing admin must approve your request.</p>
+
+      <label for="name">Name</label>
+      <input id="name" placeholder="Your name">
+
+      <label for="email">Email</label>
+      <input id="email" type="email" placeholder="name@example.com">
+
+      <label for="org">College Name</label>
+      <input id="org" placeholder="Your Polytechnic College">
+
+      <label for="department">Department (Scope)</label>
+      <input id="department" placeholder="CSE / ECE / MECH ...">
+
+      <label for="reason">Reason</label>
+      <input id="reason" placeholder="Why you need admin access">
+
+      <div class="actions">
+        <button class="btn" id="btnReq"><i class="fa-solid fa-paper-plane"></i> Submit Request</button>
+        <a class="btn secondary" href="admin-login.html"><i class="fa-solid fa-right-to-bracket"></i> Go to Login</a>
+      </div>
+
+      <p id="msg" class="mt-2 muted"></p>
+    </div>
+  </div>
+</main>
+
+<script type="module" src="../assets/js/firebase-config.js"></script>
+<script type="module">
+  import { db } from "../assets/js/firebase-config.js";
+  import { $ } from "../assets/js/utils.js";
+  import { addDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+  $("btnReq").addEventListener("click", async () => {
+    $("msg").textContent = "";
+    const name = $("name").value.trim();
+    const email = $("email").value.trim();
+    const org = $("org").value.trim();
+    const department = $("department").value.trim();
+    const reason = $("reason").value.trim();
+    if (!name || !email) { $("msg").textContent = "Name and Email are required."; return; }
+
+    try{
+      const payload = { name, email, organization: org, college_name: org, college_id: (org||"").toLowerCase().replace(/\s+/g,"_"), department, reason, status:"PENDING", createdAt: serverTimestamp() };
+      await addDoc(collection(db, "admin_requests"), payload);
+      $("msg").textContent = "Request submitted. Wait for approval.";
+    }catch(e){
+      $("msg").textContent = e.message || "Failed";
+    }
+  });
+</script>
+</body>
+</html>
