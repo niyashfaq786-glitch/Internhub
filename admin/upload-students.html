@@ -1,73 +1,72 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Upload Students | InternHub</title>
-  <link rel="stylesheet" href="../assets/css/main.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body>
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import {
+  getAuth,
+  signOut,
+  createUserWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-<header class="site-header">
-  <div class="container nav-wrapper">
-    <a class="logo" href="../home.html"><i class="fa-solid fa-graduation-cap"></i> InternHub</a>
-    <nav class="nav-links">
-      <a href="../home.html">Home</a>
-      <a  href="admin-dashboard.html">Admin Dashboard</a>
-      <a class='active' href="upload-students.html">Upload Students</a>
-      <a  href="manage-students.html">Manage Students</a>
-      <a  href="manage-admins.html">Manage Admins</a>
-    </nav>
-    <div class="nav-actions">
-      <a class="btn secondary sm" href="../student-login.html"><i class="fa-solid fa-user-graduate"></i> Student</a>
-    </div>
-  </div>
-</header>
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-<main class="dashboard-layout">
+// ✅ IMPORTANT: Secondary app/auth for creating accounts (don’t disturb admin login)
+const secondaryApp = initializeApp(firebaseConfig, "SECONDARY");
+const secondaryAuth = getAuth(secondaryApp);
 
-<aside class="sidebar" style="background:#1e293b;">
-  <div class="sidebar-title">AdminHub</div>
-  <ul class="sidebar-menu">
-    <li  onclick="location.href='admin-dashboard.html'"><i class="fa-solid fa-chart-line"></i> Dashboard</li>
-    <li class="active" onclick="location.href='upload-students.html'"><i class="fa-solid fa-file-arrow-up"></i> Upload Students</li>
-    <li  onclick="location.href='manage-students.html'"><i class="fa-solid fa-users"></i> Manage Students</li>
-    <li  onclick="location.href='manage-admins.html'"><i class="fa-solid fa-user-shield"></i> Admin Requests</li>
-    <li onclick="location.href=\'admin-profile.html\'"><i class="fa-solid fa-id-badge"></i> Admin Profile</li>
-    <li onclick="logoutAdmin()"><i class="fa-solid fa-right-from-bracket"></i> Exit</li>
-  </ul>
-</aside>
+function normalizeStudentId(v) {
+  return String(v || "").trim().toUpperCase(); // S101
+}
+function buildStudentEmail(studentId) {
+  return `${studentId.toLowerCase()}@internhub.com`;
+}
 
-<section class="main-content">
+function toISODate(v) {
+  // supports YYYY-MM-DD or DD/MM/YYYY
+  const s = String(v || "").trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
 
-<div class="page-title">
-  <div>
-    <h2>Upload Students (Excel)</h2>
-    <div class="page-subtitle">Upload an Excel file to create/update student accounts (with valid dates).</div>
-  </div>
-</div>
+  const m = s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (m) return `${m[3]}-${m[2]}-${m[1]}`;
+  return ""; // invalid
+}
 
-<div class="card">
-  <label for="file">Choose Excel (.xlsx)</label>
-  <input id="file" type="file" accept=".xlsx,.xls" />
+async function createStudentAccount(row, adminCtx) {
+  const student_id = normalizeStudentId(row.student_id);
+  const email = buildStudentEmail(student_id);
+  const password = String(row.password || "").trim();
 
-  <div class="actions">
-    <button class="btn" id="btnUpload"><i class="fa-solid fa-upload"></i> Upload</button>
-    <a class="btn secondary" href="admin-dashboard.html"><i class="fa-solid fa-arrow-left"></i> Back</a>
-  </div>
+  const valid_from = toISODate(row.valid_from);
+  const valid_to   = toISODate(row.valid_to);
 
-  <p id="msg" class="mt-2 muted"></p>
+  if (!student_id) throw new Error("Missing student_id");
+  if (password.length < 6) throw new Error("Password must be 6+ chars");
+  if (!valid_from || !valid_to) throw new Error("Invalid date format (use YYYY-MM-DD or DD/MM/YYYY)");
 
-  <div class="mt-4 card soft">
-    <b>Excel Columns:</b> student_id, name, password, branch, college, valid_from, valid_to (YYYY-MM-DD)
-  </div>
-</div>
+  // ✅ 1) Create Auth user
+  const cred = await createUserWithEmailAndPassword(secondaryAuth, email, password);
 
-</section>
-</main>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script type="module" src="../assets/js/admin-logout.js"></script>
-<script type="module" src="../assets/js/admin-students.js"></script>
-</body>
-</html>
+  // ✅ 2) Save Firestore profile using student_id as doc id (BEST)
+  await setDoc(doc(db, "students", student_id), {
+    student_id,
+    name: row.name || "",
+    email,
+    branch: row.branch || "",
+    college: row.college || "",
+    college_id: row.college_id || adminCtx.college_id || "",
+    status: "ACTIVE",
+    valid_from,
+    valid_to,
+    created_at: serverTimestamp(),
+    created_by_admin: adminCtx.admin_id || ""
+  }, { merge: true });
+
+  // ✅ 3) signout secondary (important)
+  await signOut(secondaryAuth);
+
+  return cred.user.uid;
+}
