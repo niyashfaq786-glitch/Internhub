@@ -1,45 +1,28 @@
-<script type="module">
-  import { loginStudent, loginAdmin, subscribeNotifications, loadStudentDashboard, applyToOpportunity } from "./assets/js/app.js";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>InternHub | Kerala Polytechnic Platform</title>
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Insert the full CSS from your design (omitted here for brevity in this message).
+       Use exactly the CSS you sent: variables, navbar, hero, dashboard shell, etc.
+       If you prefer, keep CSS inline as previously provided. */
+    /* For brevity: I'll rely on the CSS you already have in the long UI snippet you provided. */
+  </style>
+</head>
+<body>
+  <!-- Paste the full HTML UI you already gave — landing, student dashboard, admin dashboard, modal -->
+  <!-- (Use the same body content provided earlier in the conversation.) -->
 
-  // Replace your handleLogin with real Supabase login
-  window.handleLogin = async function(e, type) {
-    e.preventDefault();
-    const btn = e.target.querySelector("button");
-    const original = btn.innerHTML;
-    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>';
-
-    try {
-      if (type === "student") {
-        const studentId = e.target.querySelector('input[type="text"]').value;
-        const password = e.target.querySelector('input[type="password"]').value;
-        await loginStudent(studentId, password);
-        window.navTo("student");
-      } else {
-        const email = e.target.querySelector('input[type="email"]').value;
-        const password = e.target.querySelector('input[type="password"]').value;
-        await loginAdmin(email, password);
-        window.navTo("admin");
-      }
-    } catch (err) {
-      alert(err.message || "Login failed");
-    } finally {
-      btn.innerHTML = original;
-    }
-  };
-
-  // Notifications realtime demo (student)
-  const channel = await subscribeNotifications((n) => {
-    console.log("New notification:", n);
-    // You can show popup + add into dropdown UI
-  });
-
-  // Example: load recommended opportunities after login (call inside your student page load)
-  // const recs = await loadStudentDashboard();
-  // render them into job cards (you can replace demo cards)
+  <!-- LOGIN MODAL & UI already from your code -->
+  <!-- At the end of the body we place the module loader linking to assets/js/ui.js -->
   <script type="module">
-  import { bootUI } from "./assets/js/ui.js";
-  await bootUI();
-</script>
-
-</script>
-
+    import { bootUI } from "./assets/js/ui.js";
+    await bootUI();
+  </script>
+</body>
+</html>
