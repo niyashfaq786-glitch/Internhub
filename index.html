@@ -1,0 +1,39 @@
+<script type="module">
+  import { loginStudent, loginAdmin, subscribeNotifications, loadStudentDashboard, applyToOpportunity } from "./assets/js/app.js";
+
+  // Replace your handleLogin with real Supabase login
+  window.handleLogin = async function(e, type) {
+    e.preventDefault();
+    const btn = e.target.querySelector("button");
+    const original = btn.innerHTML;
+    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>';
+
+    try {
+      if (type === "student") {
+        const studentId = e.target.querySelector('input[type="text"]').value;
+        const password = e.target.querySelector('input[type="password"]').value;
+        await loginStudent(studentId, password);
+        window.navTo("student");
+      } else {
+        const email = e.target.querySelector('input[type="email"]').value;
+        const password = e.target.querySelector('input[type="password"]').value;
+        await loginAdmin(email, password);
+        window.navTo("admin");
+      }
+    } catch (err) {
+      alert(err.message || "Login failed");
+    } finally {
+      btn.innerHTML = original;
+    }
+  };
+
+  // Notifications realtime demo (student)
+  const channel = await subscribeNotifications((n) => {
+    console.log("New notification:", n);
+    // You can show popup + add into dropdown UI
+  });
+
+  // Example: load recommended opportunities after login (call inside your student page load)
+  // const recs = await loadStudentDashboard();
+  // render them into job cards (you can replace demo cards)
+</script>
