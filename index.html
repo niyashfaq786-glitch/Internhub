@@ -1,28 +1,1577 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>InternHub | Kerala Polytechnic Platform</title>
+
   <!-- Fonts & Icons -->
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Supabase + SheetJS (Excel) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
   <style>
-    /* Insert the full CSS from your design (omitted here for brevity in this message).
-       Use exactly the CSS you sent: variables, navbar, hero, dashboard shell, etc.
-       If you prefer, keep CSS inline as previously provided. */
-    /* For brevity: I'll rely on the CSS you already have in the long UI snippet you provided. */
+    /* --- CSS VARIABLES --- */
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1e40af;
+      --secondary: #0f172a;
+      --accent: #0ea5e9;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+
+      --bg-body: #f8fafc;
+      --surface: #ffffff;
+      --surface-glass: rgba(255, 255, 255, 0.9);
+
+      --border: #e2e8f0;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+
+      --radius-md: 12px;
+      --radius-lg: 20px;
+      --radius-full: 9999px;
+    }
+
+    /* --- GLOBAL RESET --- */
+    * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-body); color: var(--secondary); line-height: 1.5; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+    a { text-decoration: none; color: inherit; }
+    button { cursor: pointer; font-family: inherit; border: none; background: none; }
+    .hidden { display: none !important; }
+    .flex { display: flex; }
+    .grid { display: grid; }
+    .text-gradient { background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+    /* --- BACKGROUND --- */
+    .ambient-bg { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+    .blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.4; }
+    .blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: #dbeafe; }
+    .blob-2 { bottom: -10%; right: -10%; width: 40vw; height: 40vw; background: #dcfce7; }
+
+    /* --- NAVBAR --- */
+    .navbar {
+      position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+      width: calc(100% - 40px); max-width: 1200px; height: 70px;
+      background: var(--surface-glass); backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.8); border-radius: var(--radius-full);
+      box-shadow: var(--shadow-sm); z-index: 1000;
+      display: flex; align-items: center; justify-content: space-between; padding: 0 24px;
+    }
+    .nav-logo { font-weight: 800; font-size: 1.25rem; display: flex; align-items: center; gap: 10px; }
+    .nav-logo i { color: var(--primary); }
+
+    .btn { padding: 10px 24px; border-radius: var(--radius-full); font-weight: 600; font-size: 0.9rem; transition: 0.3s; display: inline-flex; align-items: center; gap: 8px; }
+    .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4); }
+    .btn-secondary { background: white; color: var(--secondary); border: 1px solid var(--border); }
+    .btn-sm { padding: 6px 16px; font-size: 0.85rem; }
+
+    /* --- LANDING PAGE --- */
+    .hero-section { padding-top: 140px; padding-bottom: 60px; text-align: center; position: relative; overflow: hidden; }
+    .hero-title { font-size: 3.5rem; line-height: 1.1; font-weight: 800; margin-bottom: 24px; letter-spacing: -1px; position: relative; z-index: 2; }
+    .hero-desc { font-size: 1.25rem; color: #64748b; max-width: 700px; margin: 0 auto 40px auto; position: relative; z-index: 2; }
+
+    /* --- NEW: FLOATING BACKGROUND ICONS --- */
+    .bg-icon { position: absolute; font-size: 4rem; color: var(--primary); opacity: 0.05; z-index: 1; }
+    .icon-1 { top: 15%; left: 10%; animation: floatIcon 8s infinite ease-in-out; }
+    .icon-2 { top: 25%; right: 15%; animation: floatIcon 9s infinite ease-in-out 1s; }
+    .icon-3 { bottom: 20%; left: 20%; animation: floatIcon 10s infinite ease-in-out 2s; }
+    .icon-4 { bottom: 30%; right: 10%; animation: floatIcon 7s infinite ease-in-out 0.5s; }
+
+    @keyframes floatIcon {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-30px) rotate(5deg); }
+    }
+
+    /* --- NEW: ANIMATION FRAME SECTION --- */
+    .animation-frame-container {
+      max-width: 1000px; margin: 0 auto 80px auto; padding: 40px;
+      background: white; border-radius: 24px; border: 1px solid var(--border);
+      box-shadow: var(--shadow-lg); position: relative; overflow: hidden;
+    }
+    .tech-grid {
+      position: absolute; inset: 0;
+      background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 30px 30px; opacity: 0.3; z-index: 0;
+      animation: moveGrid 20s linear infinite;
+    }
+    @keyframes moveGrid { 0% { transform: translateY(0); } 100% { transform: translateY(30px); } }
+
+    .process-title { text-align: center; font-size: 1.5rem; font-weight: 700; margin-bottom: 40px; position: relative; z-index: 1; }
+
+    .anim-steps { display: flex; justify-content: space-between; position: relative; z-index: 1; }
+    .anim-step { position: relative; z-index: 2; text-align: center; width: 150px; }
+    .anim-icon-box {
+      width: 50px; height: 50px; background: white; border: 2px solid var(--primary);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px auto; font-size: 1.2rem; color: var(--primary);
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2); transition: all 0.3s;
+    }
+    .step-1 .anim-icon-box { animation: pulseIcon 4s infinite ease-in-out; animation-delay: 0s; }
+    .step-2 .anim-icon-box { animation: pulseIcon 4s infinite ease-in-out; animation-delay: 1s; }
+    .step-3 .anim-icon-box { animation: pulseIcon 4s infinite ease-in-out; animation-delay: 2s; }
+    .step-4 .anim-icon-box { animation: pulseIcon 4s infinite ease-in-out; animation-delay: 3s; }
+
+    .anim-text { font-weight: 600; font-size: 0.9rem; opacity: 0; transform: translateY(10px); animation: fadeUpText 4s infinite; }
+    .step-1 .anim-text { animation-delay: 0.2s; }
+    .step-2 .anim-text { animation-delay: 1.2s; }
+    .step-3 .anim-text { animation-delay: 2.2s; }
+    .step-4 .anim-text { animation-delay: 3.2s; }
+
+    @keyframes pulseIcon { 0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); } 50% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); } }
+    @keyframes fadeUpText { 0%, 10% { opacity: 0; transform: translateY(10px); } 20%, 80% { opacity: 1; transform: translateY(0); } 90%, 100% { opacity: 0; transform: translateY(-10px); } }
+
+    /* --- FEATURES WITH ENTRANCE ANIMATION --- */
+    .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; padding-bottom: 80px; max-width: 1200px; margin: 0 auto; padding-left: 20px; padding-right: 20px; }
+    .feat-card {
+      background: white; padding: 30px; border-radius: var(--radius-lg); border: 1px solid var(--border);
+      transition: 0.3s;
+      animation: slideUp 0.6s ease-out backwards;
+    }
+    .feat-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); border-color: var(--primary); }
+
+    .feat-card:nth-child(1) { animation-delay: 0.1s; }
+    .feat-card:nth-child(2) { animation-delay: 0.2s; }
+    .feat-card:nth-child(3) { animation-delay: 0.3s; }
+    .feat-card:nth-child(4) { animation-delay: 0.4s; }
+
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    .feat-icon { width: 50px; height: 50px; background: #eff6ff; color: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; margin-bottom: 16px; }
+
+    /* --- DASHBOARD SHELL --- */
+    .app-shell { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; padding-top: 100px; gap: 32px; max-width: 1400px; margin: 0 auto; padding-left: 24px; padding-right: 24px; }
+
+    .sidebar { position: sticky; top: 100px; height: fit-content; background: white; padding: 24px; border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
+    .sidebar-brand { font-weight: 800; font-size: 1.2rem; margin-bottom: 30px; padding-left: 12px; display: flex; align-items: center; gap: 10px; }
+    .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; margin-bottom: 6px; border-radius: 10px; color: #64748b; font-weight: 600; transition: 0.2s; cursor: pointer; user-select:none; }
+    .nav-item:hover, .nav-item.active { background: #eff6ff; color: var(--primary); }
+    .nav-item.active { background: #dbeafe; }
+
+    .main-content { display: flex; flex-direction: column; gap: 24px; }
+    .dash-card { background: white; padding: 24px; border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
+    .dash-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
+
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+    .stat-box { background: #f8fafc; padding: 20px; border-radius: 16px; border: 1px solid var(--border); }
+    .stat-num { font-size: 2rem; font-weight: 800; color: var(--secondary); }
+    .stat-label { font-size: 0.9rem; color: #64748b; font-weight: 500; }
+
+    /* Job Cards */
+    .job-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
+    .job-card { background: white; border: 1px solid var(--border); border-radius: 20px; padding: 24px; transition: 0.3s; position: relative; overflow: hidden; }
+    .job-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: #93c5fd; }
+
+    .match-score {
+      position: absolute; top: 20px; right: 20px; background: #f0fdf4; color: #166534; font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: 20px; border: 1px solid #bbf7d0;
+      animation: badgePulse 2s infinite;
+    }
+    @keyframes badgePulse { 0% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.4); } 70% { box-shadow: 0 0 0 6px rgba(22, 163, 74, 0); } 100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); } }
+
+    .job-title { font-size: 1.1rem; font-weight: 700; margin: 12px 0 4px 0; }
+    .tag { padding: 4px 10px; background: #f1f5f9; border-radius: 6px; font-size: 0.75rem; font-weight: 600; color: var(--secondary); margin-right: 6px; display: inline-block; margin-bottom:6px; }
+
+    /* Application Tracker */
+    .tracker-card { background: white; border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 16px; }
+    @media(min-width: 768px) { .tracker-card { flex-direction: row; align-items: center; justify-content: space-between; } }
+    .timeline { display: flex; align-items: center; gap: 8px; min-width: 300px; }
+    .step { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+    .step-dot { width: 12px; height: 12px; border-radius: 50%; background: #e2e8f0; border: 2px solid white; box-shadow: 0 0 0 2px #e2e8f0; transition: 0.3s; }
+    .step.active .step-dot { background: var(--primary); box-shadow: 0 0 0 2px var(--primary); }
+    .step.completed .step-dot { background: var(--success); box-shadow: 0 0 0 2px var(--success); }
+    .step-line { height: 2px; background: #e2e8f0; flex: 1; margin-bottom: 10px; }
+    .step.completed + .step-line, .step.active + .step-line { background: var(--success); }
+    .step-label { font-size: 0.7rem; font-weight: 600; color: #64748b; text-transform: uppercase; }
+    .step.active .step-label { color: var(--primary); }
+
+    /* Tables */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 16px; font-size: 0.75rem; text-transform: uppercase; color: #64748b; background: #f8fafc; border-bottom: 1px solid var(--border); }
+    td { padding: 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    .user-cell { display: flex; align-items: center; gap: 12px; }
+    .avatar { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; background: #e2e8f0; }
+    .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; display:inline-flex; align-items:center; gap:6px; }
+    .sb-active { background: #dcfce7; color: #166534; }
+    .sb-expired { background: #fee2e2; color: #991b1b; }
+    .sb-inactive { background: #ffedd5; color: #9a3412; }
+    .sb-pending { background: #fef9c3; color: #854d0e; }
+    .sb-selected { background: #dbeafe; color: #1e40af; }
+
+    /* Role & Notifs */
+    .role-selector { display: flex; align-items: center; gap: 8px; background: #f1f5f9; padding: 6px 12px; border-radius: 8px; }
+    .role-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); }
+    .notif-bell { position: relative; cursor: pointer; }
+    .notif-badge { position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; background: var(--danger); border-radius: 50%; border: 2px solid white; display:none; }
+    .notif-dropdown { position: absolute; top: 60px; right: 0; width: 340px; max-height: 360px; overflow:auto; background: white; border-radius: 12px; box-shadow: var(--shadow-lg); border: 1px solid var(--border); display: none; z-index: 2000; }
+    .notif-dropdown.show { display: block; }
+    .notif-item { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
+    .notif-item small{ color:#64748b; display:block; margin-top:4px; }
+
+    /* Login Modal */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.4); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 3000; opacity: 0; transition: opacity 0.3s; }
+    .modal-overlay.open { display: flex; opacity: 1; }
+    .modal-box { background: white; width: 420px; max-width: calc(100% - 28px); padding: 40px; border-radius: 24px; box-shadow: 0 20px 50px -10px rgba(0,0,0,0.15); transform: scale(0.9); transition: transform 0.3s; position: relative; }
+    .modal-overlay.open .modal-box { transform: scale(1); }
+    .auth-tabs { display: flex; background: #f1f5f9; padding: 4px; border-radius: 12px; margin-bottom: 24px; }
+    .auth-tab { flex: 1; padding: 10px; text-align: center; border-radius: 8px; font-weight: 600; color: #64748b; }
+    .auth-tab.active { background: white; color: var(--primary); box-shadow: var(--shadow-sm); }
+    .input-field { width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 16px; font-family: inherit; }
+
+    /* Toast */
+    .toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); background: rgba(15,23,42,0.95); color: #fff; padding: 10px 14px; border-radius: 999px; box-shadow: var(--shadow-lg); z-index: 5000; display:none; font-weight:600; }
+    .toast.show{ display:block; }
+
+    /* Utilities (your UI uses these words but doesn't define them) */
+    .items-center{align-items:center}
+    .justify-between{justify-content:space-between}
+    .gap-2{gap:8px}
+    .gap-4{gap:16px}
+    .flex-wrap{flex-wrap:wrap}
+    .mb-4{margin-bottom:16px}
+    .mt-2{margin-top:8px}
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .navbar { top: 0; width: 100%; border-radius: 0; }
+      .app-shell { grid-template-columns: 1fr; padding-top: 80px; }
+      .sidebar { display: none; }
+      .hero-title { font-size: 2.2rem; }
+      .anim-steps { flex-direction: column; gap: 40px; }
+    }
   </style>
 </head>
-<body>
-  <!-- Paste the full HTML UI you already gave — landing, student dashboard, admin dashboard, modal -->
-  <!-- (Use the same body content provided earlier in the conversation.) -->
 
-  <!-- LOGIN MODAL & UI already from your code -->
-  <!-- At the end of the body we place the module loader linking to assets/js/ui.js -->
-  <script type="module">
-    import { bootUI } from "./assets/js/ui.js";
-    await bootUI();
+<body>
+  <!-- Background Ambient Light -->
+  <div class="ambient-bg">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+  </div>
+
+  <!-- PERSISTENT NAVBAR -->
+  <nav class="navbar">
+    <a href="#" class="nav-logo" onclick="navTo('landing')">
+      <i class="fa-solid fa-graduation-cap"></i> InternHub
+    </a>
+    <div class="flex items-center" style="gap: 20px;">
+      <button class="btn btn-secondary btn-sm" onclick="openModal('student')">Student</button>
+      <button class="btn btn-primary btn-sm" onclick="openModal('admin')">Admin</button>
+      <button class="btn btn-secondary btn-sm hidden" id="btnLogoutTop" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+    </div>
+  </nav>
+
+  <!-- =======================
+       PAGE 1: LANDING PAGE
+  ======================== -->
+  <main id="page-landing">
+    <i class="fa-solid fa-robot bg-icon icon-1"></i>
+    <i class="fa-solid fa-briefcase bg-icon icon-2"></i>
+    <i class="fa-solid fa-graduation-cap bg-icon icon-3"></i>
+    <i class="fa-solid fa-microchip bg-icon icon-4"></i>
+
+    <div class="container hero-section">
+      <div style="display: inline-block; padding: 6px 16px; background: #dbeafe; color: var(--primary); border-radius: 20px; font-weight: 600; font-size: 0.85rem; margin-bottom: 20px;">
+        <i class="fa-solid fa-check-circle"></i> Official Partner: Kerala Polytechnics
+      </div>
+      <h1 class="hero-title">AI-Powered Career Platform for <br><span class="text-gradient">Diploma Students</span></h1>
+      <p class="hero-desc">InternHub connects Kerala Polytechnic students with global internships and scholarships through AI-driven matching, automated web scraping, and real-time tracking.</p>
+    </div>
+
+    <div class="container">
+      <div class="animation-frame-container">
+        <div class="tech-grid"></div>
+        <h3 class="process-title">How InternHub Works</h3>
+
+        <div class="anim-steps">
+          <div class="anim-step step-1">
+            <div class="anim-icon-box"><i class="fa-solid fa-id-card"></i></div>
+            <div class="anim-text">1. Login with ID</div>
+          </div>
+          <div class="anim-step step-2">
+            <div class="anim-icon-box"><i class="fa-solid fa-brain"></i></div>
+            <div class="anim-text">2. AI Analysis</div>
+          </div>
+          <div class="anim-step step-3">
+            <div class="anim-icon-box"><i class="fa-solid fa-link"></i></div>
+            <div class="anim-text">3. Auto Match</div>
+          </div>
+          <div class="anim-step step-4">
+            <div class="anim-icon-box"><i class="fa-solid fa-briefcase"></i></div>
+            <div class="anim-text">4. Get Hired</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container feature-grid">
+      <div class="feat-card">
+        <div class="feat-icon"><i class="fa-solid fa-brain"></i></div>
+        <h3>AI Recommendation</h3>
+        <p style="font-size: 0.9rem; color: #64748b;">Matches based on Branch, Skills, and College rules.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon"><i class="fa-solid fa-globe"></i></div>
+        <h3>Automated Scraping</h3>
+        <p style="font-size: 0.9rem; color: #64748b;">Daily automated updates from trusted global sources.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon"><i class="fa-solid fa-clipboard-check"></i></div>
+        <h3>Application Tracker</h3>
+        <p style="font-size: 0.9rem; color: #64748b;">Real-time status updates from Submitted to Selected.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon"><i class="fa-solid fa-building-columns"></i></div>
+        <h3>Multi-College</h3>
+        <p style="font-size: 0.9rem; color: #64748b;">Unified platform for all Kerala Polytechnic institutions.</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- =======================
+       PAGE 2: STUDENT DASHBOARD
+  ======================== -->
+  <main id="page-student" class="hidden">
+    <div class="app-shell">
+
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <i class="fa-solid fa-graduation-cap" style="color: var(--primary);"></i> Student Hub
+        </div>
+        <ul>
+          <li class="nav-item active" onclick="switchTab('std', 'home', event)"><i class="fa-solid fa-house"></i> Dashboard</li>
+          <li class="nav-item" onclick="switchTab('std', 'apps', event)"><i class="fa-solid fa-file-contract"></i> Applications</li>
+          <li class="nav-item" onclick="switchTab('std', 'profile', event)"><i class="fa-solid fa-user"></i> My Profile</li>
+          <li class="nav-item" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</li>
+        </ul>
+      </aside>
+
+      <div class="main-content">
+        <!-- Header -->
+        <div class="dash-card">
+          <div class="flex justify-between items-center flex-wrap gap-4">
+            <div>
+              <h2 style="font-size: 1.5rem; font-weight: 700;" id="stdWelcome">Welcome back</h2>
+              <p style="color: #64748b;" id="stdMeta">—</p>
+            </div>
+            <div class="flex items-center gap-4">
+              <span class="status-badge sb-active" id="stdAccountBadge">Account Active</span>
+              <div class="notif-bell" onclick="toggleNotif(event)">
+                <i class="fa-regular fa-bell" style="font-size: 1.2rem;"></i>
+                <span class="notif-badge" id="stdNotifDot"></span>
+                <div class="notif-dropdown" id="std-notif"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: HOME (AI JOBS) -->
+        <div id="std-home">
+          <div class="dash-header">
+            <h3 style="margin-bottom: 0;"><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--accent);"></i> AI Recommended for You</h3>
+            <div class="flex gap-2">
+              <input id="stdSearch" class="input-field" style="margin:0; max-width:320px;" placeholder="Search opportunities...">
+              <select id="stdType" class="input-field" style="margin:0; max-width:220px;">
+                <option value="ALL">All</option>
+                <option value="INTERNSHIP">Internships</option>
+                <option value="SCHOLARSHIP">Scholarships</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="job-grid" id="stdOppGrid"></div>
+        </div>
+
+        <!-- TAB: APPLICATIONS (TRACKER) -->
+        <div id="std-apps" class="hidden">
+          <div class="dash-header">
+            <h3 style="margin-bottom: 0;">Application Tracker</h3>
+          </div>
+          <div id="stdAppsWrap"></div>
+        </div>
+
+        <!-- TAB: PROFILE -->
+        <div id="std-profile" class="hidden">
+          <div class="dash-card">
+            <div class="flex gap-4 mb-4 items-center">
+              <img id="stdAvatar" src="" class="avatar" style="border-radius: 50%; width: 80px; height: 80px;">
+              <div>
+                <h2 style="font-size: 1.5rem;" id="stdName">—</h2>
+                <p style="color: #64748b;" id="stdIdBranch">—</p>
+              </div>
+            </div>
+
+            <div class="dash-header" style="margin-bottom:12px;">
+              <h3 style="margin:0;">Edit Profile</h3>
+              <button class="btn btn-secondary btn-sm" onclick="saveStudentProfile()"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+            </div>
+
+            <label style="font-size:0.85rem; font-weight:700; color:#64748b; display:block; margin-bottom:6px;">Full Name</label>
+            <input id="pName" class="input-field" placeholder="Full name">
+
+            <label style="font-size:0.85rem; font-weight:700; color:#64748b; display:block; margin-bottom:6px;">Skills (comma)</label>
+            <input id="pSkills" class="input-field" placeholder="Python, Java, React, SQL">
+
+            <label style="font-size:0.85rem; font-weight:700; color:#64748b; display:block; margin-bottom:6px;">Photo URL (optional)</label>
+            <input id="pPhoto" class="input-field" placeholder="https://...">
+
+            <label style="font-size:0.85rem; font-weight:700; color:#64748b; display:block; margin-bottom:6px;">Resume URL (optional)</label>
+            <input id="pResume" class="input-field" placeholder="https://...">
+
+            <div style="margin-top:12px;">
+              <h4 style="margin-bottom: 10px;">Skills Preview</h4>
+              <div id="stdSkillTags"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- =======================
+       PAGE 3: ADMIN DASHBOARD
+  ======================== -->
+  <main id="page-admin" class="hidden">
+    <div class="app-shell">
+
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <i class="fa-solid fa-shield-halved" style="color: var(--primary);"></i> Admin Console
+        </div>
+        <ul>
+          <li class="nav-item active" onclick="switchTab('adm', 'overview', event)"><i class="fa-solid fa-chart-line"></i> Dashboard</li>
+          <li class="nav-item" onclick="switchTab('adm', 'students', event)"><i class="fa-solid fa-users"></i> Students</li>
+          <li class="nav-item" onclick="switchTab('adm', 'apps', event)"><i class="fa-solid fa-file-circle-check"></i> Applications</li>
+          <li class="nav-item" onclick="switchTab('adm', 'ops', event)"><i class="fa-solid fa-briefcase"></i> Opportunities</li>
+          <li class="nav-item" onclick="logout()"><i class="fa-solid fa-power-off"></i> Logout</li>
+        </ul>
+      </aside>
+
+      <div class="main-content">
+        <div class="dash-card">
+          <div class="flex justify-between items-center">
+            <div>
+              <h2 style="font-size: 1.5rem; font-weight: 700;">Admin Dashboard</h2>
+              <p style="color: #64748b; font-size: 0.9rem;" id="admScopeText">Managing —</p>
+            </div>
+            <div class="role-selector">
+              <div class="role-dot" id="admRoleDot"></div>
+              <span style="font-weight: 600; font-size: 0.9rem;" id="admRoleText">—</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: OVERVIEW -->
+        <div id="adm-overview">
+          <div class="stats-row" id="admStatsRow"></div>
+        </div>
+
+        <!-- TAB: STUDENTS -->
+        <div id="adm-students" class="hidden">
+          <div class="dash-header">
+            <h3>Student Management</h3>
+            <div class="flex gap-2 items-center">
+              <input id="admStuSearch" class="input-field" style="margin:0; max-width:260px;" placeholder="Search by ID / name">
+              <select id="admDeptFilter" class="input-field" style="margin:0; max-width:220px;">
+                <option value="ALL">All Departments</option>
+              </select>
+              <select id="admStatusFilter" class="input-field" style="margin:0; max-width:200px;">
+                <option value="ALL">All Status</option>
+                <option value="ACTIVE">ACTIVE</option>
+                <option value="INACTIVE">INACTIVE</option>
+                <option value="EXPIRED">EXPIRED</option>
+              </select>
+              <button class="btn btn-primary btn-sm" onclick="openExcelPicker()"><i class="fa-solid fa-file-excel"></i> Upload Excel</button>
+              <input type="file" id="excelFile" class="hidden" accept=".xlsx,.xls,.csv">
+            </div>
+          </div>
+
+          <div class="dash-card table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  <th>ID / Branch</th>
+                  <th>Status</th>
+                  <th>Expiry</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="admStudentsBody"></tbody>
+            </table>
+          </div>
+
+          <div class="dash-card" style="margin-top:16px;">
+            <div class="dash-header" style="margin-bottom:12px;">
+              <h3 style="margin:0;">Upload Result</h3>
+              <button class="btn btn-secondary btn-sm" onclick="clearUploadResult()"><i class="fa-solid fa-broom"></i> Clear</button>
+            </div>
+            <div id="admUploadResult" style="color:#64748b;"></div>
+          </div>
+        </div>
+
+        <!-- TAB: APPLICATIONS -->
+        <div id="adm-apps" class="hidden">
+          <div class="dash-header">
+            <h3>Application Management</h3>
+          </div>
+          <div class="dash-card table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Applicant</th>
+                  <th>Opportunity</th>
+                  <th>Current Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="admAppsBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB: OPPORTUNITIES -->
+        <div id="adm-ops" class="hidden">
+          <div class="dash-header">
+            <h3>Opportunity Management</h3>
+            <button class="btn btn-primary btn-sm" onclick="openOppModal()"><i class="fa-solid fa-plus"></i> Add Manual</button>
+          </div>
+
+          <div class="dash-card" style="margin-bottom:16px;">
+            <div class="flex gap-2 items-center flex-wrap">
+              <input id="admOppSearch" class="input-field" style="margin:0; max-width:320px;" placeholder="Search opportunities...">
+              <select id="admOppType" class="input-field" style="margin:0; max-width:220px;">
+                <option value="ALL">All</option>
+                <option value="INTERNSHIP">Internships</option>
+                <option value="SCHOLARSHIP">Scholarships</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="dash-card table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Type</th>
+                  <th>Source</th>
+                  <th>Valid Until</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="admOppBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- =======================
+       LOGIN MODAL
+  ======================== -->
+  <div id="login-modal" class="modal-overlay">
+    <div class="modal-box">
+      <button onclick="closeModal()" style="position: absolute; top: 20px; right: 20px; font-size: 1.2rem; color: #64748b;"><i class="fa-solid fa-xmark"></i></button>
+      <h2 style="text-align: center; margin-bottom: 24px;">Login to InternHub</h2>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="t-student" onclick="switchAuthType('student')">Student</button>
+        <button class="auth-tab" id="t-admin" onclick="switchAuthType('admin')">Admin</button>
+      </div>
+
+      <!-- Student Form -->
+      <form id="f-student" onsubmit="handleLogin(event, 'student')">
+        <label style="font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; display: block;">Student ID (Auto-converts to email)</label>
+        <div style="position: relative; margin-bottom: 16px;">
+          <i class="fa-solid fa-id-card" style="position: absolute; left: 12px; top: 13px; color: #94a3b8;"></i>
+          <input type="text" class="input-field" id="studentId" placeholder="e.g., S101" style="padding-left: 36px;" required>
+        </div>
+        <div style="position: relative; margin-bottom: 20px;">
+          <i class="fa-solid fa-lock" style="position: absolute; left: 12px; top: 13px; color: #94a3b8;"></i>
+          <input type="password" class="input-field" id="studentPass" placeholder="Password" style="padding-left: 36px;" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;"><span id="studentBtnText">Login</span></button>
+      </form>
+
+      <!-- Admin Form -->
+      <form id="f-admin" class="hidden" onsubmit="handleLogin(event, 'admin')">
+        <div style="position: relative; margin-bottom: 16px;">
+          <i class="fa-solid fa-envelope" style="position: absolute; left: 12px; top: 13px; color: #94a3b8;"></i>
+          <input type="email" class="input-field" id="adminEmail" placeholder="Admin Email" style="padding-left: 36px;" required>
+        </div>
+        <div style="position: relative; margin-bottom: 20px;">
+          <i class="fa-solid fa-lock" style="position: absolute; left: 12px; top: 13px; color: #94a3b8;"></i>
+          <input type="password" class="input-field" id="adminPass" placeholder="Password" style="padding-left: 36px;" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;"><span id="adminBtnText">Login</span></button>
+        <div style="margin-top:12px; text-align:center;">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="openAdminRequest()">Request Admin Access</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =======================
+       ADMIN: Add Opportunity Modal (simple)
+  ======================== -->
+  <div id="opp-modal" class="modal-overlay">
+    <div class="modal-box">
+      <button onclick="closeOppModal()" style="position: absolute; top: 20px; right: 20px; font-size: 1.2rem; color: #64748b;"><i class="fa-solid fa-xmark"></i></button>
+      <h2 style="text-align:center; margin-bottom:18px;">Add Opportunity (Manual)</h2>
+
+      <label style="font-size:0.85rem; font-weight:700; color:#64748b; display:block; margin-bottom:6px;">Type</label>
+      <select id="oppTypeNew" class="input-field">
+        <option value="INTERNSHIP">INTERNSHIP</option>
+        <option value="SCHOLARSHIP">SCHOLARSHIP</option>
+      </select>
+
+      <label style="font-size:0.85rem; font-weight:700; color:#64748b; display:block; margin-bottom:6px;">Title</label>
+      <input id="oppTitleNew" class="input-field" placeholder="Opportunity title">
+
+      <label style="font-size:0.85rem; font-weight:700; color:#64748b; display:block; margin-bottom:6px;">Description</label>
+      <input id="oppDescNew" class="input-field" placeholder="Short description">
+
+      <label style="font-size:0.85rem; font-weight:700; color:#64748b; display:block; margin-bottom:6px;">Skills Tags (comma)</label>
+      <input id="oppSkillsNew" class="input-field" placeholder="Python, SQL, Web">
+
+      <label style="font-size:0.85rem; font-weight:700; color:#64748b; display:block; margin-bottom:6px;">Location</label>
+      <input id="oppLocNew" class="input-field" placeholder="Kochi / Remote">
+
+      <label style="font-size:0.85rem; font-weight:700; color:#64748b; display:block; margin-bottom:6px;">Valid Until (YYYY-MM-DD)</label>
+      <input id="oppUntilNew" class="input-field" placeholder="2026-06-30">
+
+      <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="createOpportunity()"><i class="fa-solid fa-plus"></i> Create</button>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- =======================
+       JAVASCRIPT (Supabase Wiring)
+  ======================== -->
+  <script>
+    /***************
+     * CONFIG
+     * Put your values here (ONLY ANON KEY!)
+     ***************/
+    const SUPABASE_URL = "https://zyssuxxppcqsiwayptwo.supabase.co";
+    const SUPABASE_ANON_KEY = "PASTE_YOUR_ANON_KEY_HERE"; // ✅ publishable/anon only
+
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    /***************
+     * HELPERS
+     ***************/
+    const $ = (q) => document.querySelector(q);
+
+    function toast(msg){
+      const t = $("#toast");
+      t.textContent = msg;
+      t.classList.add("show");
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(()=>t.classList.remove("show"), 2600);
+    }
+
+    function escapeHtml(s){
+      return String(s ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function studentIdToEmail(id){
+      return String(id).trim().toLowerCase() + "@internhub.com";
+    }
+
+    function todayISO(){
+      return new Date().toISOString().slice(0,10);
+    }
+
+    function badgeClassFromStatus(s){
+      if(s === "ACTIVE") return "sb-active";
+      if(s === "EXPIRED") return "sb-expired";
+      if(s === "INACTIVE") return "sb-inactive";
+      return "sb-pending";
+    }
+
+    function setTopLogout(visible){
+      $("#btnLogoutTop").classList.toggle("hidden", !visible);
+    }
+
+    /***************
+     * PAGE NAV
+     ***************/
+    function navTo(pageId) {
+      document.querySelectorAll("main").forEach(el => el.classList.add("hidden"));
+      document.getElementById("page-" + pageId).classList.remove("hidden");
+      closeModal();
+      closeOppModal();
+      window.scrollTo(0,0);
+    }
+
+    /***************
+     * DASHBOARD TABS
+     ***************/
+    function switchTab(role, tabId, ev) {
+      const prefix = role === "std" ? "std" : "adm";
+      document.querySelectorAll(`[id^="${prefix}-"]`).forEach(el => el.classList.add("hidden"));
+      document.getElementById(prefix + "-" + tabId).classList.remove("hidden");
+
+      const mainEl = document.getElementById(`page-${role === "std" ? "student" : "admin"}`);
+      mainEl.querySelectorAll(".nav-item").forEach(item => item.classList.remove("active"));
+      if (ev && ev.currentTarget) ev.currentTarget.classList.add("active");
+    }
+
+    /***************
+     * MODAL
+     ***************/
+    function openModal(type) {
+      $("#login-modal").classList.add("open");
+      if(type) switchAuthType(type);
+    }
+    function closeModal() { $("#login-modal").classList.remove("open"); }
+
+    function switchAuthType(type) {
+      $("#t-student").classList.toggle("active", type === "student");
+      $("#t-admin").classList.toggle("active", type === "admin");
+      $("#f-student").classList.toggle("hidden", type !== "student");
+      $("#f-admin").classList.toggle("hidden", type !== "admin");
+    }
+
+    /***************
+     * NOTIFICATIONS UI
+     ***************/
+    function toggleNotif(ev) {
+      const dd = $("#std-notif");
+      dd.classList.toggle("show");
+      if(ev) ev.stopPropagation();
+    }
+
+    window.addEventListener("click", (ev) => {
+      const dd = $("#std-notif");
+      if (dd && dd.classList.contains("show") && !ev.target.closest(".notif-bell")) dd.classList.remove("show");
+      const modal = $("#login-modal");
+      if (ev.target === modal) closeModal();
+      const oppModal = $("#opp-modal");
+      if (ev.target === oppModal) closeOppModal();
+    });
+
+    /***************
+     * AUTH + ROUTING
+     ***************/
+    let currentProfile = null;
+
+    async function loadMyProfile(){
+      const { data: { user } } = await sb.auth.getUser();
+      if(!user) return null;
+
+      const { data, error } = await sb
+        .from("profiles")
+        .select("*")
+        .eq("user_id", user.id)
+        .single();
+
+      if(error) throw error;
+      return data;
+    }
+
+    function enforceStudentValidity(p){
+      const t = todayISO();
+      const within = (!p.valid_from || p.valid_from <= t) && (!p.valid_to || p.valid_to >= t);
+      if(p.status !== "ACTIVE" || !within) throw new Error("Account is not ACTIVE or validity expired.");
+    }
+
+    async function postLoginRoute(){
+      currentProfile = await loadMyProfile();
+      if(!currentProfile) throw new Error("Profile not found. Contact Admin.");
+
+      setTopLogout(true);
+
+      if(currentProfile.role === "STUDENT"){
+        enforceStudentValidity(currentProfile);
+        await loadStudentAll();
+        navTo("student");
+      } else {
+        await loadAdminAll();
+        navTo("admin");
+      }
+      closeModal();
+      toast("Login success");
+    }
+
+    async function handleLogin(e, type) {
+      e.preventDefault();
+      const btn = e.target.querySelector("button");
+      const original = btn.innerHTML;
+      btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>';
+
+      try{
+        if(type === "student"){
+          const sid = $("#studentId").value;
+          const pass = $("#studentPass").value;
+          const email = studentIdToEmail(sid);
+
+          const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+          if(error) throw error;
+
+          await postLoginRoute();
+        } else {
+          const email = $("#adminEmail").value;
+          const pass = $("#adminPass").value;
+
+          const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+          if(error) throw error;
+
+          await postLoginRoute();
+        }
+      } catch(err){
+        toast(err.message || "Login failed");
+      } finally {
+        btn.innerHTML = original;
+      }
+    }
+
+    async function logout(){
+      await sb.auth.signOut();
+      currentProfile = null;
+      setTopLogout(false);
+      navTo("landing");
+      toast("Logged out");
+    }
+
+    /***************
+     * STUDENT: Opportunities + AI + Applications
+     ***************/
+    let cachedOpps = [];
+    let cachedApps = [];
+
+    function oppMatchScore(opp, student){
+      const stSkills = (student.skills || []).map(x=>String(x).toLowerCase());
+      const tags = (opp.skills_tags || []).map(x=>String(x).toLowerCase());
+
+      let score = 50; // base
+      if(student.branch && tags.includes(String(student.branch).toLowerCase())) score += 18;
+      for(const s of stSkills) if(tags.includes(s)) score += 8;
+
+      // recency
+      const ageDays = (Date.now() - new Date(opp.created_at).getTime()) / 86400000;
+      score += Math.max(0, 12 - ageDays);
+
+      // clamp
+      score = Math.max(0, Math.min(99, Math.round(score)));
+      return score;
+    }
+
+    async function loadStudentAll(){
+      // Header info
+      $("#stdWelcome").textContent = `Welcome back, ${currentProfile.full_name || "Student"}`;
+      $("#stdMeta").textContent = `${currentProfile.college_id || "-"} • ${currentProfile.branch || "-"} • ${currentProfile.student_id || "-"}`;
+
+      const badge = $("#stdAccountBadge");
+      badge.className = "status-badge " + badgeClassFromStatus(currentProfile.status);
+      badge.textContent = currentProfile.status === "ACTIVE" ? "Account Active" : ("Account " + currentProfile.status);
+
+      // profile section
+      $("#stdName").textContent = currentProfile.full_name || "-";
+      $("#stdIdBranch").textContent = `${currentProfile.student_id || "-"} • ${currentProfile.branch || "-"}`;
+      $("#stdAvatar").src = currentProfile.photo_url || "https://picsum.photos/seed/internhub/200/200";
+
+      $("#pName").value = currentProfile.full_name || "";
+      $("#pSkills").value = (currentProfile.skills || []).join(", ");
+      $("#pPhoto").value = currentProfile.photo_url || "";
+      $("#pResume").value = currentProfile.resume_url || "";
+      renderSkillTagsPreview();
+
+      // load lists
+      await loadStudentOpportunities();
+      await loadStudentApplications();
+      await loadNotificationsStudent();
+    }
+
+    function renderSkillTagsPreview(){
+      const skills = $("#pSkills").value.split(",").map(s=>s.trim()).filter(Boolean);
+      $("#stdSkillTags").innerHTML = skills.length ? skills.map(s=>`<span class="tag">${escapeHtml(s)}</span>`).join(" ") : `<span style="color:#64748b;">No skills added</span>`;
+    }
+
+    $("#pSkills").addEventListener("input", renderSkillTagsPreview);
+
+    async function saveStudentProfile(){
+      try{
+        const skills = $("#pSkills").value.split(",").map(s=>s.trim()).filter(Boolean);
+        const payload = {
+          full_name: $("#pName").value.trim(),
+          skills,
+          photo_url: $("#pPhoto").value.trim() || null,
+          resume_url: $("#pResume").value.trim() || null
+        };
+
+        const { error } = await sb.from("profiles").update(payload).eq("user_id", currentProfile.user_id);
+        if(error) throw error;
+
+        currentProfile = await loadMyProfile();
+        toast("Profile saved");
+        await loadStudentAll();
+      } catch(err){
+        toast(err.message || "Profile save failed");
+      }
+    }
+
+    async function loadStudentOpportunities(){
+      const { data, error } = await sb
+        .from("opportunities")
+        .select("*")
+        .eq("is_active", true)
+        .order("created_at", { ascending: false })
+        .limit(250);
+
+      if(error) throw error;
+
+      // scope filter (college/department)
+      cachedOpps = (data || []).filter(o=>{
+        if(o.college_id && currentProfile.college_id && o.college_id !== currentProfile.college_id) return false;
+        if(o.department && currentProfile.department && o.department !== currentProfile.department) return false;
+        return true;
+      });
+
+      renderStudentOpps();
+    }
+
+    function renderStudentOpps(){
+      const q = ($("#stdSearch").value || "").trim().toLowerCase();
+      const type = $("#stdType").value;
+
+      let list = [...cachedOpps];
+
+      if(type !== "ALL") list = list.filter(o=>o.type === type);
+
+      if(q){
+        list = list.filter(o=>{
+          const blob = `${o.title} ${o.description || ""} ${o.location || ""} ${(o.skills_tags || []).join(" ")}`.toLowerCase();
+          return blob.includes(q);
+        });
+      }
+
+      // AI sort
+      list = list.map(o=>({ o, score: oppMatchScore(o, currentProfile) }))
+                 .sort((a,b)=>b.score-a.score)
+                 .slice(0, 40);
+
+      const grid = $("#stdOppGrid");
+      if(!list.length){
+        grid.innerHTML = `<div class="dash-card" style="color:#64748b;">No opportunities found.</div>`;
+        return;
+      }
+
+      grid.innerHTML = list.map(x=>{
+        const o = x.o;
+        const score = x.score;
+        const tags = (o.skills_tags || []).slice(0,5).map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join("");
+        return `
+          <div class="job-card">
+            <div class="match-score">${score}% Match</div>
+            <div style="display:flex; gap:10px; align-items:center; margin-bottom:12px;">
+              <div style="width:40px; height:40px; background:#e2e8f0; border-radius:8px;"></div>
+              <div>
+                <div class="job-title">${escapeHtml(o.title)}</div>
+                <div style="font-size:0.85rem; color:#64748b;">${escapeHtml(o.source)} • ${escapeHtml(o.location || "Kerala")}</div>
+              </div>
+            </div>
+            <div style="margin-bottom:16px;">${tags}</div>
+            <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="applyToOpp('${o.id}')">
+              Apply Now
+            </button>
+          </div>
+        `;
+      }).join("");
+    }
+
+    $("#stdSearch").addEventListener("input", renderStudentOpps);
+    $("#stdType").addEventListener("change", renderStudentOpps);
+
+    async function applyToOpp(oppId){
+      try{
+        enforceStudentValidity(currentProfile);
+        const { data: { user } } = await sb.auth.getUser();
+        if(!user) throw new Error("Not logged in");
+
+        const { error } = await sb.from("applications").insert({
+          student_user_id: user.id,
+          opportunity_id: oppId,
+          status: "SUBMITTED"
+        });
+
+        if(error){
+          if(String(error.message).toLowerCase().includes("duplicate")) throw new Error("Already applied");
+          throw error;
+        }
+
+        toast("Application submitted");
+        await loadStudentApplications();
+        await loadNotificationsStudent();
+      } catch(err){
+        toast(err.message || "Apply failed");
+      }
+    }
+    window.applyToOpp = applyToOpp;
+
+    function timelineHTML(status){
+      // Map our statuses to 4-step UI: Submitted -> Pending -> Interview -> Selected
+      const s = String(status || "SUBMITTED");
+      const step1 = "completed";
+      const step2 = (s === "SUBMITTED") ? "" : "completed";
+      const step3 = (s === "APPROVED" || s === "SELECTED") ? "active" : "";
+      const step4 = (s === "SELECTED") ? "active" : "";
+
+      // Rejected state: show submitted completed + rejected badge (we keep timeline but highlight)
+      const rejected = s === "REJECTED";
+
+      return `
+        <div class="timeline">
+          <div class="step completed"><div class="step-dot"></div><div class="step-label">Submitted</div></div>
+          <div class="step-line"></div>
+          <div class="step ${rejected ? "" : step2}"><div class="step-dot"></div><div class="step-label">Pending</div></div>
+          <div class="step-line"></div>
+          <div class="step ${rejected ? "" : step3}"><div class="step-dot"></div><div class="step-label">${rejected ? "Rejected" : "Interview"}</div></div>
+          <div class="step-line"></div>
+          <div class="step ${rejected ? "" : step4}"><div class="step-dot"></div><div class="step-label">Selected</div></div>
+        </div>
+      `;
+    }
+
+    async function loadStudentApplications(){
+      const { data, error } = await sb
+        .from("applications")
+        .select("id,status,remarks,created_at,opportunity_id, opportunities:opportunity_id(title, location)")
+        .order("created_at", { ascending: false });
+
+      if(error) throw error;
+      cachedApps = data || [];
+
+      const wrap = $("#stdAppsWrap");
+      if(!cachedApps.length){
+        wrap.innerHTML = `<div class="dash-card" style="color:#64748b;">No applications yet.</div>`;
+        return;
+      }
+
+      wrap.innerHTML = cachedApps.map(a=>{
+        const title = a.opportunities?.title || "Opportunity";
+        const loc = a.opportunities?.location || "—";
+        const badgeCls =
+          a.status === "SELECTED" ? "sb-selected" :
+          a.status === "REJECTED" ? "sb-expired" :
+          (a.status === "PENDING" || a.status === "SUBMITTED") ? "sb-pending" : "sb-active";
+
+        return `
+          <div class="tracker-card">
+            <div class="flex items-center gap-4">
+              <div style="width:40px; height:40px; background:#e2e8f0; border-radius:8px;"></div>
+              <div>
+                <h4 style="font-weight:700;">${escapeHtml(title)}</h4>
+                <div style="font-size:0.85rem; color:#64748b;">${escapeHtml(loc)}</div>
+                <div style="margin-top:8px;">
+                  <span class="status-badge ${badgeCls}">${escapeHtml(a.status)}</span>
+                  ${a.remarks ? `<small style="display:block; color:#64748b; margin-top:6px;">Remark: ${escapeHtml(a.remarks)}</small>` : ``}
+                </div>
+              </div>
+            </div>
+            ${timelineHTML(a.status)}
+          </div>
+        `;
+      }).join("");
+    }
+
+    async function loadNotificationsStudent(){
+      const { data: { user } } = await sb.auth.getUser();
+      if(!user) return;
+
+      const { data, error } = await sb
+        .from("notifications")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending:false })
+        .limit(30);
+
+      if(error) return;
+
+      const unread = (data || []).filter(n=>!n.is_read).length;
+      $("#stdNotifDot").style.display = unread ? "block" : "none";
+
+      const dd = $("#std-notif");
+      if(!data || !data.length){
+        dd.innerHTML = `<div class="notif-item"><strong>No notifications</strong><small>You are all caught up.</small></div>`;
+        return;
+      }
+
+      dd.innerHTML = data.map(n=>`
+        <div class="notif-item">
+          <strong>${escapeHtml(n.title)}</strong>
+          <small>${escapeHtml(n.body || "")}</small>
+          <small>${new Date(n.created_at).toLocaleString()}</small>
+        </div>
+      `).join("");
+
+      // Mark read when dropdown opened
+      // (simple: mark all read immediately after loading when in student page)
+      await sb.from("notifications").update({ is_read:true }).eq("user_id", user.id).eq("is_read", false);
+      $("#stdNotifDot").style.display = "none";
+    }
+
+    /***************
+     * ADMIN: Stats + Students + Excel Upload + Apps + Opps
+     ***************/
+    let admStudents = [];
+    let admApps = [];
+    let admOpps = [];
+
+    async function loadAdminAll(){
+      $("#admRoleText").textContent = currentProfile.role || "ADMIN";
+      $("#admScopeText").textContent =
+        currentProfile.role === "SUPER_STATE" ? "Managing All Kerala Colleges"
+        : currentProfile.role === "SUPER_COLLEGE" ? `Managing College: ${currentProfile.college_id || "-"}`
+        : `Managing ${currentProfile.college_id || "-"} • ${currentProfile.department || "-"}`;
+
+      // role dot color
+      $("#admRoleDot").style.background = (currentProfile.role === "SUPER_STATE") ? "var(--accent)" :
+                                         (currentProfile.role === "SUPER_COLLEGE") ? "var(--success)" : "var(--primary)";
+
+      await loadAdminStats();
+      await loadAdminStudents();
+      await loadAdminApplications();
+      await loadAdminOpportunities();
+    }
+
+    async function loadAdminStats(){
+      // RLS controls scope by your policies. We compute from returned rows.
+      const { data: students, error: e1 } = await sb
+        .from("profiles")
+        .select("status,role")
+        .eq("role","STUDENT")
+        .limit(2000);
+
+      if(e1) throw e1;
+
+      const total = (students||[]).length;
+      const active = (students||[]).filter(s=>s.status==="ACTIVE").length;
+      const expired = (students||[]).filter(s=>s.status==="EXPIRED").length;
+      const inactive = (students||[]).filter(s=>s.status==="INACTIVE").length;
+
+      const { data: apps, error: e2 } = await sb
+        .from("applications")
+        .select("status")
+        .limit(5000);
+
+      if(e2) throw e2;
+
+      const pending = (apps||[]).filter(a=>a.status==="PENDING" || a.status==="SUBMITTED").length;
+      const selected = (apps||[]).filter(a=>a.status==="SELECTED").length;
+
+      const { data: opps, error: e3 } = await sb
+        .from("opportunities")
+        .select("id,is_active")
+        .eq("is_active", true)
+        .limit(5000);
+
+      if(e3) throw e3;
+
+      $("#admStatsRow").innerHTML = `
+        <div class="stat-box"><div class="stat-num">${total}</div><div class="stat-label">Total Students</div></div>
+        <div class="stat-box"><div class="stat-num" style="color: var(--success);">${active}</div><div class="stat-label">Active Accounts</div></div>
+        <div class="stat-box"><div class="stat-num" style="color: var(--warning);">${pending}</div><div class="stat-label">Pending Applications</div></div>
+        <div class="stat-box"><div class="stat-num">${(opps||[]).length}</div><div class="stat-label">Active Opportunities</div></div>
+        <div class="stat-box"><div class="stat-num" style="color: var(--danger);">${expired}</div><div class="stat-label">Expired Accounts</div></div>
+        <div class="stat-box"><div class="stat-num" style="color:#9a3412;">${inactive}</div><div class="stat-label">Inactive Accounts</div></div>
+        <div class="stat-box"><div class="stat-num" style="color: var(--accent);">${selected}</div><div class="stat-label">Selected</div></div>
+      `;
+    }
+
+    async function loadAdminStudents(){
+      const { data, error } = await sb
+        .from("profiles")
+        .select("user_id,student_id,full_name,branch,college_id,department,status,valid_to,photo_url")
+        .eq("role","STUDENT")
+        .order("student_id", { ascending:true })
+        .limit(1500);
+
+      if(error) throw error;
+      admStudents = data || [];
+
+      // fill dept filter
+      const depts = [...new Set(admStudents.map(s=>s.department).filter(Boolean))].sort();
+      const sel = $("#admDeptFilter");
+      sel.innerHTML = `<option value="ALL">All Departments</option>` + depts.map(d=>`<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join("");
+
+      renderAdminStudents();
+    }
+
+    function renderAdminStudents(){
+      const q = ($("#admStuSearch").value || "").trim().toLowerCase();
+      const dept = $("#admDeptFilter").value;
+      const st = $("#admStatusFilter").value;
+
+      let list = [...admStudents];
+
+      if(dept !== "ALL") list = list.filter(s=>s.department === dept);
+      if(st !== "ALL") list = list.filter(s=>s.status === st);
+
+      if(q){
+        list = list.filter(s=>{
+          const blob = `${s.student_id||""} ${s.full_name||""}`.toLowerCase();
+          return blob.includes(q);
+        });
+      }
+
+      const body = $("#admStudentsBody");
+      if(!list.length){
+        body.innerHTML = `<tr><td colspan="5" style="color:#64748b; padding:18px;">No students found.</td></tr>`;
+        return;
+      }
+
+      body.innerHTML = list.slice(0, 200).map(s=>{
+        const badgeCls = badgeClassFromStatus(s.status);
+        const exp = s.valid_to || "-";
+        const avatar = s.photo_url || `https://picsum.photos/seed/${encodeURIComponent(s.student_id||"std")}/40/40`;
+
+        return `
+          <tr>
+            <td>
+              <div class="user-cell">
+                <img src="${escapeHtml(avatar)}" class="avatar">
+                <div>
+                  <div style="font-weight: 600;">${escapeHtml(s.full_name || "-")}</div>
+                  <div style="font-size: 0.8rem; color: #64748b;">${escapeHtml(studentIdToEmail(s.student_id || "student"))}</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div>${escapeHtml(s.student_id || "-")}</div>
+              <div style="font-size: 0.8rem; color: #64748b;">${escapeHtml(s.branch || "-")}</div>
+            </td>
+            <td><span class="status-badge ${badgeCls}">${escapeHtml(s.status)}</span></td>
+            <td>${escapeHtml(exp)}</td>
+            <td>
+              <button class="btn btn-secondary btn-sm" onclick="openExtendValidity('${s.user_id}', '${s.valid_to||""}')"><i class="fa-solid fa-rotate"></i> Extend</button>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    $("#admStuSearch").addEventListener("input", renderAdminStudents);
+    $("#admDeptFilter").addEventListener("change", renderAdminStudents);
+    $("#admStatusFilter").addEventListener("change", renderAdminStudents);
+
+    async function openExtendValidity(userId, currentTo){
+      const newTo = prompt("Enter new valid_to (YYYY-MM-DD):", currentTo || "");
+      if(!newTo) return;
+      try{
+        // Simple: update profile valid_to and status ACTIVE
+        // (Scope is enforced by RLS: admin can only see/update allowed rows if you add update policy.
+        // For production, do via Edge Function. This is a basic demo.)
+        const { error } = await sb.from("profiles").update({ valid_to: newTo, status: "ACTIVE" }).eq("user_id", userId);
+        if(error) throw error;
+        toast("Validity updated");
+        await loadAdminStudents();
+        await loadAdminStats();
+      } catch(err){
+        toast(err.message || "Update failed");
+      }
+    }
+    window.openExtendValidity = openExtendValidity;
+
+    function openExcelPicker(){
+      $("#excelFile").click();
+    }
+    window.openExcelPicker = openExcelPicker;
+
+    function clearUploadResult(){
+      $("#admUploadResult").innerHTML = "";
+    }
+    window.clearUploadResult = clearUploadResult;
+
+    // Excel upload uses Edge Function (secure)
+    $("#excelFile").addEventListener("change", async () => {
+      const file = $("#excelFile").files?.[0];
+      if(!file) return;
+
+      try{
+        const { data: { session } } = await sb.auth.getSession();
+        if(!session) throw new Error("Not logged in");
+
+        const buf = await file.arrayBuffer();
+        const wb = XLSX.read(buf, { type:"array" });
+        const sheet = wb.Sheets[wb.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet, { defval:"" });
+
+        // expected headers:
+        // student_id name password branch college_id department valid_from valid_to
+        const cleaned = rows.map(r => ({
+          student_id: String(r.student_id || r.Student_ID || r.STUDENT_ID || "").trim(),
+          name: String(r.name || r.Name || "").trim(),
+          password: String(r.password || r.Password || "").trim(),
+          branch: String(r.branch || r.Branch || "").trim(),
+          college_id: String(r.college_id || r.college || r.College || "").trim(),
+          department: String(r.department || r.dept || r.Department || "").trim(),
+          valid_from: String(r.valid_from || r.from || r.Valid_From || "").trim(),
+          valid_to: String(r.valid_to || r.to || r.Valid_To || "").trim(),
+        })).filter(r => r.student_id);
+
+        if(!cleaned.length) throw new Error("No valid rows found in file.");
+
+        // Call Edge Function
+        const res = await fetch(`${SUPABASE_URL}/functions/v1/student-upload-excel`, {
+          method:"POST",
+          headers:{
+            "Content-Type":"application/json",
+            "Authorization": `Bearer ${session.access_token}`
+          },
+          body: JSON.stringify({ rows: cleaned })
+        });
+
+        const out = await res.json();
+        if(!out.ok) throw new Error(out.error || "Upload failed");
+
+        $("#admUploadResult").innerHTML = out.results.map(x => `
+          <div style="padding:10px; border-bottom:1px solid #f1f5f9;">
+            <strong>${escapeHtml(x.student_id)}</strong> —
+            <span style="color:${x.ok ? "#166534" : "#991b1b"}; font-weight:700;">${x.ok ? "OK" : "FAILED"}</span>
+            ${x.error ? `<div style="color:#64748b; font-size:0.9rem;">${escapeHtml(x.error)}</div>` : ``}
+          </div>
+        `).join("");
+
+        toast("Excel upload finished");
+        await loadAdminStudents();
+        await loadAdminStats();
+
+      } catch(err){
+        toast(err.message || "Excel upload failed");
+      } finally {
+        $("#excelFile").value = "";
+      }
+    });
+
+    async function loadAdminApplications(){
+      // Admin can read scoped apps via RLS
+      const { data, error } = await sb
+        .from("applications")
+        .select("id,status,created_at,remarks, student_user_id, opportunity_id, opportunities:opportunity_id(title)")
+        .order("created_at",{ascending:false})
+        .limit(400);
+
+      if(error) throw error;
+      admApps = data || [];
+      renderAdminApps();
+    }
+
+    function renderAdminApps(){
+      const body = $("#admAppsBody");
+      if(!admApps.length){
+        body.innerHTML = `<tr><td colspan="4" style="color:#64748b; padding:18px;">No applications found.</td></tr>`;
+        return;
+      }
+
+      body.innerHTML = admApps.map(a=>{
+        const badgeCls =
+          a.status === "SELECTED" ? "sb-selected" :
+          a.status === "REJECTED" ? "sb-expired" :
+          (a.status === "PENDING" || a.status === "SUBMITTED") ? "sb-pending" : "sb-active";
+
+        return `
+          <tr>
+            <td>${escapeHtml(a.student_user_id)}</td>
+            <td>${escapeHtml(a.opportunities?.title || "Opportunity")}</td>
+            <td><span class="status-badge ${badgeCls}">${escapeHtml(a.status)}</span></td>
+            <td>
+              <select class="input-field" style="margin:0; max-width:220px;" onchange="adminUpdateAppStatus('${a.id}', this.value)">
+                <option ${a.status==='SUBMITTED'?'selected':''}>SUBMITTED</option>
+                <option ${a.status==='PENDING'?'selected':''}>PENDING</option>
+                <option ${a.status==='APPROVED'?'selected':''}>APPROVED</option>
+                <option ${a.status==='REJECTED'?'selected':''}>REJECTED</option>
+                <option ${a.status==='SELECTED'?'selected':''}>SELECTED</option>
+              </select>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    async function adminUpdateAppStatus(application_id, status){
+      try{
+        const { data: { session } } = await sb.auth.getSession();
+        if(!session) throw new Error("Not logged in");
+
+        // Use Edge Function to enforce scope + notify student (secure)
+        const res = await fetch(`${SUPABASE_URL}/functions/v1/application-update-status`, {
+          method:"POST",
+          headers:{
+            "Content-Type":"application/json",
+            "Authorization": `Bearer ${session.access_token}`
+          },
+          body: JSON.stringify({ application_id, status })
+        });
+
+        const out = await res.json();
+        if(!out.ok) throw new Error(out.error || "Update failed");
+
+        toast("Status updated + notification sent");
+        await loadAdminApplications();
+        await loadAdminStats();
+      } catch(err){
+        toast(err.message || "Update failed");
+      }
+    }
+    window.adminUpdateAppStatus = adminUpdateAppStatus;
+
+    async function loadAdminOpportunities(){
+      const { data, error } = await sb
+        .from("opportunities")
+        .select("*")
+        .order("created_at", { ascending:false })
+        .limit(500);
+
+      if(error) throw error;
+      admOpps = data || [];
+      renderAdminOpps();
+    }
+
+    function renderAdminOpps(){
+      const q = ($("#admOppSearch").value || "").trim().toLowerCase();
+      const type = $("#admOppType").value;
+
+      let list = [...admOpps];
+      if(type !== "ALL") list = list.filter(o=>o.type === type);
+      if(q){
+        list = list.filter(o=>{
+          const blob = `${o.title} ${o.description||""} ${o.location||""} ${(o.skills_tags||[]).join(" ")}`.toLowerCase();
+          return blob.includes(q);
+        });
+      }
+
+      const body = $("#admOppBody");
+      if(!list.length){
+        body.innerHTML = `<tr><td colspan="5" style="color:#64748b; padding:18px;">No opportunities.</td></tr>`;
+        return;
+      }
+
+      body.innerHTML = list.slice(0, 250).map(o=>{
+        const active = o.is_active ? "ACTIVE" : "INACTIVE";
+        const badgeCls = o.is_active ? "sb-active" : "sb-inactive";
+        return `
+          <tr>
+            <td style="font-weight:700;">${escapeHtml(o.title)}</td>
+            <td>${escapeHtml(o.type)}</td>
+            <td>${escapeHtml(o.source)}</td>
+            <td>${escapeHtml(o.valid_until || "-")}</td>
+            <td><span class="status-badge ${badgeCls}">${active}</span></td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    $("#admOppSearch").addEventListener("input", renderAdminOpps);
+    $("#admOppType").addEventListener("change", renderAdminOpps);
+
+    /***************
+     * ADMIN: Create Opportunity (Manual)
+     * For production use Edge Function; this is a basic demo insert.
+     ***************/
+    function openOppModal(){
+      $("#opp-modal").classList.add("open");
+    }
+    function closeOppModal(){
+      $("#opp-modal").classList.remove("open");
+    }
+    window.openOppModal = openOppModal;
+    window.closeOppModal = closeOppModal;
+
+    async function createOpportunity(){
+      try{
+        const type = $("#oppTypeNew").value;
+        const title = $("#oppTitleNew").value.trim();
+        const description = $("#oppDescNew").value.trim();
+        const location = $("#oppLocNew").value.trim();
+        const valid_until = $("#oppUntilNew").value.trim() || null;
+        const skills_tags = $("#oppSkillsNew").value.split(",").map(s=>s.trim()).filter(Boolean);
+
+        if(!title) throw new Error("Title required");
+
+        // Basic insert: relies on your RLS for opp inserts (if not allowed, it will fail).
+        const { data: { user } } = await sb.auth.getUser();
+        if(!user) throw new Error("Not logged in");
+
+        const payload = {
+          type, title, description, location,
+          valid_until,
+          skills_tags,
+          source: "MANUAL",
+          is_active: true,
+          created_by: user.id,
+          // optionally restrict to college/department:
+          college_id: currentProfile.college_id || null,
+          department: (currentProfile.role === "ADMIN_DEPT") ? (currentProfile.department || null) : null
+        };
+
+        const { error } = await sb.from("opportunities").insert(payload);
+        if(error) throw error;
+
+        toast("Opportunity created");
+        closeOppModal();
+        await loadAdminOpportunities();
+        await loadAdminStats();
+      } catch(err){
+        toast(err.message || "Create failed");
+      }
+    }
+    window.createOpportunity = createOpportunity;
+
+    function openAdminRequest(){
+      alert("Admin Request flow is enabled via Edge Functions + admin_requests table. (Add function admin-create-request + admin-approve)");
+    }
+    window.openAdminRequest = openAdminRequest;
+
+    /***************
+     * INIT
+     ***************/
+    async function init(){
+      navTo("landing");
+      setTopLogout(false);
+
+      // Restore session if exists
+      const { data: { session } } = await sb.auth.getSession();
+      if(session){
+        try{
+          await postLoginRoute();
+        } catch(e){
+          await sb.auth.signOut();
+          navTo("landing");
+        }
+      }
+
+      // Real-time auth state
+      sb.auth.onAuthStateChange(async () => {
+        const { data: { session } } = await sb.auth.getSession();
+        if(!session){
+          currentProfile = null;
+          setTopLogout(false);
+          return;
+        }
+        // refresh profile quickly
+        currentProfile = await loadMyProfile();
+      });
+    }
+
+    init();
   </script>
 </body>
 </html>
