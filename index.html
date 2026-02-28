@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>InternHub | Kerala Polytechnic Platform</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="./assets/css/styles.css" />
+
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="./assets/js/config.js"></script>
+</head>
+
+<body>
+    <div class="ambient-bg">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <!-- NAV -->
+    <nav class="navbar">
+        <a href="#" class="nav-logo" onclick="navTo('landing')">
+            <i class="fa-solid fa-graduation-cap"></i> InternHub
+        </a>
+
+        <div class="nav-links">
+            <a class="nav-pill" href="#explorer"
+                onclick="navTo('landing'); setTimeout(()=>scrollToExplorer(), 60)">Home</a>
+            <a class="nav-pill" href="#explorer"
+                onclick="navTo('landing'); setTimeout(()=>scrollToExplorer(), 60)">Opportunities</a>
+        </div>
+
+        <div class="nav-actions">
+            <button id="btn-admin" class="btn btn-primary btn-sm" onclick="openModal('admin')">
+                <i class="fa-solid fa-shield-halved"></i> Admin
+            </button>
+            <button id="btn-logout" class="btn btn-secondary btn-sm hidden" onclick="logoutAdmin()">
+                <i class="fa-solid fa-right-from-bracket"></i> Logout
+            </button>
+        </div>
+    </nav>
+
+    <!-- LANDING (includes explorer section) -->
+    <main id="page-landing">
+        <i class="fa-solid fa-robot bg-icon icon-1"></i>
+        <i class="fa-solid fa-briefcase bg-icon icon-2"></i>
+        <i class="fa-solid fa-graduation-cap bg-icon icon-3"></i>
+        <i class="fa-solid fa-microchip bg-icon icon-4"></i>
+
+        <section class="hero-section container">
+            <div class="pill"><i class="fa-solid fa-check-circle"></i> Kerala Polytechnic Opportunities</div>
+            <h1 class="hero-title">
+                Scholarships & Internships for <br><span class="text-gradient">Diploma Students</span>
+            </h1>
+            <p class="hero-desc">
+                InternHub publicly lists active scholarships and internships. Admins manage opportunities through a
+                secure dashboard.
+                Expired items are auto-hidden automatically.
+            </p>
+
+            <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;">
+                <button class="btn btn-primary" onclick="scrollToExplorer()">
+                    <i class="fa-solid fa-magnifying-glass"></i> Browse Opportunities
+                </button>
+                <button class="btn btn-secondary" onclick="openModal('admin')">
+                    <i class="fa-solid fa-lock"></i> Admin Login
+                </button>
+            </div>
+        </section>
+
+        <section class="container feature-grid">
+            <div class="feat-card">
+                <div class="feat-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+                <h3 style="font-weight:900;margin-bottom:6px;">Scholarships</h3>
+                <p class="muted">Browse scholarship listings and apply directly on official websites.</p>
+            </div>
+            <div class="feat-card">
+                <div class="feat-icon"><i class="fa-solid fa-briefcase"></i></div>
+                <h3 style="font-weight:900;margin-bottom:6px;">Internships</h3>
+                <p class="muted">Find internships filtered by location, tags, deadlines.</p>
+            </div>
+            <div class="feat-card">
+                <div class="feat-icon"><i class="fa-solid fa-bolt"></i></div>
+                <h3 style="font-weight:900;margin-bottom:6px;">Fast Explorer</h3>
+                <p class="muted">Advanced search, type filters, source filters, sorting.</p>
+            </div>
+            <div class="feat-card">
+                <div class="feat-icon"><i class="fa-solid fa-user-shield"></i></div>
+                <h3 style="font-weight:900;margin-bottom:6px;">Admin Dashboard</h3>
+                <p class="muted">Secure login, manage listings, approve new admins.</p>
+            </div>
+        </section>
+
+        <!-- Opportunities Explorer -->
+        <section id="explorer" class="container explorer-shell">
+            <div class="panel">
+                <div class="explorer-header">
+                    <div>
+                        <h2 style="font-weight:1000;font-size:1.4rem;">Opportunities Explorer</h2>
+                        <p class="muted">Only ACTIVE opportunities are shown. Expired deadlines auto-hide.</p>
+                    </div>
+                    <div class="pill"><i class="fa-solid fa-circle-info"></i> Public View</div>
+                </div>
+
+                <div class="searchbar">
+                    <i class="fa-solid fa-magnifying-glass" style="color:#94a3b8;"></i>
+                    <input id="q" placeholder="Search title, provider, tags, location..." />
+                    <button class="btn btn-primary btn-sm" onclick="applyPublicFilters()">
+                        <i class="fa-solid fa-filter"></i> Apply
+                    </button>
+                </div>
+
+                <div class="filters">
+                    <select id="typeFilter" onchange="applyPublicFilters()">
+                        <option value="all">All Types</option>
+                        <option value="scholarship">Scholarships</option>
+                        <option value="internship">Internships</option>
+                    </select>
+                    <select id="locationFilter" onchange="applyPublicFilters()">
+                        <option value="all">All Locations</option>
+                    </select>
+                    <select id="sourceFilter" onchange="applyPublicFilters()">
+                        <option value="all">All Sources</option>
+                        <option value="SCRAPED">SCRAPED</option>
+                        <option value="MANUAL">MANUAL</option>
+                    </select>
+                    <select id="sortBy" onchange="applyPublicFilters()">
+                        <option value="latest">Sort: Latest</option>
+                        <option value="deadline">Sort: Deadline</option>
+                        <option value="title">Sort: Title</option>
+                    </select>
+                </div>
+
+                <div id="publicGrid" class="job-grid"></div>
+                <div id="publicEmpty" class="empty hidden">No active opportunities found. Try changing filters.</div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ADMIN -->
+    <main id="page-admin" class="hidden">
+        <div class="app-shell">
+            <aside class="sidebar">
+                <div class="sidebar-brand">
+                    <i class="fa-solid fa-shield-halved" style="color:var(--primary);"></i> Admin Console
+                </div>
+
+                <div class="nav-item active" onclick="switchAdminTab(event,'overview')">
+                    <i class="fa-solid fa-chart-line"></i> Dashboard
+                </div>
+                <div class="nav-item" onclick="switchAdminTab(event,'opps')">
+                    <i class="fa-solid fa-briefcase"></i> Opportunities
+                </div>
+                <div class="nav-item" onclick="switchAdminTab(event,'requests')">
+                    <i class="fa-solid fa-user-plus"></i> Admin Requests
+                </div>
+                <div class="nav-item" onclick="navTo('landing')">
+                    <i class="fa-solid fa-globe"></i> Public View
+                </div>
+                <div class="nav-item" onclick="logoutAdmin()">
+                    <i class="fa-solid fa-power-off"></i> Logout
+                </div>
+            </aside>
+
+            <div class="main-content">
+                <div class="dash-card">
+                    <div class="dash-header">
+                        <div>
+                            <h2 style="font-size:1.5rem;font-weight:1000;">Admin Dashboard</h2>
+                            <p class="muted" id="adminMeta">Loading admin…</p>
+                        </div>
+                        <div class="pill">
+                            <i class="fa-solid fa-user-shield"></i>
+                            <span style="font-weight:1000;font-size:.9rem;" id="adminRole">ADMIN</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- OVERVIEW -->
+                <section id="adm-overview">
+                    <div class="stats-row">
+                        <div class="stat-box">
+                            <div class="stat-num" id="st-total">0</div>
+                            <div class="stat-label">Total Opportunities</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-num" style="color:var(--success);" id="st-active">0</div>
+                            <div class="stat-label">Active Opportunities</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-num" id="st-sch">0</div>
+                            <div class="stat-label">Scholarships</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-num" id="st-int">0</div>
+                            <div class="stat-label">Internships</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- OPPORTUNITIES -->
+                <section id="adm-opps" class="hidden">
+                    <div class="dash-card">
+                        <div class="dash-header">
+                            <div>
+                                <h3 style="font-weight:1000;">Opportunity Management</h3>
+                                <p class="muted">Add / edit / delete opportunities (public shows ACTIVE + not expired).
+                                </p>
+                            </div>
+                            <button class="btn btn-primary" onclick="openOppEditor()">
+                                <i class="fa-solid fa-plus"></i> Add Manual
+                            </button>
+                        </div>
+
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Type</th>
+                                        <th>Location</th>
+                                        <th>Deadline</th>
+                                        <th>Source</th>
+                                        <th>Status</th>
+                                        <th style="width:160px;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admOppTbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- REQUESTS -->
+                <section id="adm-requests" class="hidden">
+                    <div class="dash-card">
+                        <div class="dash-header">
+                            <div>
+                                <h3 style="font-weight:1000;">Admin Requests</h3>
+                                <p class="muted">Approving creates admin login automatically (secure Edge Function).</p>
+                            </div>
+                            <button class="btn btn-secondary" onclick="loadAdminRequests()">
+                                <i class="fa-solid fa-rotate"></i> Refresh
+                            </button>
+                        </div>
+
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Email</th>
+                                        <th>Name</th>
+                                        <th>College</th>
+                                        <th>Requested Role</th>
+                                        <th>Status</th>
+                                        <th style="width:240px;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admReqTbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- LOGIN MODAL -->
+    <div id="login-modal" class="modal-overlay">
+        <div class="modal-box">
+            <button onclick="closeModal()"
+                style="position:absolute;top:16px;right:16px;font-size:1.2rem;color:#64748b;">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <h2 style="text-align:center;font-weight:1000;">InternHub Access</h2>
+            <p class="muted" style="text-align:center;margin-top:6px;">
+                Public browsing is open. Admin console requires approval.
+            </p>
+
+            <div class="auth-tabs">
+                <button class="auth-tab active" id="t-admin" onclick="switchAuthType('admin')">Admin Login</button>
+                <button class="auth-tab" id="t-request" onclick="switchAuthType('request')">Request Admin</button>
+            </div>
+
+            <!-- Admin Login -->
+            <form id="f-admin" onsubmit="handleAdminLogin(event)">
+                <div style="position:relative;margin-bottom:12px;">
+                    <i class="fa-solid fa-envelope" style="position:absolute;left:12px;top:13px;color:#94a3b8;"></i>
+                    <input id="adminEmail" type="email" class="input-field" placeholder="Admin Email"
+                        style="padding-left:36px;" required>
+                </div>
+                <div style="position:relative;margin-bottom:14px;">
+                    <i class="fa-solid fa-lock" style="position:absolute;left:12px;top:13px;color:#94a3b8;"></i>
+                    <input id="adminPass" type="password" class="input-field" placeholder="Password"
+                        style="padding-left:36px;" required>
+                </div>
+                <button id="btnLogin" type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">
+                    <i class="fa-solid fa-right-to-bracket"></i> Login
+                </button>
+            </form>
+
+            <!-- Admin Request -->
+            <form id="f-request" class="hidden" onsubmit="submitAdminRequest(event)">
+                <input id="reqName" class="input-field" placeholder="Full Name" required>
+                <input id="reqEmail" class="input-field" placeholder="Email" type="email" required>
+                <input id="reqCollege" class="input-field" placeholder="College (e.g. GPTC Palakkad)" required>
+                <select id="reqRole">
+                    <option value="ADMIN_DEPT">ADMIN_DEPT</option>
+                    <option value="SUPER_COLLEGE">SUPER_COLLEGE</option>
+                    <option value="SUPER_STATE">SUPER_STATE</option>
+                </select>
+                <button id="btnReq" type="submit" class="btn btn-primary"
+                    style="width:100%;justify-content:center;margin-top:12px;">
+                    <i class="fa-solid fa-paper-plane"></i> Submit Request
+                </button>
+                <p class="muted" style="margin-top:10px;text-align:center;font-weight:800;">
+                    After approval, Supabase sends an invite email.
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Opportunity Editor Modal -->
+    <div id="opp-modal" class="modal-overlay">
+        <div class="modal-box">
+            <button onclick="closeOppEditor()"
+                style="position:absolute;top:16px;right:16px;font-size:1.2rem;color:#64748b;">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <h2 style="font-weight:1000;">Opportunity Editor</h2>
+            <p class="muted" style="margin:6px 0 12px;">Add or edit an opportunity.</p>
+
+            <form onsubmit="saveOpportunity(event)">
+                <input id="op_id" type="hidden" />
+
+                <input id="op_title" class="input-field" placeholder="Title" required />
+                <select id="op_type">
+                    <option value="scholarship">scholarship</option>
+                    <option value="internship">internship</option>
+                </select>
+
+                <input id="op_provider" class="input-field" placeholder="Provider (optional)" />
+                <input id="op_location" class="input-field" placeholder="Location (optional)" />
+                <input id="op_tags" class="input-field" placeholder="Tags (comma separated) e.g. AI, Python, CSE" />
+
+                <select id="op_source">
+                    <option value="MANUAL">MANUAL</option>
+                    <option value="SCRAPED">SCRAPED</option>
+                </select>
+
+                <input id="op_deadline" class="input-field" type="date" />
+                <input id="op_apply" class="input-field" placeholder="Apply URL (https://...)" required />
+
+                <select id="op_status">
+                    <option value="ACTIVE">ACTIVE</option>
+                    <option value="EXPIRED">EXPIRED</option>
+                </select>
+
+                <button id="btnSaveOpp" class="btn btn-primary"
+                    style="width:100%;justify-content:center;margin-top:10px;">
+                    <i class="fa-solid fa-floppy-disk"></i> Save
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="./assets/js/app.js"></script>
+</body>
+
+</html>
