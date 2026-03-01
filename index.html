@@ -374,7 +374,917 @@
 
     <div id="toast" class="toast"></div>
 
-    <script src="./assets/js/app.js"></script>
+    <script type="module">
+  /***********************
+   * INTERNHUB SUPABASE CONFIG
+   ***********************/
+  const SUPABASE_URL = "https://zyssuxxppcqsiwayptwo.supabase.co";
+  const SUPABASE_ANON_KEY = "PASTE_YOUR_ANON_KEY_HERE";
+  const FUNCTIONS_URL = "https://zyssuxxppcqsiwayptwo.functions.supabase.co"; // Edge Functions base
+
+  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  /***********************
+   * FAST NETWORK HELPERS (NO INFINITE LOADING)
+   ***********************/
+  function withTimeout(promise, ms = 12000) {
+    let t;
+    const timeout = new Promise((_, rej) => (t = setTimeout(() => rej(new Error("Timeout. Try again.")), ms)));
+    return Promise.race([promise, timeout]).finally(() => clearTimeout(t));
+  }
+
+  async function fetchJSON(url, opts = {}, ms = 15000) {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), ms);
+    try {
+      const res = await fetch(url, { ...opts, signal: controller.signal });
+      const text = await res.text();
+      let json = {};
+      try { json = text ? JSON.parse(text) : {}; } catch {}
+      if (!res.ok) throw new Error(json?.error || `Request failed (${res.status})`);
+      return json;
+    } finally {
+      clearTimeout(id);
+    }
+  }
+
+  /***********************
+   * YOUR UI STATE (kept)
+   ***********************/
+  const SESSION_KEY = "internhub_admin_session";
+  const NOTIF_KEY = "internhub_admin_notifications_v1";
+
+  let opportunities = [];          // now loaded from Supabase
+  let adminSession = loadSession(); // cached session info for UI
+  let notifications = loadNotifications();
+
+  let typeFilter = "all";
+  let oppModalMode = "add";
+  let editingId = null;
+
+  /***********************
+   * HELPERS
+   ***********************/
+  const $ = (id) => document.getElementById(id);
+
+  function nowISO() { return new Date().toISOString(); }
+  function todayISO() {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  }
+
+  function isActive(deadlineISO) {
+    if (!deadlineISO) return true;
+    return deadlineISO >= todayISO();
+  }
+
+  function diffDays(aISO, bISO) {
+    const a = new Date(aISO + "T00:00:00");
+    const b = new Date(bISO + "T00:00:00");
+    return Math.round((b - a) / (1000 * 60 * 60 * 24));
+  }
+
+  function formatISO(iso) {
+    try {
+      const [y, m, d] = iso.split("-").map(Number);
+      const dt = new Date(y, m - 1, d);
+      return dt.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+    } catch { return iso; }
+  }
+
+  function escapeHTML(s) {
+    return String(s || "")
+      .replaceAll("&", "&amp;").replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;").replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function parseTags(str) {
+    if (!str) return [];
+    return str.split(",").map(s => s.trim()).filter(Boolean).slice(0, 12);
+  }
+
+  function toast(title, desc, type = "success") {
+    const wrap = $("toast-wrap");
+    const el = document.createElement("div");
+    el.className = "toast " + (type || "");
+    el.innerHTML = `<div class="toast-title">${escapeHTML(title)}</div><div class="toast-desc">${escapeHTML(desc)}</div>`;
+    wrap.appendChild(el);
+    setTimeout(() => {
+      el.style.opacity = "0";
+      el.style.transform = "translateY(-6px)";
+      el.style.transition = "0.25s";
+      setTimeout(() => el.remove(), 260);
+    }, 2400);
+  }
+
+  /***********************
+   * LOCAL UI SESSION + NOTIFS (kept)
+   ***********************/
+  function loadSession() {
+    try {
+      const raw = localStorage.getItem(SESSION_KEY);
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch { return null; }
+  }
+  function saveSession(session) { localStorage.setItem(SESSION_KEY, JSON.stringify(session)); }
+  function clearSession() { localStorage.removeItem(SESSION_KEY); }
+
+  function loadNotifications() {
+    try {
+      const raw = localStorage.getItem(NOTIF_KEY);
+      if (!raw) return [];
+      return JSON.parse(raw) || [];
+    } catch { return []; }
+  }
+  function saveNotifications(list) { localStorage.setItem(NOTIF_KEY, JSON.stringify(list)); }
+
+  function pushNotif(title, message) {
+    const item = { title, message, at: nowISO() };
+    notifications.push(item);
+    if (notifications.length > 50) notifications = notifications.slice(-50);
+    saveNotifications(notifications);
+    renderAdminNotifDropdown();
+    renderAdminLogs();
+  }
+
+  /***********************
+   * NAV + MODALS (kept)
+   ***********************/
+  function navTo(pageId) {
+    document.querySelectorAll("main").forEach(el => el.classList.add("hidden"));
+    const page = document.getElementById("page-" + pageId);
+    if (page) page.classList.remove("hidden");
+
+    closeModal();
+    closeOppModal();
+
+    if (pageId === "admin") {
+      if (!adminSession) {
+        toast("Admin access required", "Please login to open Admin Dashboard.", "danger");
+        navTo("explorer");
+        openModal("admin");
+        return;
+      }
+      showAdminTab("overview");
+      refreshAdmin();
+    }
+
+    if (pageId === "explorer") {
+      setTodayPill();
+      hydrateFilterOptions();
+      renderExplorer();
+    }
+
+    window.scrollTo(0, 0);
+    syncNavbarState();
+  }
+
+  function openModal(type) {
+    const modal = $("login-modal");
+    modal.classList.add("open");
+    switchAuthType(type === "admin" ? "admin" : "public");
+  }
+
+  function closeModal() { $("login-modal").classList.remove("open"); }
+
+  function switchAuthType(type) {
+    const isAdmin = type === "admin";
+    $("t-admin").classList.toggle("active", isAdmin);
+    $("t-student").classList.toggle("active", !isAdmin);
+    $("f-admin").classList.toggle("hidden", !isAdmin);
+    $("f-public").classList.toggle("hidden", isAdmin);
+  }
+
+  function syncNavbarState() {
+    const isAdmin = !!adminSession;
+    $("btn-admin-open").classList.toggle("hidden", isAdmin);
+    $("btn-admin-panel").classList.toggle("hidden", !isAdmin);
+    $("btn-admin-logout").classList.toggle("hidden", !isAdmin);
+  }
+
+  /***********************
+   * PUBLIC EXPLORER (Supabase)
+   ***********************/
+  async function loadPublicOpportunities() {
+    // Public RLS policy: only ACTIVE and deadline not passed
+    const { data, error } = await withTimeout(
+      supabase
+        .from("opportunities")
+        .select("id,title,type,provider,location,tags,source,deadline,apply_url,created_at,updated_at,status")
+        .order("created_at", { ascending: false }),
+      10000
+    );
+    if (error) throw error;
+    opportunities = data || [];
+  }
+
+  function setTypeFilter(type) {
+    typeFilter = type;
+    $("chip-all").classList.toggle("active", type === "all");
+    $("chip-sch").classList.toggle("active", type === "scholarship");
+    $("chip-int").classList.toggle("active", type === "internship");
+    renderExplorer();
+  }
+
+  function resetExplorer() {
+    typeFilter = "all";
+    $("q").value = "";
+    $("f-location").value = "all";
+    $("f-source").value = "all";
+    $("f-sort").value = "latest";
+    setTypeFilter("all");
+    renderExplorer();
+    toast("Reset done", "Filters cleared.", "success");
+  }
+
+  function hydrateFilterOptions() {
+    const locSel = $("f-location");
+    const current = locSel.value || "all";
+    const locations = Array.from(new Set(opportunities.map(o => o.location).filter(Boolean)))
+      .sort((a, b) => a.localeCompare(b));
+
+    locSel.innerHTML = '<option value="all">Location</option>';
+    locations.forEach(loc => {
+      const opt = document.createElement("option");
+      opt.value = loc;
+      opt.textContent = loc;
+      locSel.appendChild(opt);
+    });
+    locSel.value = locations.includes(current) ? current : "all";
+  }
+
+  function renderExplorer() {
+    // Supabase already filters expired via RLS, but keep safe UI-side too
+    const active = opportunities.filter(o => isActive(o.deadline));
+
+    const q = ($("q").value || "").trim().toLowerCase();
+    const loc = $("f-location").value;
+    const src = $("f-source").value;
+    const sort = $("f-sort").value;
+
+    let list = active.slice();
+
+    if (typeFilter !== "all") list = list.filter(o => o.type === typeFilter);
+    if (loc && loc !== "all") list = list.filter(o => o.location === loc);
+    if (src && src !== "all") list = list.filter(o => o.source === src);
+
+    if (q) {
+      list = list.filter(o => {
+        const hay = [o.title, o.provider, o.location, o.source, (o.tags || []).join(" ")].join(" ").toLowerCase();
+        return hay.includes(q);
+      });
+    }
+
+    if (sort === "latest") list.sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""));
+    else if (sort === "deadline") list.sort((a, b) => (a.deadline || "").localeCompare(b.deadline || ""));
+    else if (sort === "title") list.sort((a, b) => (a.title || "").localeCompare(b.title || ""));
+
+    $("count-pill").innerHTML =
+      `<i class="fa-solid fa-circle-check" style="color:var(--success)"></i> ${list.length} Active`;
+
+    const wrap = $("explorer-list");
+    const empty = $("explorer-empty");
+    wrap.innerHTML = "";
+
+    if (list.length === 0) {
+      empty.classList.remove("hidden");
+      return;
+    }
+    empty.classList.add("hidden");
+    list.forEach(o => wrap.appendChild(explorerCard(o)));
+  }
+
+  function computeMatchLabel(o) {
+    // keep your style
+    let h = 0;
+    const str = (o.title || "") + (o.provider || "");
+    for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
+    const min = 78, max = 99;
+    return `${min + (h % (max - min + 1))}% Match`;
+  }
+
+  function deadlineBadge(deadlineISO) {
+    const today = todayISO();
+    if (!deadlineISO) return `<span class="deadline-badge"><i class="fa-solid fa-calendar"></i> No deadline</span>`;
+
+    if (deadlineISO < today) {
+      return `<span class="deadline-badge dl-expired"><i class="fa-solid fa-triangle-exclamation"></i> Expired: ${formatISO(deadlineISO)}</span>`;
+    }
+    const days = diffDays(today, deadlineISO);
+    if (days <= 7) {
+      return `<span class="deadline-badge dl-soon"><i class="fa-solid fa-clock"></i> Deadline: ${formatISO(deadlineISO)}</span>`;
+    }
+    return `<span class="deadline-badge"><i class="fa-solid fa-calendar"></i> Deadline: ${formatISO(deadlineISO)}</span>`;
+  }
+
+  function explorerCard(o) {
+    const card = document.createElement("div");
+    card.className = "job-card";
+
+    const dl = deadlineBadge(o.deadline);
+    const src = o.source === "SCRAPED"
+      ? `<span class="source-badge src-scraped"><i class="fa-solid fa-robot"></i> SCRAPED</span>`
+      : `<span class="source-badge src-manual"><i class="fa-solid fa-pen"></i> MANUAL</span>`;
+
+    const type = o.type === "scholarship"
+      ? `<span class="tag"><i class="fa-solid fa-graduation-cap"></i> Scholarship</span>`
+      : `<span class="tag"><i class="fa-solid fa-briefcase"></i> Internship</span>`;
+
+    card.innerHTML = `
+      <div class="match-score">${computeMatchLabel(o)}</div>
+
+      <div class="job-top-row">
+        <div class="logo-box"></div>
+        <div style="min-width:0;">
+          <div class="job-title">${escapeHTML(o.title)}</div>
+          <div class="muted" style="font-weight:700; font-size:0.9rem;">${escapeHTML(o.provider || "-")} • ${escapeHTML(o.location || "-")}</div>
+        </div>
+      </div>
+
+      <div class="flex" style="gap:10px; flex-wrap:wrap; margin-bottom: 8px;">
+        ${type}
+        ${src}
+        ${dl}
+      </div>
+
+      <div style="margin-top:10px;">
+        ${(o.tags || []).slice(0, 6).map(t => `<span class="tag">${escapeHTML(t)}</span>`).join("")}
+      </div>
+
+      <div class="job-actions">
+        <button class="btn btn-primary btn-block" onclick="applyNow('${encodeURIComponent(o.apply_url)}')">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> Apply (Official)
+        </button>
+      </div>
+    `;
+    return card;
+  }
+
+  function applyNow(urlEnc) {
+    const url = decodeURIComponent(urlEnc);
+    if (!url || !/^https?:\/\//i.test(url)) {
+      toast("Invalid URL", "This opportunity has an invalid apply link.", "danger");
+      return;
+    }
+    window.open(url, "_blank", "noopener,noreferrer");
+  }
+
+  function setTodayPill() {
+    const d = new Date();
+    const str = d.toLocaleDateString(undefined, { weekday: "short", year: "numeric", month: "short", day: "numeric" });
+    $("today-pill").innerHTML = `<i class="fa-solid fa-calendar-day"></i> Today: ${str}`;
+  }
+
+  /***********************
+   * ADMIN AUTH (Supabase FAST)
+   ***********************/
+  async function ensureAdminApproved(userId) {
+    const { data, error } = await withTimeout(
+      supabase.from("admins").select("id,is_active,role,college,email,full_name").eq("id", userId).maybeSingle(),
+      10000
+    );
+    if (error) throw error;
+    if (!data) throw new Error("Not approved as admin yet.");
+    if (!data.is_active) throw new Error("Admin disabled. Contact Super Admin.");
+    return data;
+  }
+
+  async function handleAdminLogin(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector("button[type='submit']");
+    const original = btn.innerHTML;
+    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Logging in...';
+
+    const email = $("admin-email").value.trim().toLowerCase();
+    const pass = $("admin-pass").value;
+
+    try {
+      const { data, error } = await withTimeout(
+        supabase.auth.signInWithPassword({ email, password: pass }),
+        10000
+      );
+      if (error) throw error;
+
+      const userId = data?.session?.user?.id;
+      if (!userId) throw new Error("Login OK but session missing.");
+
+      const adminRow = await ensureAdminApproved(userId);
+
+      adminSession = {
+        email: adminRow.email || email,
+        role: adminRow.role || "ADMIN_DEPT",
+        college: adminRow.college || "",
+        user_id: adminRow.id,
+        logged_in_at: nowISO(),
+      };
+      saveSession(adminSession);
+
+      pushNotif("Admin Login", `Admin ${adminSession.email} logged in.`);
+      toast("Login success", "Welcome to Admin Dashboard.", "success");
+
+      btn.innerHTML = original;
+      closeModal();
+
+      // load opportunities for admin + public view
+      await refreshAllDataFast();
+      navTo("admin");
+
+    } catch (err) {
+      console.error(err);
+      btn.innerHTML = original;
+      pushNotif("Failed Login Attempt", `Invalid admin login attempt for ${email || "unknown"}.`);
+      toast("Login failed", err?.message || "Check email & password.", "danger");
+      try { await supabase.auth.signOut(); } catch {}
+    }
+  }
+
+  async function adminLogout() {
+    adminSession = null;
+    clearSession();
+    try { await supabase.auth.signOut(); } catch {}
+    toast("Logged out", "Admin session ended.", "success");
+    navTo("explorer");
+    syncNavbarState();
+  }
+
+  /***********************
+   * ADMIN UI TABS (kept)
+   ***********************/
+  function showAdminTab(tabId) {
+    document.querySelectorAll("[id^='adm-']").forEach(el => el.classList.add("hidden"));
+    const target = document.getElementById("adm-" + tabId);
+    if (target) target.classList.remove("hidden");
+  }
+
+  function switchTab(role, tabId) {
+    showAdminTab(tabId);
+    const mainEl = document.getElementById("page-admin");
+    mainEl.querySelectorAll(".nav-item").forEach(item => item.classList.remove("active"));
+    if (window.event && window.event.currentTarget) window.event.currentTarget.classList.add("active");
+
+    if (tabId === "ops") renderAdminOpsTable();
+    if (tabId === "logs") renderAdminLogs();
+    if (tabId === "req") loadAdminRequests();
+  }
+
+  /***********************
+   * ADMIN: OPPORTUNITIES CRUD (Supabase)
+   ***********************/
+  function refreshAdmin() {
+    if (!adminSession) return;
+
+    $("admin-role").textContent = adminSession.role || "ADMIN";
+
+    const total = opportunities.length;
+    const active = opportunities.filter(o => isActive(o.deadline)).length;
+    const sch = opportunities.filter(o => o.type === "scholarship").length;
+    const intr = opportunities.filter(o => o.type === "internship").length;
+
+    $("stat-total").textContent = total;
+    $("stat-active").textContent = active;
+    $("stat-sch").textContent = sch;
+    $("stat-int").textContent = intr;
+
+    renderAdminNotifDropdown();
+    renderAdminOpsTable();
+    renderAdminLogs();
+  }
+
+  function renderAdminOpsTable() {
+    const body = $("admin-ops-body");
+    if (!body) return;
+    body.innerHTML = "";
+
+    const list = opportunities.slice().sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""));
+
+    list.forEach(o => {
+      const tr = document.createElement("tr");
+      const status = isActive(o.deadline)
+        ? `<span class="status-badge sb-active"><i class="fa-solid fa-circle-check"></i> ACTIVE</span>`
+        : `<span class="status-badge sb-expired"><i class="fa-solid fa-circle-xmark"></i> EXPIRED</span>`;
+
+      const type = o.type === "scholarship"
+        ? `<span class="status-badge sb-scraped"><i class="fa-solid fa-graduation-cap"></i> SCHOLARSHIP</span>`
+        : `<span class="status-badge sb-manual" style="background:#fff7ed; border-color:#fed7aa; color:#9a3412;"><i class="fa-solid fa-briefcase"></i> INTERNSHIP</span>`;
+
+      const source = o.source === "SCRAPED"
+        ? `<span class="status-badge sb-scraped"><i class="fa-solid fa-robot"></i> SCRAPED</span>`
+        : `<span class="status-badge sb-manual"><i class="fa-solid fa-pen"></i> MANUAL</span>`;
+
+      tr.innerHTML = `
+        <td style="font-weight:900;">${escapeHTML(o.title)}</td>
+        <td>${type}</td>
+        <td>${escapeHTML(o.provider || "-")}</td>
+        <td>${escapeHTML(o.location || "-")}</td>
+        <td>${source}</td>
+        <td style="font-weight:900;">${escapeHTML(o.deadline || "-")}</td>
+        <td>${status}</td>
+        <td style="text-align:right; white-space:nowrap;">
+          <button class="btn btn-secondary btn-sm" onclick="openOppModal('edit','${o.id}')"><i class="fa-solid fa-pen"></i> Edit</button>
+          <button class="btn btn-secondary btn-sm" onclick="deleteOpportunity('${o.id}')"><i class="fa-solid fa-trash"></i> Delete</button>
+        </td>
+      `;
+      body.appendChild(tr);
+    });
+  }
+
+  function openOppModal(mode, id) {
+    if (!adminSession) {
+      toast("Admin access required", "Please login to manage opportunities.", "danger");
+      openModal("admin");
+      return;
+    }
+    oppModalMode = mode;
+    editingId = id || null;
+
+    $("opp-modal").classList.add("open");
+
+    if (mode === "add") {
+      $("opp-modal-title").textContent = "Add Opportunity";
+      $("opp-save-btn").innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Save`;
+      clearOppForm();
+      // default deadline optional
+    } else {
+      $("opp-modal-title").textContent = "Edit Opportunity";
+      $("opp-save-btn").innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Update`;
+      fillOppForm(id);
+    }
+  }
+
+  function closeOppModal() {
+    $("opp-modal").classList.remove("open");
+    editingId = null;
+    oppModalMode = "add";
+  }
+
+  function clearOppForm() {
+    $("opp-title").value = "";
+    $("opp-type").value = "internship";
+    $("opp-source").value = "MANUAL";
+    $("opp-provider").value = "";
+    $("opp-location").value = "";
+    $("opp-deadline").value = "";
+    $("opp-url").value = "";
+    $("opp-tags").value = "";
+    $("opp-notes").value = "";
+  }
+
+  function fillOppForm(id) {
+    const o = opportunities.find(x => x.id === id);
+    if (!o) return;
+
+    $("opp-title").value = o.title || "";
+    $("opp-type").value = o.type || "internship";
+    $("opp-source").value = o.source || "MANUAL";
+    $("opp-provider").value = o.provider || "";
+    $("opp-location").value = o.location || "";
+    $("opp-deadline").value = o.deadline || "";
+    $("opp-url").value = o.apply_url || "";
+    $("opp-tags").value = (o.tags || []).join(", ");
+    $("opp-notes").value = o.notes || "";
+  }
+
+  async function saveOpportunity(e) {
+    e.preventDefault();
+    if (!adminSession) return;
+
+    const btn = $("opp-save-btn");
+    const original = btn.innerHTML;
+    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Saving...';
+
+    const payload = {
+      title: $("opp-title").value.trim(),
+      type: $("opp-type").value,
+      source: $("opp-source").value,
+      provider: $("opp-provider").value.trim(),
+      location: $("opp-location").value.trim(),
+      deadline: $("opp-deadline").value || null,
+      apply_url: $("opp-url").value.trim(),
+      tags: parseTags($("opp-tags").value),
+      // notes not in your SQL table; keep local only or remove
+    };
+
+    if (!/^https?:\/\//i.test(payload.apply_url)) {
+      btn.innerHTML = original;
+      toast("Invalid Apply URL", "URL must start with http:// or https://", "danger");
+      return;
+    }
+
+    try {
+      if (oppModalMode === "add") {
+        const { error } = await withTimeout(
+          supabase.from("opportunities").insert(payload),
+          12000
+        );
+        if (error) throw error;
+
+        pushNotif("Opportunity Added", `${payload.title} added (${payload.source}).`);
+        toast("Added", "Opportunity saved successfully.", "success");
+      } else {
+        const { error } = await withTimeout(
+          supabase.from("opportunities").update(payload).eq("id", editingId),
+          12000
+        );
+        if (error) throw error;
+
+        pushNotif("Opportunity Updated", `${payload.title} updated.`);
+        toast("Updated", "Opportunity updated successfully.", "success");
+      }
+
+      btn.innerHTML = original;
+      closeOppModal();
+
+      await refreshAllDataFast();
+      refreshAdmin();
+      hydrateFilterOptions();
+      renderExplorer();
+
+    } catch (err) {
+      console.error(err);
+      btn.innerHTML = original;
+      toast("Save failed", err?.message || "Try again", "danger");
+    }
+  }
+
+  async function deleteOpportunity(id) {
+    if (!adminSession) return;
+
+    const o = opportunities.find(x => x.id === id);
+    if (!o) return;
+
+    const ok = confirm(`Delete "${o.title}"?\nThis will remove it from public view.`);
+    if (!ok) return;
+
+    try {
+      const { error } = await withTimeout(
+        supabase.from("opportunities").delete().eq("id", id),
+        12000
+      );
+      if (error) throw error;
+
+      pushNotif("Opportunity Deleted", `${o.title} deleted.`);
+      toast("Deleted", "Opportunity removed.", "success");
+
+      await refreshAllDataFast();
+      refreshAdmin();
+      renderExplorer();
+      hydrateFilterOptions();
+    } catch (err) {
+      console.error(err);
+      toast("Delete failed", err?.message || "Try again", "danger");
+    }
+  }
+
+  async function runExpiryCleanup() {
+    // Optional: mark expired as EXPIRED (or delete). We'll just mark.
+    if (!adminSession) return;
+
+    const today = todayISO();
+    try {
+      const { error } = await withTimeout(
+        supabase
+          .from("opportunities")
+          .update({ status: "EXPIRED" })
+          .lt("deadline", today),
+        12000
+      );
+      if (error) throw error;
+
+      pushNotif("Cleanup", "Expired opportunities marked EXPIRED.");
+      toast("Cleanup done", "Expired opportunities updated.", "success");
+
+      await refreshAllDataFast();
+      refreshAdmin();
+      renderExplorer();
+    } catch (err) {
+      console.error(err);
+      toast("Cleanup failed", err?.message || "Try again", "danger");
+    }
+  }
+
+  /***********************
+   * ADMIN REQUESTS (Approve/Reject via Edge Function)
+   ***********************/
+  async function loadAdminRequests() {
+    if (!adminSession) return;
+
+    const msgEl = $("req-msg");
+    const listEl = $("req-list");
+    const emptyEl = $("req-empty");
+    msgEl.textContent = "Loading...";
+    listEl.innerHTML = "";
+    emptyEl.style.display = "none";
+
+    try {
+      const { data, error } = await withTimeout(
+        supabase.from("admin_requests").select("*").order("created_at", { ascending: false }),
+        12000
+      );
+      if (error) throw error;
+
+      const pending = (data || []);
+
+      msgEl.textContent = "";
+      if (!pending.length) {
+        emptyEl.style.display = "block";
+        return;
+      }
+
+      listEl.innerHTML = pending.map(r => `
+        <div class="item">
+          <div><b>${escapeHTML(r.full_name || "-")}</b> — ${escapeHTML(r.email)}</div>
+          <div class="tag">${escapeHTML(r.college || "-")} • <b>${escapeHTML(r.status)}</b></div>
+          <div class="row" style="margin-top:10px">
+            <button class="btn btn-primary btn-sm" ${r.status !== "PENDING" ? "disabled" : ""} onclick="decideAdminRequest('${r.id}','APPROVE')">
+              <i class="fa-solid fa-check"></i> Approve
+            </button>
+            <button class="btn btn-secondary btn-sm" ${r.status !== "PENDING" ? "disabled" : ""} onclick="decideAdminRequest('${r.id}','REJECT')">
+              <i class="fa-solid fa-xmark"></i> Reject
+            </button>
+          </div>
+        </div>
+      `).join("");
+
+    } catch (err) {
+      console.error(err);
+      msgEl.textContent = err?.message || "Failed loading requests";
+    }
+  }
+
+  async function decideAdminRequest(request_id, action) {
+    try {
+      const { data } = await supabase.auth.getSession();
+      const session = data?.session;
+      if (!session) throw new Error("Please login again.");
+
+      toast("Working...", "Please wait...", "success");
+
+      await fetchJSON(`${FUNCTIONS_URL}/approve-admin`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ request_id, action }),
+      }, 15000);
+
+      pushNotif("Admin Request", `Request ${action}: ${request_id}`);
+      toast("Done", `Request ${action} completed.`, "success");
+
+      await loadAdminRequests();
+
+    } catch (err) {
+      console.error(err);
+      toast("Action failed", err?.message || "Try again", "danger");
+    }
+  }
+
+  /***********************
+   * NOTIFICATIONS UI (kept)
+   ***********************/
+  function toggleAdminNotif(e) {
+    e.stopPropagation();
+    $("admin-notif-dd").classList.toggle("show");
+  }
+
+  function renderAdminNotifDropdown() {
+    const dot = $("admin-notif-dot");
+    const ddItems = $("admin-notif-items");
+    if (!dot || !ddItems) return;
+
+    dot.classList.toggle("hidden", notifications.length === 0);
+    ddItems.innerHTML = "";
+
+    if (!notifications.length) {
+      ddItems.innerHTML = `<div class="notif-item"><strong>No notifications</strong><br><span class="muted" style="font-size:0.8rem;">You're all caught up.</span></div>`;
+      return;
+    }
+
+    notifications.slice().reverse().slice(0, 6).forEach(n => {
+      const el = document.createElement("div");
+      el.className = "notif-item";
+      el.innerHTML = `
+        <strong>${escapeHTML(n.title)}</strong><br>
+        <span style="font-size:0.8rem; color:#64748b; font-weight:700;">${escapeHTML(n.message)}</span><br>
+        <span style="font-size:0.75rem; color:#94a3b8; font-weight:800;">${escapeHTML(new Date(n.at).toLocaleString())}</span>
+      `;
+      ddItems.appendChild(el);
+    });
+  }
+
+  function renderAdminLogs() {
+    const listWrap = $("admin-logs-list");
+    const empty = $("admin-logs-empty");
+    if (!listWrap || !empty) return;
+
+    listWrap.innerHTML = "";
+    if (!notifications.length) {
+      empty.classList.remove("hidden");
+      return;
+    }
+    empty.classList.add("hidden");
+
+    notifications.slice().reverse().forEach(n => {
+      const box = document.createElement("div");
+      box.className = "dash-card";
+      box.style.marginBottom = "12px";
+      box.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap;">
+          <div>
+            <div style="font-weight:900; margin-bottom:4px;"><i class="fa-solid fa-bell" style="color:var(--accent)"></i> ${escapeHTML(n.title)}</div>
+            <div class="muted" style="font-weight:700;">${escapeHTML(n.message)}</div>
+          </div>
+          <div class="muted" style="font-size:0.85rem; font-weight:800;">${escapeHTML(new Date(n.at).toLocaleString())}</div>
+        </div>
+      `;
+      listWrap.appendChild(box);
+    });
+  }
+
+  function clearNotifications(e) {
+    if (e) e.stopPropagation();
+    notifications = [];
+    saveNotifications(notifications);
+    renderAdminNotifDropdown();
+    renderAdminLogs();
+    toast("Cleared", "All admin notifications cleared.", "success");
+  }
+
+  /***********************
+   * FAST REFRESH (one call)
+   ***********************/
+  async function refreshAllDataFast() {
+    await loadPublicOpportunities();
+  }
+
+  /***********************
+   * GLOBAL CLICK HANDLERS (kept)
+   ***********************/
+  window.onclick = function (event) {
+    const dd = $("admin-notif-dd");
+    if (dd && dd.classList.contains("show") && !event.target.closest(".notif-bell")) dd.classList.remove("show");
+
+    const loginModal = $("login-modal");
+    if (event.target === loginModal) closeModal();
+
+    const oppModal = $("opp-modal");
+    if (event.target === oppModal) closeOppModal();
+  };
+
+  /***********************
+   * EXPORT FUNCTIONS TO WINDOW (because your HTML uses onclick="")
+   ***********************/
+  window.navTo = navTo;
+  window.openModal = openModal;
+  window.closeModal = closeModal;
+  window.switchAuthType = switchAuthType;
+  window.handleAdminLogin = handleAdminLogin;
+  window.adminLogout = adminLogout;
+
+  window.setTypeFilter = setTypeFilter;
+  window.resetExplorer = resetExplorer;
+  window.renderExplorer = renderExplorer;
+  window.applyNow = applyNow;
+
+  window.switchTab = switchTab;
+  window.toggleAdminNotif = toggleAdminNotif;
+  window.clearNotifications = clearNotifications;
+
+  window.openOppModal = openOppModal;
+  window.closeOppModal = closeOppModal;
+  window.saveOpportunity = saveOpportunity;
+  window.deleteOpportunity = deleteOpportunity;
+  window.runExpiryCleanup = runExpiryCleanup;
+
+  window.loadAdminRequests = loadAdminRequests;
+  window.decideAdminRequest = decideAdminRequest;
+
+  /***********************
+   * INIT
+   ***********************/
+  (async function init() {
+    syncNavbarState();
+    setTodayPill();
+
+    try {
+      await refreshAllDataFast();
+    } catch (err) {
+      console.error(err);
+      toast("Supabase Error", err?.message || "Check config keys", "danger");
+    }
+
+    hydrateFilterOptions();
+    renderExplorer();
+    navTo("landing");
+  })();
+</script>
 </body>
+
 
 </html>
