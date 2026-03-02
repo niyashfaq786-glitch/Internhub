@@ -2,1874 +2,1110 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>InternHub | Kerala Polytechnic Platform</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InternHub | Kerala Polytechnic Platform</title>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <!-- Fonts & Icons -->
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-    rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* --- CSS VARIABLES --- */
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary: #0f172a;
+            --accent: #0ea5e9;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
 
-  <style>
-    /* ======= YOUR UI CSS (UNCHANGED) ======= */
-    :root {
-      --primary: #2563eb;
-      --primary-dark: #1e40af;
-      --secondary: #0f172a;
-      --accent: #0ea5e9;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
+            --bg-body: #f8fafc;
+            --surface: #ffffff;
+            --surface-glass: rgba(255, 255, 255, 0.9);
 
-      --bg-body: #f8fafc;
-      --surface: #ffffff;
-      --surface-glass: rgba(255, 255, 255, 0.9);
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 
-      --border: #e2e8f0;
-      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --radius-full: 9999px;
+        }
 
-      --radius-md: 12px;
-      --radius-lg: 20px;
-      --radius-full: 9999px;
-    }
+        /* --- GLOBAL RESET --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            outline: none;
+        }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
-    html, body { height: 100%; width: 100%; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--secondary);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
 
-    body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      background-color: var(--bg-body);
-      color: var(--secondary);
-      line-height: 1.5;
-      -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
-    }
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
 
-    img, video, canvas, svg { max-width: 100%; height: auto; display: block; }
-    a { text-decoration: none; color: inherit; }
-    button { cursor: pointer; font-family: inherit; border: none; background: none; }
-    input, select, textarea { font-family: inherit; }
-    .hidden { display: none !important; }
-    .flex { display: flex; }
-    .grid { display: grid; }
+        button {
+            cursor: pointer;
+            font-family: inherit;
+            border: none;
+            background: none;
+        }
 
-    .text-gradient {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
+        .hidden {
+            display: none !important;
+        }
 
-    .ambient-bg { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
-    .blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.4; }
-    .blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: #dbeafe; }
-    .blob-2 { bottom: -10%; right: -10%; width: 40vw; height: 40vw; background: #dcfce7; }
+        .flex {
+            display: flex;
+        }
 
-    .container {
-      width: 100%;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding-left: clamp(16px, 2vw, 24px);
-      padding-right: clamp(16px, 2vw, 24px);
-    }
+        .grid {
+            display: grid;
+        }
 
-    .navbar {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: calc(100% - 40px);
-      max-width: 1200px;
-      height: 70px;
-      background: var(--surface-glass);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.8);
-      border-radius: var(--radius-full);
-      box-shadow: var(--shadow-sm);
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 24px;
-    }
+        .text-gradient {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-    .nav-logo { font-weight: 800; font-size: 1.25rem; display: flex; align-items: center; gap: 10px; min-width: 0; white-space: nowrap; }
-    .nav-logo i { color: var(--primary); }
-    .nav-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
+        /* Container (needed, your HTML uses .container) */
+        .container {
+            width: calc(100% - 40px);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
 
-    .btn {
-      padding: 10px 24px;
-      border-radius: var(--radius-full);
-      font-weight: 600;
-      font-size: 0.9rem;
-      transition: 0.3s;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      white-space: nowrap;
-    }
-    .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4); }
-    .btn-secondary { background: white; color: var(--secondary); border: 1px solid var(--border); }
-    .btn-secondary:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
-    .btn-sm { padding: 6px 16px; font-size: 0.85rem; }
+        /* --- BACKGROUND --- */
+        .ambient-bg {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
 
-    .pill {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 6px 14px; border-radius: 999px;
-      background: #dbeafe; color: var(--primary);
-      font-weight: 700; font-size: 0.85rem;
-    }
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(90px);
+            opacity: 0.4;
+        }
 
-    .hero-section { padding-top: 140px; padding-bottom: 60px; text-align: center; position: relative; overflow: hidden; }
-    .hero-title { font-size: clamp(2.1rem, 5vw, 3.5rem); line-height: 1.1; font-weight: 800; margin-bottom: 24px; letter-spacing: -1px; position: relative; z-index: 2; word-break: break-word; }
-    .hero-desc { font-size: clamp(1rem, 2.2vw, 1.25rem); color: #64748b; max-width: 760px; margin: 0 auto 30px auto; position: relative; z-index: 2; }
+        .blob-1 {
+            top: -10%;
+            left: -10%;
+            width: 50vw;
+            height: 50vw;
+            background: #dbeafe;
+        }
 
-    .bg-icon { position: absolute; font-size: 4rem; color: var(--primary); opacity: 0.05; z-index: 1; pointer-events: none; }
-    .icon-1 { top: 15%; left: 10%; animation: floatIcon 8s infinite ease-in-out; }
-    .icon-2 { top: 25%; right: 15%; animation: floatIcon 9s infinite ease-in-out 1s; }
-    .icon-3 { bottom: 20%; left: 20%; animation: floatIcon 10s infinite ease-in-out 2s; }
-    .icon-4 { bottom: 30%; right: 10%; animation: floatIcon 7s infinite ease-in-out 0.5s; }
-    @keyframes floatIcon { 0%,100% { transform: translateY(0) rotate(0deg);} 50% { transform: translateY(-30px) rotate(5deg);} }
+        .blob-2 {
+            bottom: -10%;
+            right: -10%;
+            width: 40vw;
+            height: 40vw;
+            background: #dcfce7;
+        }
 
-    .animation-frame-container {
-      max-width: 1000px; margin: 0 auto 80px auto;
-      padding: clamp(18px, 3vw, 40px);
-      background: white; border-radius: 24px;
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-lg);
-      position: relative; overflow: hidden;
-    }
+        /* --- NAVBAR --- */
+        .navbar {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 40px);
+            max-width: 1200px;
+            height: 70px;
+            background: var(--surface-glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: var(--radius-full);
+            box-shadow: var(--shadow-sm);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+        }
 
-    .tech-grid {
-      position: absolute; inset: 0;
-      background-image: linear-gradient(var(--border) 1px, transparent 1px),
-        linear-gradient(90deg, var(--border) 1px, transparent 1px);
-      background-size: 30px 30px;
-      opacity: 0.3; z-index: 0;
-      animation: moveGrid 20s linear infinite;
-    }
-    @keyframes moveGrid { 0% { transform: translateY(0);} 100% { transform: translateY(30px);} }
+        .nav-logo {
+            font-weight: 800;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-    .process-title { text-align: center; font-size: 1.5rem; font-weight: 800; margin-bottom: 34px; position: relative; z-index: 1; }
-    .anim-steps { display: flex; justify-content: space-between; position: relative; z-index: 1; gap: 12px; flex-wrap: wrap; }
-    .anim-line-bg { position: absolute; top: 25px; left: 50px; right: 50px; height: 4px; background: #f1f5f9; z-index: 0; border-radius: 999px; }
-    .anim-line-fill { position: absolute; top: 25px; left: 50px; height: 4px; background: var(--primary); z-index: 1; width: 0%; animation: fillLine 4s infinite linear; border-radius: 999px; }
-    @keyframes fillLine { 0% { width: 0%; left: 50px; } 100% { width: calc(100% - 100px); left: 50px; } }
+        .nav-logo i {
+            color: var(--primary);
+        }
 
-    .anim-step { position: relative; z-index: 2; text-align: center; width: 150px; flex: 1; min-width: 160px; }
-    .anim-icon-box {
-      width: 50px; height: 50px; background: white;
-      border: 2px solid var(--primary); border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 16px auto; font-size: 1.2rem; color: var(--primary);
-      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
-      transition: all 0.3s;
-    }
-    .step-1 .anim-icon-box { animation: pulseIcon 4s infinite ease-in-out; animation-delay: 0s; }
-    .step-2 .anim-icon-box { animation: pulseIcon 4s infinite ease-in-out; animation-delay: 1s; }
-    .step-3 .anim-icon-box { animation: pulseIcon 4s infinite ease-in-out; animation-delay: 2s; }
-    .step-4 .anim-icon-box { animation: pulseIcon 4s infinite ease-in-out; animation-delay: 3s; }
+        .btn {
+            padding: 10px 24px;
+            border-radius: var(--radius-full);
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-    @keyframes pulseIcon {
-      0%,100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); }
-      50% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); }
-    }
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
 
-    .anim-text {
-      font-weight: 800; font-size: 0.9rem;
-      opacity: 0; transform: translateY(10px);
-      animation: fadeUpText 4s infinite; color: #334155;
-    }
-    .step-1 .anim-text { animation-delay: 0.2s; }
-    .step-2 .anim-text { animation-delay: 1.2s; }
-    .step-3 .anim-text { animation-delay: 2.2s; }
-    .step-4 .anim-text { animation-delay: 3.2s; }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+        }
 
-    @keyframes fadeUpText {
-      0%,10% { opacity: 0; transform: translateY(10px); }
-      20%,80% { opacity: 1; transform: translateY(0); }
-      90%,100% { opacity: 0; transform: translateY(-10px); }
-    }
+        .btn-secondary {
+            background: white;
+            color: var(--secondary);
+            border: 1px solid var(--border);
+        }
 
-    .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; padding-bottom: 80px; }
-    .feat-card { background: white; padding: 30px; border-radius: var(--radius-lg); border: 1px solid var(--border); transition: 0.3s; animation: slideUp 0.6s ease-out backwards; min-width: 0; }
-    .feat-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); border-color: var(--primary); }
-    .feat-card:nth-child(1) { animation-delay: 0.1s; }
-    .feat-card:nth-child(2) { animation-delay: 0.2s; }
-    .feat-card:nth-child(3) { animation-delay: 0.3s; }
-    .feat-card:nth-child(4) { animation-delay: 0.4s; }
-    @keyframes slideUp { from { opacity: 0; transform: translateY(20px);} to { opacity: 1; transform: translateY(0);} }
-    .feat-icon { width: 50px; height: 50px; background: #eff6ff; color: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; margin-bottom: 16px; }
+        .btn-sm {
+            padding: 6px 16px;
+            font-size: 0.85rem;
+        }
 
-    .explorer-wrap { padding-top: 110px; padding-bottom: 90px; }
-    .explorer-header { background: white; border: 1px solid var(--border); border-radius: 24px; box-shadow: var(--shadow-md); padding: 24px; margin-bottom: 20px; overflow: hidden; }
-    .explorer-title { font-size: 1.6rem; font-weight: 900; margin-bottom: 6px; letter-spacing: -0.3px; }
-    .explorer-sub { color: #64748b; font-size: 0.95rem; font-weight: 600; }
+        /* --- LANDING PAGE --- */
+        .hero-section {
+            padding-top: 140px;
+            padding-bottom: 60px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
 
-    .filter-bar { display: grid; grid-template-columns: 1.4fr 0.7fr 0.7fr 0.7fr 0.7fr; gap: 12px; margin-top: 18px; }
-    .input-shell { position: relative; background: #f8fafc; border: 1px solid var(--border); border-radius: 14px; padding: 10px 12px; display: flex; align-items: center; gap: 10px; min-height: 44px; min-width: 0; }
-    .input-shell i { color: #94a3b8; }
-    .input-shell input, .input-shell select { width: 100%; border: none; background: transparent; font-weight: 700; color: #0f172a; font-size: 0.9rem; min-width: 0; }
+        .hero-title {
+            font-size: 3.5rem;
+            line-height: 1.1;
+            font-weight: 800;
+            margin-bottom: 24px;
+            letter-spacing: -1px;
+            position: relative;
+            z-index: 2;
+        }
 
-    .chips-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
-    .chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 999px; border: 1px solid var(--border); background: white; font-weight: 800; font-size: 0.85rem; color: #475569; transition: 0.2s; }
-    .chip.active { background: #dbeafe; border-color: #bfdbfe; color: var(--primary-dark); }
+        .hero-desc {
+            font-size: 1.25rem;
+            color: #64748b;
+            max-width: 700px;
+            margin: 0 auto 40px auto;
+            position: relative;
+            z-index: 2;
+        }
 
-    .meta-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
-    .count-pill { background: #f1f5f9; border: 1px solid var(--border); padding: 6px 12px; border-radius: 999px; font-weight: 900; font-size: 0.85rem; color: #334155; display: inline-flex; align-items: center; gap: 8px; }
+        /* --- NEW: FLOATING BACKGROUND ICONS --- */
+        .bg-icon {
+            position: absolute;
+            font-size: 4rem;
+            color: var(--primary);
+            opacity: 0.05;
+            z-index: 1;
+        }
 
-    .job-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; margin-top: 18px; }
+        .icon-1 {
+            top: 15%;
+            left: 10%;
+            animation: floatIcon 8s infinite ease-in-out;
+        }
 
-    .job-card { background: white; border: 1px solid var(--border); border-radius: 20px; padding: 24px; transition: 0.3s; position: relative; overflow: hidden; min-width: 0; }
-    .job-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: #bfdbfe; }
+        .icon-2 {
+            top: 25%;
+            right: 15%;
+            animation: floatIcon 9s infinite ease-in-out 1s;
+        }
 
-    .match-score { position: absolute; top: 18px; right: 18px; background: #f0fdf4; color: #166534; font-size: 0.75rem; font-weight: 900; padding: 4px 10px; border-radius: 20px; border: 1px solid #bbf7d0; animation: badgePulse 2s infinite; max-width: calc(100% - 36px); white-space: nowrap; }
-    @keyframes badgePulse { 0% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.4);} 70% { box-shadow: 0 0 0 6px rgba(22, 163, 74, 0);} 100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0);} }
+        .icon-3 {
+            bottom: 20%;
+            left: 20%;
+            animation: floatIcon 10s infinite ease-in-out 2s;
+        }
 
-    .job-title { font-size: 1.1rem; font-weight: 900; margin: 12px 0 4px 0; letter-spacing: -0.2px; word-break: break-word; }
+        .icon-4 {
+            bottom: 30%;
+            right: 10%;
+            animation: floatIcon 7s infinite ease-in-out 0.5s;
+        }
 
-    .tag { padding: 4px 10px; background: #f1f5f9; border-radius: 8px; font-size: 0.75rem; font-weight: 900; color: #0f172a; margin-right: 6px; display: inline-block; margin-top: 6px; }
-    .muted { color: #64748b; }
+        @keyframes floatIcon {
 
-    .source-badge, .deadline-badge {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 6px 10px; border-radius: 999px; font-weight: 900;
-      font-size: 0.75rem; border: 1px solid var(--border);
-      background: white; color: #334155; white-space: nowrap; max-width: 100%;
-    }
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
 
-    .src-scraped { background: #eff6ff; border-color: #bfdbfe; color: #1e40af; }
-    .src-manual { background: #fef9c3; border-color: #fde68a; color: #854d0e; }
-    .dl-soon { background: #fff7ed; border-color: #fed7aa; color: #9a3412; }
-    .dl-expired { background: #fee2e2; border-color: #fecaca; color: #991b1b; }
+            50% {
+                transform: translateY(-30px) rotate(5deg);
+            }
+        }
 
-    .job-top-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; min-width: 0; }
-    .logo-box { width: 42px; height: 42px; background: #e2e8f0; border-radius: 10px; flex: 0 0 auto; }
+        /* --- NEW: ANIMATION FRAME SECTION --- */
+        .animation-frame-container {
+            max-width: 1000px;
+            margin: 0 auto 80px auto;
+            padding: 40px;
+            background: white;
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
 
-    .job-actions { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
-    .btn-block { width: 100%; justify-content: center; }
+        /* Tech Grid Background */
+        .tech-grid {
+            position: absolute;
+            inset: 0;
+            background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size: 30px 30px;
+            opacity: 0.3;
+            z-index: 0;
+            animation: moveGrid 20s linear infinite;
+        }
 
-    .empty-state { background: white; border: 1px solid var(--border); border-radius: 20px; padding: 28px; text-align: center; color: #64748b; box-shadow: var(--shadow-sm); margin-top: 18px; }
+        @keyframes moveGrid {
+            0% {
+                transform: translateY(0);
+            }
 
-    .app-shell { display: grid; grid-template-columns: 260px 1fr; min-height: calc(100vh - 80px); padding-top: 100px; gap: 32px; max-width: 1400px; margin: 0 auto; padding-left: clamp(16px, 2vw, 24px); padding-right: clamp(16px, 2vw, 24px); padding-bottom: 80px; }
-    .sidebar { position: sticky; top: 100px; height: fit-content; background: white; padding: 24px; border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
-    .sidebar-brand { font-weight: 900; font-size: 1.2rem; margin-bottom: 30px; padding-left: 12px; display: flex; align-items: center; gap: 10px; }
-    .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; margin-bottom: 6px; border-radius: 10px; color: #64748b; font-weight: 900; transition: 0.2s; cursor: pointer; list-style: none; }
-    .nav-item:hover, .nav-item.active { background: #eff6ff; color: var(--primary); }
-    .nav-item.active { background: #dbeafe; }
-    .main-content { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
-    .dash-card { background: white; padding: 24px; border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); min-width: 0; }
-    .dash-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
+            100% {
+                transform: translateY(30px);
+            }
+        }
 
-    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
-    .stat-box { background: #f8fafc; padding: 20px; border-radius: 16px; border: 1px solid var(--border); min-width: 0; }
-    .stat-num { font-size: 2rem; font-weight: 900; color: var(--secondary); }
-    .stat-label { font-size: 0.9rem; color: #64748b; font-weight: 800; }
+        .process-title {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 40px;
+            position: relative;
+            z-index: 1;
+        }
 
-    .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 16px; }
-    table { width: 100%; border-collapse: collapse; min-width: 920px; }
-    th { text-align: left; padding: 16px; font-size: 0.75rem; text-transform: uppercase; color: #64748b; background: #f8fafc; border-bottom: 1px solid var(--border); letter-spacing: 0.06em; white-space: nowrap; }
-    td { padding: 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+        .anim-steps {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            z-index: 1;
+        }
 
-    .status-badge { padding: 6px 12px; border-radius: 999px; font-size: 0.75rem; font-weight: 900; display: inline-flex; align-items: center; gap: 8px; border: 1px solid transparent; white-space: nowrap; }
-    .sb-active { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
-    .sb-expired { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
-    .sb-scraped { background: #eff6ff; color: #1e40af; border-color: #bfdbfe; }
-    .sb-manual { background: #fef9c3; color: #854d0e; border-color: #fde68a; }
+        .anim-line-bg {
+            position: absolute;
+            top: 25px;
+            left: 50px;
+            right: 50px;
+            height: 4px;
+            background: #f1f5f9;
+            z-index: 0;
+        }
 
-    .role-selector { display: flex; align-items: center; gap: 8px; background: #f1f5f9; padding: 6px 12px; border-radius: 10px; border: 1px solid var(--border); }
-    .role-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); }
+        .anim-line-fill {
+            position: absolute;
+            top: 25px;
+            left: 50px;
+            height: 4px;
+            background: var(--primary);
+            z-index: 1;
+            width: 0%;
+            animation: fillLine 4s infinite linear;
+        }
 
-    .notif-bell { position: relative; cursor: pointer; }
-    .notif-badge { position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; background: var(--danger); border-radius: 50%; border: 2px solid white; }
+        .anim-step {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            width: 150px;
+        }
 
-    .notif-dropdown {
-      position: absolute; top: 48px; right: 0;
-      width: min(340px, 90vw);
-      background: white; border-radius: 14px;
-      box-shadow: var(--shadow-lg);
-      border: 1px solid var(--border);
-      display: none; z-index: 2000; overflow: hidden;
-    }
-    .notif-dropdown.show { display: block; }
-    .notif-item { padding: 12px 14px; border-bottom: 1px solid #f1f5f9; font-size: 0.92rem; }
-    .notif-item:last-child { border-bottom: none; }
-    .notif-head { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; border-bottom: 1px solid #f1f5f9; background: #f8fafc; font-weight: 900; gap: 10px; flex-wrap: wrap; }
+        .anim-icon-box {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px auto;
+            font-size: 1.2rem;
+            color: var(--primary);
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+            transition: all 0.3s;
+        }
 
-    .modal-overlay {
-      position: fixed; inset: 0;
-      background: rgba(15, 23, 42, 0.4);
-      backdrop-filter: blur(4px);
-      display: none; align-items: center; justify-content: center;
-      z-index: 3000; opacity: 0; transition: opacity 0.3s;
-      padding: 18px;
-    }
-    .modal-overlay.open { display: flex; opacity: 1; }
-    .modal-box {
-      background: white;
-      width: min(720px, 96vw);
-      max-width: 100%;
-      padding: clamp(18px, 3vw, 34px);
-      border-radius: 24px;
-      box-shadow: 0 20px 50px -10px rgba(0,0,0,0.15);
-      transform: scale(0.9);
-      transition: transform 0.3s;
-      position: relative;
-      border: 1px solid var(--border);
-      max-height: 86vh;
-      overflow: auto;
-    }
-    .modal-overlay.open .modal-box { transform: scale(1); }
+        .step-1 .anim-icon-box {
+            animation: pulseIcon 4s infinite ease-in-out;
+            animation-delay: 0s;
+        }
 
-    .auth-tabs { display: flex; background: #f1f5f9; padding: 4px; border-radius: 12px; margin-bottom: 18px; }
-    .auth-tab { flex: 1; padding: 10px; text-align: center; border-radius: 8px; font-weight: 900; color: #64748b; }
-    .auth-tab.active { background: white; color: var(--primary); box-shadow: var(--shadow-sm); }
+        .step-2 .anim-icon-box {
+            animation: pulseIcon 4s infinite ease-in-out;
+            animation-delay: 1s;
+        }
 
-    .input-field { width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 14px; font-family: inherit; font-weight: 700; min-width: 0; }
-    .hint { font-size: 0.82rem; color: #64748b; margin-top: -6px; margin-bottom: 14px; }
+        .step-3 .anim-icon-box {
+            animation: pulseIcon 4s infinite ease-in-out;
+            animation-delay: 2s;
+        }
 
-    .toast-wrap { position: fixed; top: 100px; right: 20px; z-index: 4000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; max-width: calc(100vw - 40px); }
-    .toast { background: white; border: 1px solid var(--border); box-shadow: var(--shadow-lg); border-radius: 14px; padding: 12px 14px; min-width: 260px; max-width: min(360px, calc(100vw - 40px)); pointer-events: auto; animation: toastIn 0.25s ease-out; }
-    @keyframes toastIn { from { opacity: 0; transform: translateY(-8px);} to { opacity: 1; transform: translateY(0);} }
-    .toast-title { font-weight: 900; margin-bottom: 2px; }
-    .toast-desc { color: #64748b; font-size: 0.86rem; font-weight: 650; }
-    .toast.success { border-color: #bbf7d0; }
-    .toast.danger { border-color: #fecaca; }
+        .step-4 .anim-icon-box {
+            animation: pulseIcon 4s infinite ease-in-out;
+            animation-delay: 3s;
+        }
 
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
-    .form-grid .full { grid-column: 1 / -1; }
-    .label { font-size: 0.85rem; font-weight: 900; color: #334155; margin-bottom: 6px; display: block; }
-    textarea.input-field { min-height: 90px; resize: vertical; }
+        .anim-text {
+            font-weight: 600;
+            font-size: 0.9rem;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeUpText 4s infinite;
+        }
 
-    @media (max-width: 980px) { .filter-bar { grid-template-columns: 1fr 1fr; } }
-    @media (max-width: 640px) {
-      .filter-bar { grid-template-columns: 1fr; }
-      .form-grid { grid-template-columns: 1fr; }
-      table { min-width: 860px; }
-    }
-    @media (max-width: 768px) {
-      .navbar { top: 0; width: 100%; border-radius: 0; padding: 0 14px; }
-      .app-shell { grid-template-columns: 1fr; padding-top: 80px; }
-      .sidebar { display: none; }
-      .anim-line-bg, .anim-line-fill { display: none; }
-    }
-  </style>
+        .step-1 .anim-text {
+            animation-delay: 0.2s;
+        }
+
+        .step-2 .anim-text {
+            animation-delay: 1.2s;
+        }
+
+        .step-3 .anim-text {
+            animation-delay: 2.2s;
+        }
+
+        .step-4 .anim-text {
+            animation-delay: 3.2s;
+        }
+
+        @keyframes fillLine {
+            0% {
+                width: 0%;
+                left: 50px;
+            }
+
+            100% {
+                width: 100%;
+                left: 50px;
+            }
+        }
+
+        @keyframes pulseIcon {
+
+            0%,
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4);
+            }
+
+            50% {
+                transform: scale(1.1);
+                box-shadow: 0 0 0 10px rgba(37, 99, 235, 0);
+            }
+        }
+
+        @keyframes fadeUpText {
+
+            0%,
+            10% {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            20%,
+            80% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            90%,
+            100% {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+        }
+
+        /* --- FEATURES WITH ENTRANCE ANIMATION --- */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            padding-bottom: 80px;
+        }
+
+        .feat-card {
+            background: white;
+            padding: 30px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            transition: 0.3s;
+            animation: slideUp 0.6s ease-out backwards;
+        }
+
+        .feat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+
+        .feat-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .feat-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .feat-card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .feat-card:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .feat-icon {
+            width: 50px;
+            height: 50px;
+            background: #eff6ff;
+            color: var(--primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            margin-bottom: 16px;
+        }
+
+        /* --- DASHBOARD SHELL (we reuse cards + grid for Explorer) --- */
+        .dash-card {
+            background: white;
+            padding: 24px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Job Cards (used for Opportunity cards too) */
+        .job-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .job-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .job-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: #c7d2fe;
+        }
+
+        .job-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 12px 0 4px 0;
+        }
+
+        .tag {
+            padding: 4px 10px;
+            background: #f1f5f9;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--secondary);
+            margin-right: 6px;
+            display: inline-block;
+            margin-top: 6px;
+        }
+
+        /* Inputs (reused) */
+        .input-field {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-family: inherit;
+            background: white;
+        }
+
+        /* Explorer small extras */
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: #dbeafe;
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .muted {
+            color: #64748b;
+        }
+
+        .loader {
+            padding: 30px;
+            text-align: center;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .empty {
+            padding: 30px;
+            text-align: center;
+            color: #64748b;
+            border: 1px dashed #cbd5e1;
+            border-radius: 20px;
+            background: white;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                top: 0;
+                width: 100%;
+                border-radius: 0;
+            }
+
+            .hero-title {
+                font-size: 2.2rem;
+            }
+
+            .anim-steps {
+                flex-direction: column;
+                gap: 40px;
+            }
+
+            .anim-line-bg,
+            .anim-line-fill {
+                display: none;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-  <div class="ambient-bg">
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
-  </div>
-
-  <div class="toast-wrap" id="toast-wrap"></div>
-
-  <nav class="navbar">
-    <a href="#" class="nav-logo" onclick="navTo('landing')">
-      <i class="fa-solid fa-graduation-cap"></i> InternHub
-    </a>
-    <div class="nav-actions">
-      <button class="btn btn-secondary btn-sm" onclick="navTo('explorer')"><i class="fa-solid fa-compass"></i> Home</button>
-
-      <button class="btn btn-primary btn-sm" id="btn-admin-open" onclick="openModal('admin')">
-        <i class="fa-solid fa-shield-halved"></i> Admin
-      </button>
-
-      <button class="btn btn-secondary btn-sm hidden" id="btn-admin-panel" onclick="navTo('admin')">
-        <i class="fa-solid fa-gauge"></i> Admin Panel
-      </button>
-
-      <button class="btn btn-secondary btn-sm hidden" id="btn-admin-logout" onclick="adminLogout()">
-        <i class="fa-solid fa-right-from-bracket"></i> Logout
-      </button>
+    <!-- Background Ambient Light -->
+    <div class="ambient-bg">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
     </div>
-  </nav>
 
-  <!-- PAGE 1: LANDING -->
-  <main id="page-landing">
-    <i class="fa-solid fa-robot bg-icon icon-1"></i>
-    <i class="fa-solid fa-briefcase bg-icon icon-2"></i>
-    <i class="fa-solid fa-graduation-cap bg-icon icon-3"></i>
-    <i class="fa-solid fa-microchip bg-icon icon-4"></i>
-
-    <div class="container hero-section">
-      <div class="pill" style="margin-bottom: 18px;">
-        <i class="fa-solid fa-check-circle"></i> Official Partner: Kerala Polytechnics
-      </div>
-
-      <h1 class="hero-title">
-        Public Scholarships & Internships for <br>
-        <span class="text-gradient">Diploma Students</span>
-      </h1>
-
-      <p class="hero-desc">
-        InternHub lists active opportunities with powerful search, filters, and deadline-based auto-hide.
-        Admins manage listings securely via an Admin-only console.
-      </p>
-
-      <div class="flex" style="justify-content:center; gap:12px; flex-wrap:wrap; margin-top: 6px;">
-        <button class="btn btn-primary" onclick="navTo('explorer')">
-          <i class="fa-solid fa-compass"></i> Browse Opportunities
+    <!-- PERSISTENT NAVBAR (ONLY ONE BUTTON: BROWSE) -->
+    <nav class="navbar">
+        <a href="#" class="nav-logo" onclick="navTo('landing')">
+            <i class="fa-solid fa-graduation-cap"></i> InternHub
+        </a>
+        <button class="btn btn-primary btn-sm" onclick="navTo('explorer')">
+            <i class="fa-solid fa-magnifying-glass"></i> Browse
         </button>
-        <button class="btn btn-secondary" onclick="openModal('admin')">
-          <i class="fa-solid fa-shield-halved"></i> Admin Login
-        </button>
-      </div>
-    </div>
+    </nav>
 
-    <div class="container">
-      <div class="animation-frame-container">
-        <div class="tech-grid"></div>
-        <h3 class="process-title">How InternHub Works</h3>
+    <!-- =======================
+         PAGE 1: LANDING PAGE
+    ======================== -->
+    <main id="page-landing">
+        <!-- Floating Background Icons for Animation -->
+        <i class="fa-solid fa-robot bg-icon icon-1"></i>
+        <i class="fa-solid fa-briefcase bg-icon icon-2"></i>
+        <i class="fa-solid fa-graduation-cap bg-icon icon-3"></i>
+        <i class="fa-solid fa-microchip bg-icon icon-4"></i>
 
-        <div class="anim-line-bg"></div>
-        <div class="anim-line-fill"></div>
-
-        <div class="anim-steps">
-          <div class="anim-step step-1">
-            <div class="anim-icon-box"><i class="fa-solid fa-compass"></i></div>
-            <div class="anim-text">1. Open Explorer</div>
-          </div>
-          <div class="anim-step step-2">
-            <div class="anim-icon-box"><i class="fa-solid fa-filter"></i></div>
-            <div class="anim-text">2. Filter & Search</div>
-          </div>
-          <div class="anim-step step-3">
-            <div class="anim-icon-box"><i class="fa-solid fa-arrow-up-right-from-square"></i></div>
-            <div class="anim-text">3. Apply (Official Link)</div>
-          </div>
-          <div class="anim-step step-4">
-            <div class="anim-icon-box"><i class="fa-solid fa-shield-halved"></i></div>
-            <div class="anim-text">4. Admin Updates List</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="container feature-grid">
-      <div class="feat-card">
-        <div class="feat-icon"><i class="fa-solid fa-graduation-cap"></i></div>
-        <h3>Scholarships</h3>
-        <p style="font-size: 0.9rem; color: #64748b;">Public listing of verified scholarships with deadlines and tags.</p>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon"><i class="fa-solid fa-briefcase"></i></div>
-        <h3>Internships</h3>
-        <p style="font-size: 0.9rem; color: #64748b;">Browse internships and open the official apply link instantly.</p>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon"><i class="fa-solid fa-clock"></i></div>
-        <h3>Auto-Hide Expired</h3>
-        <p style="font-size: 0.9rem; color: #64748b;">Expired opportunities automatically disappear from public view.</p>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon"><i class="fa-solid fa-shield-halved"></i></div>
-        <h3>Admin Console</h3>
-        <p style="font-size: 0.9rem; color: #64748b;">Admin-only dashboard to add, edit, delete & manage listings.</p>
-      </div>
-    </div>
-  </main>
-
-  <!-- PAGE 2: EXPLORER -->
-  <main id="page-explorer" class="hidden">
-    <div class="explorer-wrap">
-      <div class="container">
-        <div class="explorer-header">
-          <div class="flex" style="justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap;">
-            <div>
-              <div class="explorer-title"><i class="fa-solid fa-compass" style="color:var(--accent)"></i> Opportunities Explorer</div>
-              <div class="explorer-sub">Search scholarships & internships. Only ACTIVE opportunities are shown.</div>
-            </div>
-            <div class="flex" style="gap:10px; flex-wrap:wrap;">
-              <button class="btn btn-secondary btn-sm" onclick="navTo('landing')"><i class="fa-solid fa-house"></i> Landing</button>
-              <button class="btn btn-primary btn-sm" onclick="openModal('admin')"><i class="fa-solid fa-shield-halved"></i> Admin Login</button>
-            </div>
-          </div>
-
-          <div class="chips-row">
-            <button class="chip active" id="chip-all" onclick="setTypeFilter('all')"><i class="fa-solid fa-layer-group"></i> All</button>
-            <button class="chip" id="chip-sch" onclick="setTypeFilter('scholarship')"><i class="fa-solid fa-graduation-cap"></i> Scholarships</button>
-            <button class="chip" id="chip-int" onclick="setTypeFilter('internship')"><i class="fa-solid fa-briefcase"></i> Internships</button>
-          </div>
-
-          <div class="filter-bar">
-            <div class="input-shell" title="Search by title/provider/tags">
-              <i class="fa-solid fa-magnifying-glass"></i>
-              <input id="q" type="text" placeholder="Search: title, provider, tags..." oninput="renderExplorer()" />
+        <div class="container hero-section">
+            <div
+                style="display: inline-block; padding: 6px 16px; background: #dbeafe; color: var(--primary); border-radius: 20px; font-weight: 600; font-size: 0.85rem; margin-bottom: 20px;">
+                <i class="fa-solid fa-check-circle"></i> Official Partner: Kerala Polytechnics
             </div>
 
-            <div class="input-shell" title="Location">
-              <i class="fa-solid fa-location-dot"></i>
-              <select id="f-location" onchange="renderExplorer()">
-                <option value="all">Location</option>
-              </select>
+            <h1 class="hero-title">
+                AI-Powered Career Platform for <br>
+                <span class="text-gradient">Diploma Students</span>
+            </h1>
+
+            <p class="hero-desc">
+                InternHub connects Kerala Polytechnic students with global internships and scholarships through
+                AI-driven matching, automated web scraping, and real-time tracking.
+            </p>
+
+            <!-- BROWSE CTA (ONLY PUBLIC FLOW) -->
+            <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap; margin-bottom: 10px;">
+                <button class="btn btn-primary" onclick="navTo('explorer')">
+                    <i class="fa-solid fa-magnifying-glass"></i> Browse Opportunities
+                </button>
             </div>
-
-            <div class="input-shell" title="Source">
-              <i class="fa-solid fa-database"></i>
-              <select id="f-source" onchange="renderExplorer()">
-                <option value="all">Source</option>
-                <option value="SCRAPED">SCRAPED</option>
-                <option value="MANUAL">MANUAL</option>
-              </select>
-            </div>
-
-            <div class="input-shell" title="Sort">
-              <i class="fa-solid fa-arrow-down-wide-short"></i>
-              <select id="f-sort" onchange="renderExplorer()">
-                <option value="latest">Sort: Latest</option>
-                <option value="deadline">Sort: Deadline</option>
-                <option value="title">Sort: Title</option>
-              </select>
-            </div>
-
-            <button class="btn btn-secondary" onclick="resetExplorer()"><i class="fa-solid fa-rotate-left"></i> Reset</button>
-          </div>
-
-          <div class="meta-row">
-            <div class="count-pill" id="count-pill"><i class="fa-solid fa-circle-check" style="color:var(--success)"></i> 0 Active</div>
-            <div class="count-pill" id="today-pill"><i class="fa-solid fa-calendar-day"></i> Today: --</div>
-          </div>
         </div>
 
-        <div id="explorer-list" class="job-grid"></div>
-        <div id="explorer-empty" class="empty-state hidden">
-          <div style="font-size:1.1rem; font-weight:900; color:#0f172a; margin-bottom:6px;">No matching opportunities</div>
-          Try adjusting search, filters, or sorting.
-        </div>
-      </div>
-    </div>
-  </main>
+        <!-- =======================
+             ANIMATION FRAME
+        ======================== -->
+        <div class="container">
+            <div class="animation-frame-container">
+                <div class="tech-grid"></div>
+                <h3 class="process-title">How InternHub Works</h3>
 
-  <!-- PAGE 3: ADMIN -->
-  <main id="page-admin" class="hidden">
-    <div class="app-shell">
-      <aside class="sidebar">
-        <div class="sidebar-brand">
-          <i class="fa-solid fa-shield-halved" style="color: var(--primary);"></i> Admin Console
-        </div>
-        <ul style="padding-left:0;">
-          <li class="nav-item active" onclick="switchTab('adm', 'overview')"><i class="fa-solid fa-chart-line"></i> Dashboard</li>
-          <li class="nav-item" onclick="switchTab('adm', 'ops')"><i class="fa-solid fa-briefcase"></i> Opportunities</li>
-          <li class="nav-item" onclick="switchTab('adm', 'req')"><i class="fa-solid fa-user-plus"></i> Admin Requests</li>
-          <li class="nav-item" onclick="switchTab('adm', 'logs')"><i class="fa-solid fa-bell"></i> Notifications</li>
-          <li class="nav-item" onclick="navTo('explorer')"><i class="fa-solid fa-compass"></i> Public View</li>
-          <li class="nav-item" onclick="adminLogout()"><i class="fa-solid fa-power-off"></i> Logout</li>
-        </ul>
-      </aside>
+                <div class="anim-line-bg"></div>
+                <div class="anim-line-fill"></div>
 
-      <div class="main-content">
-        <div class="dash-card">
-          <div class="flex" style="justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
-            <div>
-              <h2 style="font-size: 1.5rem; font-weight: 900;">Admin Dashboard</h2>
-              <p class="muted" style="font-size: 0.92rem;">Manage public opportunities (Scholarships + Internships)</p>
-            </div>
-
-            <div class="flex" style="align-items:center; gap:12px; flex-wrap:wrap;">
-              <div class="role-selector" title="Role">
-                <div class="role-dot"></div>
-                <span style="font-weight: 900; font-size: 0.9rem;" id="admin-role">ADMIN</span>
-              </div>
-
-              <div class="notif-bell" onclick="toggleAdminNotif(event)" title="Notifications">
-                <i class="fa-regular fa-bell" style="font-size: 1.2rem;"></i>
-                <span class="notif-badge hidden" id="admin-notif-dot"></span>
-                <div class="notif-dropdown" id="admin-notif-dd">
-                  <div class="notif-head">
-                    <span><i class="fa-solid fa-bell"></i> Admin Notifications</span>
-                    <button class="btn btn-secondary btn-sm" onclick="clearNotifications(event)">Clear</button>
-                  </div>
-                  <div id="admin-notif-items"></div>
+                <div class="anim-steps">
+                    <div class="anim-step step-1">
+                        <div class="anim-icon-box"><i class="fa-solid fa-id-card"></i></div>
+                        <div class="anim-text">1. Browse Listings</div>
+                    </div>
+                    <div class="anim-step step-2">
+                        <div class="anim-icon-box"><i class="fa-solid fa-filter"></i></div>
+                        <div class="anim-text">2. Search & Filter</div>
+                    </div>
+                    <div class="anim-step step-3">
+                        <div class="anim-icon-box"><i class="fa-solid fa-link"></i></div>
+                        <div class="anim-text">3. Open Official Link</div>
+                    </div>
+                    <div class="anim-step step-4">
+                        <div class="anim-icon-box"><i class="fa-solid fa-briefcase"></i></div>
+                        <div class="anim-text">4. Apply & Track</div>
+                    </div>
                 </div>
-              </div>
-
-              <button class="btn btn-primary btn-sm" onclick="openOppModal('add')">
-                <i class="fa-solid fa-plus"></i> Add Opportunity
-              </button>
             </div>
-          </div>
         </div>
 
-        <div id="adm-overview">
-          <div class="stats-row">
-            <div class="stat-box">
-              <div class="stat-num" id="stat-total">0</div>
-              <div class="stat-label">Total Opportunities</div>
+        <div class="container feature-grid">
+            <div class="feat-card">
+                <div class="feat-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+                <h3>Scholarships</h3>
+                <p style="font-size: 0.9rem; color: #64748b;">Browse scholarship opportunities relevant for diploma
+                    students.</p>
             </div>
-            <div class="stat-box">
-              <div class="stat-num" style="color: var(--success);" id="stat-active">0</div>
-              <div class="stat-label">Active Opportunities</div>
+            <div class="feat-card">
+                <div class="feat-icon"><i class="fa-solid fa-briefcase"></i></div>
+                <h3>Internships</h3>
+                <p style="font-size: 0.9rem; color: #64748b;">Find internships and training programs from trusted
+                    sources.</p>
             </div>
-            <div class="stat-box">
-              <div class="stat-num" style="color: var(--accent);" id="stat-sch">0</div>
-              <div class="stat-label">Scholarships</div>
+            <div class="feat-card">
+                <div class="feat-icon"><i class="fa-solid fa-filter"></i></div>
+                <h3>Filters</h3>
+                <p style="font-size: 0.9rem; color: #64748b;">Search, filter by type/location, and sort instantly.</p>
             </div>
-            <div class="stat-box">
-              <div class="stat-num" style="color: var(--warning);" id="stat-int">0</div>
-              <div class="stat-label">Internships</div>
+            <div class="feat-card">
+                <div class="feat-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                <h3>Auto Expiry</h3>
+                <p style="font-size: 0.9rem; color: #64748b;">Expired opportunities are hidden automatically.</p>
             </div>
-          </div>
-
-          <div class="dash-card" style="margin-top:18px;">
-            <div class="dash-header">
-              <h3 style="font-weight: 900;">Automation Status (Backend-ready)</h3>
-              <button class="btn btn-secondary btn-sm" onclick="runExpiryCleanup()">
-                <i class="fa-solid fa-broom"></i> Run Expiry Cleanup
-              </button>
-            </div>
-            <div class="muted">
-              Public view auto-hides expired opportunities by deadline. This button optionally deletes expired records from DB.
-            </div>
-          </div>
         </div>
+    </main>
 
-        <div id="adm-ops" class="hidden">
-          <div class="dash-card">
-            <div class="dash-header">
-              <div>
-                <h3 style="font-weight:900;">Opportunity Management</h3>
-                <p class="muted" style="font-size:0.9rem;">Add/Edit/Delete opportunities. Public list updates instantly.</p>
-              </div>
-              <div class="flex" style="gap:10px; flex-wrap:wrap;">
-                <button class="btn btn-secondary btn-sm" onclick="exportJSON()"><i class="fa-solid fa-download"></i> Export JSON</button>
-                <button class="btn btn-secondary btn-sm" onclick="importJSONPrompt()"><i class="fa-solid fa-upload"></i> Import JSON</button>
-              </div>
-            </div>
+    <!-- =======================
+         PAGE 2: OPPORTUNITIES EXPLORER (PUBLIC)
+    ======================== -->
+    <main id="page-explorer" class="hidden">
+        <div class="container" style="padding-top: 120px; padding-bottom: 60px;">
 
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Title</th>
-                    <th>Type</th>
-                    <th>Provider</th>
-                    <th>Location</th>
-                    <th>Source</th>
-                    <th>Deadline</th>
-                    <th>Status</th>
-                    <th style="text-align:right;">Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="admin-ops-body"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
+            <div
+                style="display:flex; justify-content:space-between; align-items:flex-end; gap:16px; flex-wrap:wrap; margin-bottom: 18px;">
+                <div>
+                    <h2 style="font-size: 1.8rem; font-weight: 800; letter-spacing: -0.5px;">
+                        <span class="text-gradient">Opportunities</span> Explorer
+                    </h2>
+                    <p class="muted" style="margin-top: 6px;">
+                        Search, filter, sort. Apply opens the official website in a new tab. Expired listings are
+                        hidden.
+                    </p>
+                </div>
 
-        <div id="adm-req" class="hidden">
-          <div class="dash-card">
-            <div class="dash-header">
-              <div>
-                <h3 style="font-weight:900;">Admin Requests</h3>
-                <p class="muted" style="font-size:0.9rem;">Approve new admins. Approval auto-creates login + adds into admins table.</p>
-              </div>
-              <button class="btn btn-secondary btn-sm" onclick="loadAdminRequests()"><i class="fa-solid fa-rotate"></i> Refresh</button>
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <button class="btn btn-secondary btn-sm" onclick="navTo('landing')">
+                        <i class="fa-solid fa-house"></i> Home
+                    </button>
+                    <button class="btn btn-primary btn-sm" onclick="refreshExplorer()">
+                        <i class="fa-solid fa-arrows-rotate"></i> Refresh
+                    </button>
+                </div>
             </div>
 
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Email</th>
-                    <th>Name</th>
-                    <th>College</th>
-                    <th>Dept</th>
-                    <th>Status</th>
-                    <th>Requested</th>
-                    <th style="text-align:right;">Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="admin-req-body"></tbody>
-              </table>
+            <!-- Controls -->
+            <div class="dash-card" style="margin-bottom: 16px;">
+                <div style="display:grid; grid-template-columns: 1.4fr 0.8fr 0.8fr 0.8fr; gap: 12px;">
+                    <div style="position:relative;">
+                        <i class="fa-solid fa-magnifying-glass"
+                            style="position:absolute; left:14px; top:14px; color:#94a3b8;"></i>
+                        <input id="qSearch" class="input-field" placeholder="Search title, provider, tags..."
+                            style="padding-left: 40px;">
+                    </div>
+
+                    <select id="qType" class="input-field">
+                        <option value="all">All</option>
+                        <option value="scholarship">Scholarships</option>
+                        <option value="internship">Internships</option>
+                    </select>
+
+                    <input id="qLocation" class="input-field" placeholder="Location (e.g., Kochi / Remote)">
+
+                    <select id="qSort" class="input-field">
+                        <option value="latest">Latest</option>
+                        <option value="deadline">Deadline</option>
+                        <option value="title">Title</option>
+                    </select>
+                </div>
+
+                <div
+                    style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-top: 14px;">
+                    <div class="pill">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span id="activeCount">0</span> Active
+                    </div>
+                    <div class="muted" id="dataNote">Loading…</div>
+                </div>
             </div>
-          </div>
-        </div>
 
-        <div id="adm-logs" class="hidden">
-          <div class="dash-card">
-            <div class="dash-header">
-              <h3 style="font-weight:900;">Admin Notifications (Optional)</h3>
-              <button class="btn btn-secondary btn-sm" onclick="clearNotifications(event)"><i class="fa-solid fa-trash"></i> Clear</button>
+            <!-- List -->
+            <div id="oppList" class="loader">
+                <i class="fa-solid fa-circle-notch fa-spin"></i> Loading opportunities…
             </div>
-            <div id="admin-logs-list"></div>
-            <div id="admin-logs-empty" class="muted">No notifications yet.</div>
-          </div>
+
         </div>
-
-      </div>
-    </div>
-  </main>
-
-  <!-- LOGIN MODAL -->
-  <div id="login-modal" class="modal-overlay">
-    <div class="modal-box" style="width:min(460px, 96vw);">
-      <button onclick="closeModal()" style="position:absolute; top:18px; right:18px; font-size:1.2rem; color:#64748b;">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-
-      <h2 style="text-align:center; margin-bottom: 14px; font-weight:900;">Login to InternHub</h2>
-
-      <div class="auth-tabs">
-        <button class="auth-tab" id="t-student" onclick="switchAuthType('public')">Public</button>
-        <button class="auth-tab active" id="t-admin" onclick="switchAuthType('admin')">Admin</button>
-      </div>
-
-      <div id="f-public" class="hidden">
-        <div class="dash-card" style="padding:16px; border-radius:16px;">
-          <div style="font-weight:900; margin-bottom:6px;">Public Mode</div>
-          <div class="muted" style="font-size:0.92rem;">
-            Student accounts/login are removed in this version. Use Opportunities Explorer to browse and apply via official links.
-          </div>
-          <div class="flex" style="gap:10px; margin-top:12px;">
-            <button class="btn btn-primary btn-sm" style="width:100%; justify-content:center;" onclick="closeModal(); navTo('explorer')">
-              <i class="fa-solid fa-compass"></i> Open Explorer
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <form id="f-admin" onsubmit="handleAdminLogin(event)">
-        <label class="label">Admin Email</label>
-        <div style="position: relative; margin-bottom: 10px;">
-          <i class="fa-solid fa-envelope" style="position:absolute; left:12px; top:13px; color:#94a3b8;"></i>
-          <input type="email" class="input-field" id="admin-email" placeholder="admin@internhub.com" style="padding-left:36px;" required>
-        </div>
-
-        <label class="label">Password</label>
-        <div style="position: relative; margin-bottom: 10px;">
-          <i class="fa-solid fa-lock" style="position:absolute; left:12px; top:13px; color:#94a3b8;"></i>
-          <input type="password" class="input-field" id="admin-pass" placeholder="••••••••" style="padding-left:36px;" required>
-        </div>
-
-        <div class="flex" style="justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-top:-2px; margin-bottom: 12px;">
-          <button type="button" class="btn btn-secondary btn-sm" onclick="openRequestModal()">
-            <i class="fa-solid fa-user-plus"></i> Request Admin Access
-          </button>
-          <button type="button" class="btn btn-secondary btn-sm" onclick="forgotPassword()">
-            <i class="fa-solid fa-key"></i> Forgot Password
-          </button>
-        </div>
-
-        <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">
-          <i class="fa-solid fa-right-to-bracket"></i> Login
-        </button>
-      </form>
-    </div>
-  </div>
-
-  <!-- ADMIN REQUEST MODAL -->
-  <div id="req-modal" class="modal-overlay">
-    <div class="modal-box" style="width:min(560px, 96vw);">
-      <button onclick="closeRequestModal()" style="position:absolute; top:18px; right:18px; font-size:1.2rem; color:#64748b;">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-
-      <h2 style="font-weight:900; margin-bottom: 6px;">Request Admin Access</h2>
-      <div class="muted" style="margin-bottom: 12px;">
-        Submit request. A current admin must approve you. After approval, login credentials will be generated.
-      </div>
-
-      <form onsubmit="submitAdminRequest(event)">
-        <div class="form-grid">
-          <div class="full">
-            <label class="label">Email</label>
-            <input class="input-field" id="req-email" type="email" placeholder="yourname@gmail.com" required />
-          </div>
-          <div>
-            <label class="label">Full Name</label>
-            <input class="input-field" id="req-name" placeholder="Full name" />
-          </div>
-          <div>
-            <label class="label">College</label>
-            <input class="input-field" id="req-college" placeholder="Kerala Polytechnic" />
-          </div>
-          <div>
-            <label class="label">Department</label>
-            <input class="input-field" id="req-dept" placeholder="CSE / ECE / ..." />
-          </div>
-          <div class="full">
-            <label class="label">Reason</label>
-            <textarea class="input-field" id="req-reason" placeholder="Why should you be an admin?"></textarea>
-          </div>
-        </div>
-
-        <div class="flex" style="gap:10px; margin-top:14px; flex-wrap:wrap; justify-content:flex-end;">
-          <button type="button" class="btn btn-secondary" onclick="closeRequestModal()"><i class="fa-solid fa-ban"></i> Cancel</button>
-          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i> Submit Request</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- OPPORTUNITY MODAL -->
-  <div id="opp-modal" class="modal-overlay">
-    <div class="modal-box">
-      <button onclick="closeOppModal()" style="position:absolute; top:18px; right:18px; font-size:1.2rem; color:#64748b;">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-
-      <h2 style="text-align:left; margin-bottom: 6px; font-weight:900;" id="opp-modal-title">Add Opportunity</h2>
-      <div class="muted" style="margin-bottom: 12px;">This updates the public Opportunities Explorer instantly.</div>
-
-      <form id="opp-form" onsubmit="saveOpportunity(event)">
-        <div class="form-grid">
-          <div class="full">
-            <label class="label">Title</label>
-            <input class="input-field" id="opp-title" placeholder="e.g., Google Summer Internship" required />
-          </div>
-
-          <div>
-            <label class="label">Type</label>
-            <select class="input-field" id="opp-type" required>
-              <option value="internship">Internship</option>
-              <option value="scholarship">Scholarship</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="label">Source</label>
-            <select class="input-field" id="opp-source" required>
-              <option value="SCRAPED">SCRAPED</option>
-              <option value="MANUAL">MANUAL</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="label">Provider</label>
-            <input class="input-field" id="opp-provider" placeholder="e.g., Google" required />
-          </div>
-
-          <div>
-            <label class="label">Location</label>
-            <input class="input-field" id="opp-location" placeholder="e.g., Kochi / Remote" required />
-          </div>
-
-          <div>
-            <label class="label">Deadline</label>
-            <input type="date" class="input-field" id="opp-deadline" />
-          </div>
-
-          <div>
-            <label class="label">Apply URL</label>
-            <input class="input-field" id="opp-url" placeholder="https://official-site.com/apply" required />
-          </div>
-
-          <div class="full">
-            <label class="label">Tags (comma separated)</label>
-            <input class="input-field" id="opp-tags" placeholder="Python, Diploma, CSE, Remote" />
-          </div>
-
-          <div class="full">
-            <label class="label">Notes (optional)</label>
-            <textarea class="input-field" id="opp-notes" placeholder="Short note shown in admin only..."></textarea>
-          </div>
-        </div>
-
-        <div class="flex" style="gap:10px; margin-top:14px; flex-wrap:wrap; justify-content:flex-end;">
-          <button type="button" class="btn btn-secondary" onclick="closeOppModal()"><i class="fa-solid fa-ban"></i> Cancel</button>
-          <button type="submit" class="btn btn-primary" id="opp-save-btn"><i class="fa-solid fa-floppy-disk"></i> Save</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- SUPABASE JS -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <script>
-    // =========================
-    // CONFIG (SAFE FOR BROWSER)
-    // =========================
-    const SUPABASE_URL = "https://zyssuxxppcqsiwayptwo.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp5c3N1eHhwcGNxc2l3YXlwdHdvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyNDQyNDEsImV4cCI6MjA4NjgyMDI0MX0.mjUjJJh_EFvbp23vA7jcawiMCKV2XLeWkwDemnyLO4E";
-
-    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    // =========================
-    // STATE
-    // =========================
-    let opportunities = [];
-    let adminSession = null;   // { user, adminRow }
-    let notifications = [];
-    let typeFilter = "all";
-    let oppModalMode = "add";
-    let editingId = null;
-
-    // =========================
-    // NAV
-    // =========================
-    function navTo(pageId) {
-      document.querySelectorAll("main").forEach(el => el.classList.add("hidden"));
-      const page = document.getElementById("page-" + pageId);
-      if (page) page.classList.remove("hidden");
-
-      closeModal();
-      closeOppModal();
-      closeRequestModal();
-
-      if (pageId === "admin") {
-        if (!adminSession) {
-          toast("Admin access required", "Please login to open Admin Dashboard.", "danger");
-          navTo("explorer");
-          openModal("admin");
-          return;
-        }
-        showAdminTab("overview");
-        refreshAdmin();
-      }
-
-      if (pageId === "explorer") {
-        setTodayPill();
-        hydrateFilterOptions();
-        renderExplorer();
-      }
-
-      window.scrollTo(0, 0);
-      syncNavbarState();
-    }
-
-    // =========================
-    // AUTH MODAL
-    // =========================
-    function openModal(type) {
-      const modal = document.getElementById("login-modal");
-      modal.classList.add("open");
-      switchAuthType(type === "admin" ? "admin" : "public");
-    }
-    function closeModal() { document.getElementById("login-modal").classList.remove("open"); }
-
-    function switchAuthType(type) {
-      const isAdmin = type === "admin";
-      document.getElementById("t-admin").classList.toggle("active", isAdmin);
-      document.getElementById("t-student").classList.toggle("active", !isAdmin);
-
-      document.getElementById("f-admin").classList.toggle("hidden", !isAdmin);
-      document.getElementById("f-public").classList.toggle("hidden", isAdmin);
-    }
-
-    // =========================
-    // REQUEST ADMIN ACCESS
-    // =========================
-    function openRequestModal() {
-      document.getElementById("req-modal").classList.add("open");
-    }
-    function closeRequestModal() {
-      document.getElementById("req-modal").classList.remove("open");
-    }
-
-    async function submitAdminRequest(e) {
-      e.preventDefault();
-      const email = document.getElementById("req-email").value.trim().toLowerCase();
-      const full_name = document.getElementById("req-name").value.trim();
-      const college = document.getElementById("req-college").value.trim();
-      const dept = document.getElementById("req-dept").value.trim();
-      const reason = document.getElementById("req-reason").value.trim();
-
-      if (!email) {
-        toast("Email required", "Please enter your email.", "danger");
-        return;
-      }
-
-      const { error } = await sb.from("admin_requests").insert({
-        email, full_name, college, dept, reason, status: "PENDING"
-      });
-
-      if (error) {
-        toast("Request failed", error.message, "danger");
-        return;
-      }
-
-      toast("Request sent", "Waiting for admin approval.", "success");
-      closeRequestModal();
-      closeModal();
-    }
-
-    // =========================
-    // ADMIN LOGIN (REAL)
-    // =========================
-    async function handleAdminLogin(e) {
-      e.preventDefault();
-      const btn = e.target.querySelector("button[type='submit']");
-      const original = btn.innerHTML;
-      btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Logging in...';
-
-      const email = document.getElementById("admin-email").value.trim().toLowerCase();
-      const pass = document.getElementById("admin-pass").value;
-
-      try {
-        const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
-        if (error) throw error;
-
-        // Verify admin in admins table
-        const { data: adminRow, error: adminErr } = await sb
-          .from("admins")
-          .select("*")
-          .eq("user_id", data.user.id)
-          .maybeSingle();
-
-        if (adminErr || !adminRow || !adminRow.approved) {
-          await sb.auth.signOut();
-          throw new Error("Not approved as admin. Please request access or wait for approval.");
-        }
-
-        adminSession = { user: data.user, adminRow };
-        toast("Login success", "Welcome to Admin Dashboard.", "success");
-        closeModal();
-        navTo("admin");
-      } catch (err) {
-        toast("Login failed", err.message || "Invalid login.", "danger");
-      } finally {
-        btn.innerHTML = original;
-      }
-    }
-
-    async function forgotPassword() {
-      const email = (document.getElementById("admin-email").value || "").trim().toLowerCase();
-      if (!email) {
-        toast("Enter email", "Type your email first, then click Forgot Password.", "danger");
-        return;
-      }
-      const { error } = await sb.auth.resetPasswordForEmail(email, {
-        redirectTo: window.location.href
-      });
-      if (error) toast("Failed", error.message, "danger");
-      else toast("Email sent", "Password reset link sent to your email.", "success");
-    }
-
-    async function adminLogout() {
-      await sb.auth.signOut();
-      adminSession = null;
-      toast("Logged out", "Admin session ended.", "success");
-      navTo("explorer");
-      syncNavbarState();
-    }
-
-    function syncNavbarState() {
-      const isAdmin = !!adminSession;
-      document.getElementById("btn-admin-open").classList.toggle("hidden", isAdmin);
-      document.getElementById("btn-admin-panel").classList.toggle("hidden", !isAdmin);
-      document.getElementById("btn-admin-logout").classList.toggle("hidden", !isAdmin);
-    }
-
-    // =========================
-    // EXPLORER FILTERS
-    // =========================
-    function setTypeFilter(type) {
-      typeFilter = type;
-      document.getElementById("chip-all").classList.toggle("active", type === "all");
-      document.getElementById("chip-sch").classList.toggle("active", type === "scholarship");
-      document.getElementById("chip-int").classList.toggle("active", type === "internship");
-      renderExplorer();
-    }
-
-    function resetExplorer() {
-      typeFilter = "all";
-      document.getElementById("q").value = "";
-      document.getElementById("f-location").value = "all";
-      document.getElementById("f-source").value = "all";
-      document.getElementById("f-sort").value = "latest";
-      setTypeFilter("all");
-      renderExplorer();
-      toast("Reset done", "Filters cleared.", "success");
-    }
-
-    function hydrateFilterOptions() {
-      const locSel = document.getElementById("f-location");
-      const current = locSel.value || "all";
-      const locations = Array.from(new Set(opportunities.map(o => o.location).filter(Boolean))).sort((a, b) => a.localeCompare(b));
-      locSel.innerHTML = '<option value="all">Location</option>';
-      locations.forEach(loc => {
-        const opt = document.createElement("option");
-        opt.value = loc;
-        opt.textContent = loc;
-        locSel.appendChild(opt);
-      });
-      locSel.value = locations.includes(current) ? current : "all";
-    }
-
-    function renderExplorer() {
-      // DB already hides expired via RLS policy for public,
-      // but we keep client filter too for safety.
-      const active = opportunities.filter(o => isActive(o.deadline));
-
-      const q = (document.getElementById("q").value || "").trim().toLowerCase();
-      const loc = document.getElementById("f-location").value;
-      const src = document.getElementById("f-source").value;
-      const sort = document.getElementById("f-sort").value;
-
-      let list = active.slice();
-
-      if (typeFilter !== "all") list = list.filter(o => o.type === typeFilter);
-      if (loc && loc !== "all") list = list.filter(o => o.location === loc);
-      if (src && src !== "all") list = list.filter(o => o.source === src);
-
-      if (q) {
-        list = list.filter(o => {
-          const hay = [o.title, o.provider, o.location, o.source, (o.tags || []).join(" ")].join(" ").toLowerCase();
-          return hay.includes(q);
-        });
-      }
-
-      if (sort === "latest") list.sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""));
-      else if (sort === "deadline") list.sort((a, b) => (String(a.deadline || "")).localeCompare(String(b.deadline || "")));
-      else if (sort === "title") list.sort((a, b) => (a.title || "").localeCompare(b.title || ""));
-
-      document.getElementById("count-pill").innerHTML =
-        `<i class="fa-solid fa-circle-check" style="color:var(--success)"></i> ${list.length} Active`;
-
-      const wrap = document.getElementById("explorer-list");
-      const empty = document.getElementById("explorer-empty");
-      wrap.innerHTML = "";
-
-      if (list.length === 0) {
-        empty.classList.remove("hidden");
-        return;
-      }
-      empty.classList.add("hidden");
-
-      list.forEach(o => wrap.appendChild(explorerCard(o)));
-    }
-
-    function explorerCard(o) {
-      const card = document.createElement("div");
-      card.className = "job-card";
-
-      const dl = deadlineBadge(o.deadline);
-      const src = o.source === "SCRAPED"
-        ? `<span class="source-badge src-scraped"><i class="fa-solid fa-robot"></i> SCRAPED</span>`
-        : `<span class="source-badge src-manual"><i class="fa-solid fa-pen"></i> MANUAL</span>`;
-
-      const type = o.type === "scholarship"
-        ? `<span class="tag"><i class="fa-solid fa-graduation-cap"></i> Scholarship</span>`
-        : `<span class="tag"><i class="fa-solid fa-briefcase"></i> Internship</span>`;
-
-      card.innerHTML = `
-        <div class="match-score">${computeMatchLabel(o)}</div>
-
-        <div class="job-top-row">
-          <div class="logo-box"></div>
-          <div style="min-width:0;">
-            <div class="job-title">${escapeHTML(o.title)}</div>
-            <div class="muted" style="font-weight:700; font-size:0.9rem;">${escapeHTML(o.provider)} • ${escapeHTML(o.location)}</div>
-          </div>
-        </div>
-
-        <div class="flex" style="gap:10px; flex-wrap:wrap; margin-bottom: 8px;">
-          ${type}
-          ${src}
-          ${dl}
-        </div>
-
-        <div style="margin-top:10px;">
-          ${(o.tags || []).slice(0, 6).map(t => `<span class="tag">${escapeHTML(t)}</span>`).join("")}
-        </div>
-
-        <div class="job-actions">
-          <button class="btn btn-primary btn-block" onclick="applyNow('${encodeURIComponent(o.apply_url)}')">
-            <i class="fa-solid fa-arrow-up-right-from-square"></i> Apply (Official)
-          </button>
-        </div>
-      `;
-      return card;
-    }
-
-    function applyNow(urlEnc) {
-      const url = decodeURIComponent(urlEnc);
-      if (!url || !/^https?:\/\//i.test(url)) {
-        toast("Invalid URL", "This opportunity has an invalid apply link.", "danger");
-        return;
-      }
-      window.open(url, "_blank", "noopener,noreferrer");
-    }
-
-    // =========================
-    // ADMIN TABS
-    // =========================
-    function showAdminTab(tabId) {
-      document.querySelectorAll("[id^='adm-']").forEach(el => el.classList.add("hidden"));
-      const target = document.getElementById("adm-" + tabId);
-      if (target) target.classList.remove("hidden");
-    }
-
-    function switchTab(role, tabId) {
-      showAdminTab(tabId);
-      const mainEl = document.getElementById("page-admin");
-      mainEl.querySelectorAll(".nav-item").forEach(item => item.classList.remove("active"));
-      if (event && event.currentTarget) event.currentTarget.classList.add("active");
-
-      if (tabId === "ops") renderAdminOpsTable();
-      if (tabId === "logs") renderAdminLogs();
-      if (tabId === "req") loadAdminRequests();
-    }
-
-    async function refreshAdmin() {
-      if (!adminSession) return;
-
-      // refresh admin row
-      const { data: adminRow } = await sb.from("admins").select("*").eq("user_id", adminSession.user.id).maybeSingle();
-      if (adminRow) adminSession.adminRow = adminRow;
-
-      document.getElementById("admin-role").textContent = adminSession.adminRow.role || "ADMIN";
-
-      const total = opportunities.length;
-      const active = opportunities.filter(o => isActive(o.deadline)).length;
-      const sch = opportunities.filter(o => o.type === "scholarship").length;
-      const intr = opportunities.filter(o => o.type === "internship").length;
-
-      document.getElementById("stat-total").textContent = total;
-      document.getElementById("stat-active").textContent = active;
-      document.getElementById("stat-sch").textContent = sch;
-      document.getElementById("stat-int").textContent = intr;
-
-      await loadNotifications();
-      renderAdminNotifDropdown();
-      renderAdminOpsTable();
-      renderAdminLogs();
-    }
-
-    // =========================
-    // ADMIN: OPPORTUNITIES CRUD (Supabase)
-    // =========================
-    function openOppModal(mode, id) {
-      if (!adminSession) {
-        toast("Admin access required", "Please login to manage opportunities.", "danger");
-        openModal("admin");
-        return;
-      }
-      oppModalMode = mode;
-      editingId = id || null;
-
-      const modal = document.getElementById("opp-modal");
-      modal.classList.add("open");
-
-      const titleEl = document.getElementById("opp-modal-title");
-      const saveBtn = document.getElementById("opp-save-btn");
-
-      if (mode === "add") {
-        titleEl.textContent = "Add Opportunity";
-        saveBtn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Save`;
-        clearOppForm();
-        document.getElementById("opp-deadline").value = addDaysISO(14);
-      } else {
-        titleEl.textContent = "Edit Opportunity";
-        saveBtn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Update`;
-        fillOppForm(id);
-      }
-    }
-
-    function closeOppModal() {
-      document.getElementById("opp-modal").classList.remove("open");
-      editingId = null;
-      oppModalMode = "add";
-    }
-
-    function clearOppForm() {
-      document.getElementById("opp-title").value = "";
-      document.getElementById("opp-type").value = "internship";
-      document.getElementById("opp-source").value = "MANUAL";
-      document.getElementById("opp-provider").value = "";
-      document.getElementById("opp-location").value = "";
-      document.getElementById("opp-deadline").value = "";
-      document.getElementById("opp-url").value = "";
-      document.getElementById("opp-tags").value = "";
-      document.getElementById("opp-notes").value = "";
-    }
-
-    function fillOppForm(id) {
-      const o = opportunities.find(x => x.id === id);
-      if (!o) return;
-
-      document.getElementById("opp-title").value = o.title || "";
-      document.getElementById("opp-type").value = o.type || "internship";
-      document.getElementById("opp-source").value = o.source || "MANUAL";
-      document.getElementById("opp-provider").value = o.provider || "";
-      document.getElementById("opp-location").value = o.location || "";
-      document.getElementById("opp-deadline").value = (o.deadline || "").slice(0,10);
-      document.getElementById("opp-url").value = o.apply_url || "";
-      document.getElementById("opp-tags").value = (o.tags || []).join(", ");
-      document.getElementById("opp-notes").value = o.notes || "";
-    }
-
-    async function saveOpportunity(e) {
-      e.preventDefault();
-      if (!adminSession) return;
-
-      const btn = document.getElementById("opp-save-btn");
-      const original = btn.innerHTML;
-      btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Saving...';
-
-      const data = {
-        title: document.getElementById("opp-title").value.trim(),
-        type: document.getElementById("opp-type").value,
-        source: document.getElementById("opp-source").value,
-        provider: document.getElementById("opp-provider").value.trim(),
-        location: document.getElementById("opp-location").value.trim(),
-        deadline: document.getElementById("opp-deadline").value || null,
-        apply_url: document.getElementById("opp-url").value.trim(),
-        tags: parseTags(document.getElementById("opp-tags").value),
-        notes: document.getElementById("opp-notes").value.trim() || null,
-        created_by: adminSession.user.id
-      };
-
-      try {
-        if (!/^https?:\/\//i.test(data.apply_url)) throw new Error("URL must start with http:// or https://");
-
-        if (oppModalMode === "add") {
-          const { error } = await sb.from("opportunities").insert(data);
-          if (error) throw error;
-          await addNotification("Opportunity Added", `${data.title} added (${data.source}).`);
-          toast("Added", "Opportunity saved successfully.", "success");
-        } else {
-          const { error } = await sb.from("opportunities").update(data).eq("id", editingId);
-          if (error) throw error;
-          await addNotification("Opportunity Updated", `${data.title} updated.`);
-          toast("Updated", "Opportunity updated successfully.", "success");
-        }
-
-        closeOppModal();
-        await loadOpportunities();
-        hydrateFilterOptions();
-        renderExplorer();
-        refreshAdmin();
-      } catch (err) {
-        toast("Save failed", err.message || "Failed.", "danger");
-      } finally {
-        btn.innerHTML = original;
-      }
-    }
-
-    async function deleteOpportunity(id) {
-      if (!adminSession) return;
-      const o = opportunities.find(x => x.id === id);
-      if (!o) return;
-
-      const ok = confirm(`Delete "${o.title}"?\nThis will remove it from public view.`);
-      if (!ok) return;
-
-      const { error } = await sb.from("opportunities").delete().eq("id", id);
-      if (error) {
-        toast("Delete failed", error.message, "danger");
-        return;
-      }
-
-      await addNotification("Opportunity Deleted", `${o.title} deleted.`);
-      toast("Deleted", "Opportunity removed.", "success");
-
-      await loadOpportunities();
-      renderExplorer();
-      hydrateFilterOptions();
-      refreshAdmin();
-    }
-
-    async function runExpiryCleanup() {
-      if (!adminSession) return;
-
-      // Delete expired (deadline < today)
-      const today = todayISO();
-      const ok = confirm("This will DELETE all expired opportunities from database. Proceed?");
-      if (!ok) return;
-
-      const { error } = await sb
-        .from("opportunities")
-        .delete()
-        .lt("deadline", today);
-
-      if (error) {
-        toast("Cleanup failed", error.message, "danger");
-        return;
-      }
-
-      await addNotification("Expired Cleanup", "Expired opportunities deleted.");
-      toast("Cleanup done", "Expired opportunities removed.", "success");
-
-      await loadOpportunities();
-      hydrateFilterOptions();
-      renderExplorer();
-      refreshAdmin();
-    }
-
-    function renderAdminOpsTable() {
-      const body = document.getElementById("admin-ops-body");
-      if (!body) return;
-      body.innerHTML = "";
-
-      const list = opportunities.slice().sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""));
-
-      list.forEach(o => {
-        const tr = document.createElement("tr");
-        const status = isActive(o.deadline)
-          ? `<span class="status-badge sb-active"><i class="fa-solid fa-circle-check"></i> ACTIVE</span>`
-          : `<span class="status-badge sb-expired"><i class="fa-solid fa-circle-xmark"></i> EXPIRED</span>`;
-
-        const type = o.type === "scholarship"
-          ? `<span class="status-badge sb-scraped"><i class="fa-solid fa-graduation-cap"></i> SCHOLARSHIP</span>`
-          : `<span class="status-badge sb-manual" style="background:#fff7ed; border-color:#fed7aa; color:#9a3412;"><i class="fa-solid fa-briefcase"></i> INTERNSHIP</span>`;
-
-        const source = o.source === "SCRAPED"
-          ? `<span class="status-badge sb-scraped"><i class="fa-solid fa-robot"></i> SCRAPED</span>`
-          : `<span class="status-badge sb-manual"><i class="fa-solid fa-pen"></i> MANUAL</span>`;
-
-        tr.innerHTML = `
-          <td style="font-weight:900;">${escapeHTML(o.title)}</td>
-          <td>${type}</td>
-          <td>${escapeHTML(o.provider)}</td>
-          <td>${escapeHTML(o.location)}</td>
-          <td>${source}</td>
-          <td style="font-weight:900;">${escapeHTML((o.deadline || "").slice(0,10) || "-")}</td>
-          <td>${status}</td>
-          <td style="text-align:right; white-space:nowrap;">
-            <button class="btn btn-secondary btn-sm" onclick="openOppModal('edit','${o.id}')"><i class="fa-solid fa-pen"></i> Edit</button>
-            <button class="btn btn-secondary btn-sm" onclick="deleteOpportunity('${o.id}')"><i class="fa-solid fa-trash"></i> Delete</button>
-          </td>
-        `;
-        body.appendChild(tr);
-      });
-    }
-
-    // =========================
-    // ADMIN REQUESTS (Approve via Edge Function)
-    // =========================
-    async function loadAdminRequests() {
-      if (!adminSession) return;
-
-      const { data, error } = await sb
-        .from("admin_requests")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        toast("Load failed", error.message, "danger");
-        return;
-      }
-
-      const body = document.getElementById("admin-req-body");
-      body.innerHTML = "";
-
-      data.forEach(r => {
-        const statusBadge = r.status === "PENDING"
-          ? `<span class="status-badge" style="background:#fff7ed;border-color:#fed7aa;color:#9a3412;border:1px solid #fed7aa"><i class="fa-solid fa-hourglass-half"></i> PENDING</span>`
-          : r.status === "APPROVED"
-            ? `<span class="status-badge sb-active"><i class="fa-solid fa-circle-check"></i> APPROVED</span>`
-            : `<span class="status-badge sb-expired"><i class="fa-solid fa-circle-xmark"></i> REJECTED</span>`;
-
-        const canAct = r.status === "PENDING";
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td style="font-weight:900;">${escapeHTML(r.email)}</td>
-          <td>${escapeHTML(r.full_name || "-")}</td>
-          <td>${escapeHTML(r.college || "-")}</td>
-          <td>${escapeHTML(r.dept || "-")}</td>
-          <td>${statusBadge}</td>
-          <td class="muted" style="font-weight:800;">${escapeHTML(formatDateTime(r.created_at))}</td>
-          <td style="text-align:right; white-space:nowrap;">
-            <button class="btn btn-secondary btn-sm ${canAct ? "" : "hidden"}" onclick="approveAdminRequest('${r.id}')"><i class="fa-solid fa-check"></i> Approve</button>
-            <button class="btn btn-secondary btn-sm ${canAct ? "" : "hidden"}" onclick="rejectAdminRequest('${r.id}')"><i class="fa-solid fa-xmark"></i> Reject</button>
-          </td>
-        `;
-        body.appendChild(tr);
-      });
-    }
-
-    async function approveAdminRequest(requestId) {
-      if (!adminSession) return;
-
-      const role = prompt("Role for this admin? (SUPER_STATE / SUPER_COLLEGE / ADMIN_DEPT / ADMIN)", "ADMIN");
-      if (!role) return;
-
-      const ok = confirm("Approve and auto-create login credentials now?");
-      if (!ok) return;
-
-      try {
-        const { data: sessionData } = await sb.auth.getSession();
-        const jwt = sessionData?.session?.access_token;
-        if (!jwt) throw new Error("No session token");
-
-        const resp = await fetch(`${SUPABASE_URL}/functions/v1/approve-admin`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${jwt}`
-          },
-          body: JSON.stringify({ request_id: requestId, role })
+    </main>
+
+    <!-- =======================
+         JAVASCRIPT (Supabase + Explorer)
+    ======================== -->
+
+    <script type="module">
+        import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+        // ✅ SET THESE 2 (Supabase Project Settings → API)
+        const SUPABASE_URL = "PASTE_YOUR_SUPABASE_URL_HERE";
+        const SUPABASE_ANON_KEY = "PASTE_YOUR_PUBLISHABLE_KEY_HERE";
+
+        const ready = SUPABASE_URL.startsWith("http") && SUPABASE_ANON_KEY.length > 20;
+        const supabase = ready ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+        const state = {
+            all: [],
+            loadedOnce: false,
+            loading: false
+        };
+
+        // --- Navigation (Landing <-> Explorer)
+        window.navTo = function (pageId) {
+            document.querySelectorAll("main").forEach(m => m.classList.add("hidden"));
+            document.getElementById("page-" + pageId).classList.remove("hidden");
+            window.scrollTo(0, 0);
+
+            if (pageId === "explorer") {
+                if (!state.loadedOnce) loadFromDB();
+                else applyFiltersAndRender();
+            }
+        };
+
+        // --- Refresh button
+        window.refreshExplorer = function () {
+            loadFromDB(true);
+        };
+
+        // --- Control events (debounced)
+        const debounce = (fn, ms = 250) => {
+            let t;
+            return (...args) => {
+                clearTimeout(t);
+                t = setTimeout(() => fn(...args), ms);
+            };
+        };
+
+        const onChange = debounce(() => applyFiltersAndRender(), 220);
+
+        window.addEventListener("DOMContentLoaded", () => {
+            const s = document.getElementById("qSearch");
+            const t = document.getElementById("qType");
+            const l = document.getElementById("qLocation");
+            const so = document.getElementById("qSort");
+
+            s.addEventListener("input", onChange);
+            l.addEventListener("input", onChange);
+            t.addEventListener("change", onChange);
+            so.addEventListener("change", onChange);
         });
 
-        const out = await resp.json();
-        if (!resp.ok) throw new Error(out.error || "Approval failed");
-
-        await addNotification("Admin Approved", `Approved ${out.email} (${out.role}).`);
-        toast("Approved", "Admin created successfully.", "success");
-
-        alert(
-          "NEW ADMIN CREDENTIALS (copy and send to them):\n\n" +
-          `Email: ${out.email}\n` +
-          `Temp Password: ${out.temp_password}\n\n` +
-          "They should login and change password immediately."
-        );
-
-        await loadAdminRequests();
-        refreshAdmin();
-      } catch (err) {
-        toast("Approve failed", err.message || "Failed.", "danger");
-      }
-    }
-
-    async function rejectAdminRequest(requestId) {
-      if (!adminSession) return;
-      const ok = confirm("Reject this request?");
-      if (!ok) return;
-
-      const { error } = await sb
-        .from("admin_requests")
-        .update({ status: "REJECTED", decided_at: new Date().toISOString(), decided_by: adminSession.user.id })
-        .eq("id", requestId);
-
-      if (error) {
-        toast("Reject failed", error.message, "danger");
-        return;
-      }
-
-      await addNotification("Admin Rejected", `Rejected request ${requestId}.`);
-      toast("Rejected", "Request rejected.", "success");
-      await loadAdminRequests();
-    }
-
-    // =========================
-    // NOTIFICATIONS (DB)
-    // =========================
-    async function addNotification(title, message) {
-      if (!adminSession) return;
-      await sb.from("notifications").insert({ title, message, created_by: adminSession.user.id });
-    }
-
-    async function loadNotifications() {
-      if (!adminSession) return;
-      const { data, error } = await sb
-        .from("notifications")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(50);
-
-      if (!error) notifications = data || [];
-    }
-
-    function toggleAdminNotif(e) {
-      e.stopPropagation();
-      const dd = document.getElementById("admin-notif-dd");
-      dd.classList.toggle("show");
-    }
-
-    function renderAdminNotifDropdown() {
-      const dot = document.getElementById("admin-notif-dot");
-      const ddItems = document.getElementById("admin-notif-items");
-      if (!dot || !ddItems) return;
-
-      dot.classList.toggle("hidden", notifications.length === 0);
-      ddItems.innerHTML = "";
-
-      if (!notifications.length) {
-        ddItems.innerHTML = `<div class="notif-item"><strong>No notifications</strong><br><span class="muted" style="font-size:0.8rem;">You're all caught up.</span></div>`;
-        return;
-      }
-
-      notifications.slice(0, 6).forEach(n => {
-        const el = document.createElement("div");
-        el.className = "notif-item";
-        el.innerHTML = `
-          <strong>${escapeHTML(n.title)}</strong><br>
-          <span style="font-size:0.8rem; color:#64748b; font-weight:700;">${escapeHTML(n.message)}</span><br>
-          <span style="font-size:0.75rem; color:#94a3b8; font-weight:800;">${escapeHTML(formatDateTime(n.created_at))}</span>
-        `;
-        ddItems.appendChild(el);
-      });
-    }
-
-    async function clearNotifications(e) {
-      if (e) e.stopPropagation();
-      if (!adminSession) return;
-
-      const ok = confirm("Delete ALL notifications from database?");
-      if (!ok) return;
-
-      const { error } = await sb.from("notifications").delete().neq("id", "00000000-0000-0000-0000-000000000000");
-      if (error) {
-        toast("Clear failed", error.message, "danger");
-        return;
-      }
-      notifications = [];
-      renderAdminNotifDropdown();
-      renderAdminLogs();
-      toast("Cleared", "All notifications cleared.", "success");
-    }
-
-    function renderAdminLogs() {
-      const listWrap = document.getElementById("admin-logs-list");
-      const empty = document.getElementById("admin-logs-empty");
-      if (!listWrap || !empty) return;
-
-      listWrap.innerHTML = "";
-      if (!notifications.length) {
-        empty.classList.remove("hidden");
-        return;
-      }
-      empty.classList.add("hidden");
-
-      notifications.forEach(n => {
-        const box = document.createElement("div");
-        box.className = "dash-card";
-        box.style.marginBottom = "12px";
-        box.innerHTML = `
-          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap;">
-            <div>
-              <div style="font-weight:900; margin-bottom:4px;"><i class="fa-solid fa-bell" style="color:var(--accent)"></i> ${escapeHTML(n.title)}</div>
-              <div class="muted" style="font-weight:700;">${escapeHTML(n.message)}</div>
-            </div>
-            <div class="muted" style="font-size:0.85rem; font-weight:800;">${escapeHTML(formatDateTime(n.created_at))}</div>
-          </div>
-        `;
-        listWrap.appendChild(box);
-      });
-    }
-
-    // =========================
-    // EXPORT/IMPORT JSON (Admin)
-    // =========================
-    function exportJSON() {
-      if (!adminSession) return;
-      const payload = JSON.stringify(opportunities, null, 2);
-      const blob = new Blob([payload], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "internhub-opportunities.json";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-
-      toast("Exported", "Downloaded JSON file.", "success");
-    }
-
-    function importJSONPrompt() {
-      if (!adminSession) return;
-
-      const input = document.createElement("input");
-      input.type = "file";
-      input.accept = "application/json";
-      input.onchange = async () => {
-        const file = input.files && input.files[0];
-        if (!file) return;
-
-        const text = await file.text();
-        try {
-          const parsed = JSON.parse(text);
-          if (!Array.isArray(parsed)) throw new Error("JSON must be an array");
-
-          const cleaned = parsed.map(o => ({
-            title: String(o.title || "").trim(),
-            type: (o.type === "scholarship" ? "scholarship" : "internship"),
-            provider: String(o.provider || "").trim(),
-            location: String(o.location || "").trim(),
-            tags: Array.isArray(o.tags) ? o.tags.map(x => String(x)) : [],
-            source: (o.source === "SCRAPED" ? "SCRAPED" : "MANUAL"),
-            deadline: (o.deadline ? String(o.deadline).slice(0,10) : null),
-            apply_url: String(o.apply_url || o.applyUrl || "").trim(),
-            notes: String(o.notes || "") || null,
-            created_by: adminSession.user.id
-          })).filter(o => o.title && o.provider && o.location && o.apply_url);
-
-          // Insert all
-          const { error } = await sb.from("opportunities").insert(cleaned);
-          if (error) throw error;
-
-          toast("Imported", `Imported ${cleaned.length} opportunities.`, "success");
-          await addNotification("Import", `Imported ${cleaned.length} opportunities from JSON.`);
-          await loadOpportunities();
-          hydrateFilterOptions();
-          renderExplorer();
-          refreshAdmin();
-        } catch (err) {
-          toast("Import failed", err.message || "Invalid JSON file.", "danger");
+        function todayISO() {
+            return new Date().toISOString().slice(0, 10);
         }
-      };
-      input.click();
-    }
 
-    // =========================
-    // LOAD OPPORTUNITIES
-    // =========================
-    async function loadOpportunities() {
-      // Public reads only active due to RLS,
-      // admin reads all (because admin policy allows select via is_admin())
-      const { data, error } = await sb
-        .from("opportunities")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        toast("Load failed", error.message, "danger");
-        opportunities = [];
-        return;
-      }
-
-      opportunities = data || [];
-    }
-
-    // =========================
-    // HELPERS
-    // =========================
-    function setTodayPill() {
-      const d = new Date();
-      const str = d.toLocaleDateString(undefined, { weekday: "short", year: "numeric", month: "short", day: "numeric" });
-      document.getElementById("today-pill").innerHTML = `<i class="fa-solid fa-calendar-day"></i> Today: ${str}`;
-    }
-
-    function deadlineBadge(deadlineISO) {
-      const today = todayISO();
-      if (!deadlineISO) return `<span class="deadline-badge"><i class="fa-solid fa-calendar"></i> No deadline</span>`;
-
-      const iso = String(deadlineISO).slice(0,10);
-
-      if (iso < today) {
-        return `<span class="deadline-badge dl-expired"><i class="fa-solid fa-triangle-exclamation"></i> Expired: ${formatISO(iso)}</span>`;
-      }
-
-      const days = diffDays(today, iso);
-      if (days <= 7) {
-        return `<span class="deadline-badge dl-soon"><i class="fa-solid fa-clock"></i> Deadline: ${formatISO(iso)}</span>`;
-      }
-      return `<span class="deadline-badge"><i class="fa-solid fa-calendar"></i> Deadline: ${formatISO(iso)}</span>`;
-    }
-
-    function computeMatchLabel(o) {
-      const n = hashToPercent((o.title || "") + (o.provider || ""));
-      return `${n}% Match`;
-    }
-
-    function nowISO() { return new Date().toISOString(); }
-
-    function todayISO() {
-      const d = new Date();
-      const y = d.getFullYear();
-      const m = String(d.getMonth() + 1).padStart(2, "0");
-      const day = String(d.getDate()).padStart(2, "0");
-      return `${y}-${m}-${day}`;
-    }
-
-    function addDaysISO(days) {
-      const d = new Date();
-      d.setDate(d.getDate() + days);
-      const y = d.getFullYear();
-      const m = String(d.getMonth() + 1).padStart(2, "0");
-      const day = String(d.getDate()).padStart(2, "0");
-      return `${y}-${m}-${day}`;
-    }
-
-    function diffDays(aISO, bISO) {
-      const a = new Date(aISO + "T00:00:00");
-      const b = new Date(bISO + "T00:00:00");
-      return Math.round((b - a) / (1000 * 60 * 60 * 24));
-    }
-
-    function isActive(deadlineISO) {
-      if (!deadlineISO) return true;
-      const iso = String(deadlineISO).slice(0,10);
-      return iso >= todayISO();
-    }
-
-    function formatISO(iso) {
-      try {
-        const [y, m, d] = iso.split("-").map(Number);
-        const dt = new Date(y, m - 1, d);
-        return dt.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
-      } catch { return iso; }
-    }
-
-    function formatDateTime(iso) {
-      try {
-        const dt = new Date(iso);
-        return dt.toLocaleString(undefined, { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
-      } catch { return iso; }
-    }
-
-    function parseTags(str) {
-      if (!str) return [];
-      return str.split(",").map(s => s.trim()).filter(Boolean).slice(0, 12);
-    }
-
-    function escapeHTML(s) {
-      return String(s || "")
-        .replaceAll("&", "&amp;").replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;").replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
-
-    function hashToPercent(str) {
-      let h = 0;
-      for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
-      const min = 78, max = 99;
-      return min + (h % (max - min + 1));
-    }
-
-    function toast(title, desc, type = "success") {
-      const wrap = document.getElementById("toast-wrap");
-      const el = document.createElement("div");
-      el.className = "toast " + (type || "");
-      el.innerHTML = `<div class="toast-title">${escapeHTML(title)}</div><div class="toast-desc">${escapeHTML(desc)}</div>`;
-      wrap.appendChild(el);
-      setTimeout(() => {
-        el.style.opacity = "0";
-        el.style.transform = "translateY(-6px)";
-        el.style.transition = "0.25s";
-        setTimeout(() => el.remove(), 260);
-      }, 2400);
-    }
-
-    // =========================
-    // WINDOW CLOSE HANDLERS
-    // =========================
-    window.onclick = function (event) {
-      const dd = document.getElementById("admin-notif-dd");
-      if (dd && dd.classList.contains("show") && !event.target.closest(".notif-bell")) dd.classList.remove("show");
-
-      const loginModal = document.getElementById("login-modal");
-      if (event.target === loginModal) closeModal();
-
-      const oppModal = document.getElementById("opp-modal");
-      if (event.target === oppModal) closeOppModal();
-
-      const reqModal = document.getElementById("req-modal");
-      if (event.target === reqModal) closeRequestModal();
-    };
-
-    // =========================
-    // INIT
-    // =========================
-    (async function init() {
-      syncNavbarState();
-      setTodayPill();
-
-      // If already logged in, restore admin session
-      const { data: sessionData } = await sb.auth.getSession();
-      if (sessionData?.session?.user) {
-        const user = sessionData.session.user;
-        const { data: adminRow } = await sb.from("admins").select("*").eq("user_id", user.id).maybeSingle();
-        if (adminRow && adminRow.approved) {
-          adminSession = { user, adminRow };
+        function isActiveClient(o) {
+            if (!o) return false;
+            if (o.status && o.status !== "ACTIVE") return false;
+            if (!o.deadline) return true;
+            const d = new Date(o.deadline + "T00:00:00");
+            const now = new Date();
+            now.setHours(0, 0, 0, 0);
+            return d.getTime() >= now.getTime();
         }
-      }
 
-      await loadOpportunities();
-      hydrateFilterOptions();
-      renderExplorer();
-      syncNavbarState();
-      navTo("landing");
-    })();
-  </script>
+        function safe(s) {
+            return String(s ?? "")
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;");
+        }
+
+        function fmtDeadline(deadline) {
+            if (!deadline) return "N/A";
+            const d = new Date(deadline + "T00:00:00");
+            return d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "2-digit" });
+        }
+
+        async function loadFromDB(force = false) {
+            const listEl = document.getElementById("oppList");
+            const noteEl = document.getElementById("dataNote");
+
+            if (state.loading) return;
+            if (state.loadedOnce && !force) return;
+
+            state.loading = true;
+            listEl.className = "loader";
+            listEl.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Loading opportunities…`;
+
+            try {
+                let rows = [];
+
+                if (!ready) {
+                    noteEl.textContent = "Supabase not configured yet — showing demo data. (Paste URL + publishable key.)";
+                    rows = demoData().filter(isActiveClient);
+                } else {
+                    noteEl.textContent = "Loading from database…";
+
+                    const { data, error } = await supabase
+                        .from("opportunities")
+                        .select("id,title,type,provider,location,tags,source,deadline,apply_url,status,created_at")
+                        .eq("status", "ACTIVE")
+                        .or(`deadline.is.null,deadline.gte.${todayISO()}`)
+                        .limit(300);
+
+                    if (error) throw error;
+                    rows = (data || []).filter(isActiveClient);
+
+                    noteEl.textContent = `Loaded ${rows.length} active opportunities (expired auto-hidden).`;
+                }
+
+                state.all = rows;
+                state.loadedOnce = true;
+                applyFiltersAndRender();
+
+            } catch (e) {
+                console.error(e);
+                noteEl.textContent = "Error loading data. Check Supabase keys + table + RLS.";
+                listEl.className = "empty";
+                listEl.innerHTML = `
+                    <div style="font-weight:800; font-size:1.05rem; color:#0f172a;">Could not load opportunities</div>
+                    <div style="margin-top:8px;">Fix Supabase URL/key, table name <b>opportunities</b>, and RLS select policy.</div>
+                `;
+            } finally {
+                state.loading = false;
+            }
+        }
+
+        function applyFiltersAndRender() {
+            const qSearch = (document.getElementById("qSearch")?.value || "").trim().toLowerCase();
+            const qType = document.getElementById("qType")?.value || "all";
+            const qLocation = (document.getElementById("qLocation")?.value || "").trim().toLowerCase();
+            const qSort = document.getElementById("qSort")?.value || "latest";
+
+            let rows = [...state.all];
+
+            // Filter: type
+            if (qType !== "all") {
+                rows = rows.filter(r => (r.type || "").toLowerCase() === qType);
+            }
+
+            // Filter: location contains
+            if (qLocation) {
+                rows = rows.filter(r => (r.location || "").toLowerCase().includes(qLocation));
+            }
+
+            // Search: title/provider/tags/location
+            if (qSearch) {
+                rows = rows.filter(r => {
+                    const t = (r.title || "").toLowerCase();
+                    const p = (r.provider || "").toLowerCase();
+                    const l = (r.location || "").toLowerCase();
+                    const tags = Array.isArray(r.tags) ? r.tags.join(" ").toLowerCase() : "";
+                    return t.includes(qSearch) || p.includes(qSearch) || l.includes(qSearch) || tags.includes(qSearch);
+                });
+            }
+
+            // Sort
+            if (qSort === "latest") {
+                rows.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+            } else if (qSort === "deadline") {
+                rows.sort((a, b) => {
+                    const ad = a.deadline ? new Date(a.deadline) : new Date("9999-12-31");
+                    const bd = b.deadline ? new Date(b.deadline) : new Date("9999-12-31");
+                    return ad - bd;
+                });
+            } else if (qSort === "title") {
+                rows.sort((a, b) => String(a.title || "").localeCompare(String(b.title || "")));
+            }
+
+            render(rows);
+        }
+
+        function render(rows) {
+            const listEl = document.getElementById("oppList");
+            const countEl = document.getElementById("activeCount");
+
+            countEl.textContent = String(rows.length);
+
+            if (!rows.length) {
+                listEl.className = "empty";
+                listEl.innerHTML = `
+                    <div style="font-weight:800; font-size:1.05rem; color:#0f172a;">No opportunities found</div>
+                    <div style="margin-top:8px;">Try different search / filters, or press Refresh.</div>
+                `;
+                return;
+            }
+
+            listEl.className = "job-grid";
+            listEl.innerHTML = rows.map(o => {
+                const typeLabel = (o.type || "").toLowerCase() === "internship" ? "Internship" : "Scholarship";
+                const provider = o.provider ? safe(o.provider) : "Unknown Provider";
+                const location = o.location ? safe(o.location) : "Location not specified";
+                const deadline = fmtDeadline(o.deadline);
+                const tags = Array.isArray(o.tags) ? o.tags.slice(0, 6) : [];
+
+                return `
+                    <div class="job-card">
+                        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+                            <div class="tag" style="background:#eff6ff; color:var(--primary);">${typeLabel}</div>
+                            <div class="tag" title="Source">${safe(o.source || "MANUAL")}</div>
+                        </div>
+
+                        <div class="job-title">${safe(o.title)}</div>
+
+                        <div style="font-size:0.9rem; color:#64748b; margin-top:6px;">
+                            <i class="fa-solid fa-building"></i> ${provider}
+                        </div>
+                        <div style="font-size:0.9rem; color:#64748b; margin-top:6px;">
+                            <i class="fa-solid fa-location-dot"></i> ${location}
+                        </div>
+
+                        <div style="margin-top:12px;">
+                            ${tags.length ? tags.map(t => `<span class="tag">${safe(t)}</span>`).join("") : `<span class="tag">Kerala Polytechnic</span>`}
+                        </div>
+
+                        <div style="margin-top:16px; display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+                            <div class="tag" style="background:#f8fafc; border:1px solid var(--border);">
+                                <i class="fa-solid fa-calendar"></i> Deadline: ${deadline}
+                            </div>
+
+                            <button class="btn btn-primary btn-sm" onclick="window.open('${safe(o.apply_url)}','_blank','noopener')">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i> Apply
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        function demoData() {
+            // Demo (used only if you didn't paste supabase keys)
+            return [
+                {
+                    id: "d1",
+                    title: "Scholarship for Diploma Excellence 2026",
+                    type: "scholarship",
+                    provider: "Kerala Education Board",
+                    location: "Kerala",
+                    tags: ["Merit", "Diploma", "2026"],
+                    source: "MANUAL",
+                    deadline: "2026-04-15",
+                    apply_url: "https://example.com/apply",
+                    status: "ACTIVE",
+                    created_at: new Date().toISOString()
+                },
+                {
+                    id: "d2",
+                    title: "Internship: Junior Web Developer",
+                    type: "internship",
+                    provider: "Tech Park Kochi",
+                    location: "Kochi",
+                    tags: ["HTML", "CSS", "JavaScript"],
+                    source: "SCRAPED",
+                    deadline: "2026-03-25",
+                    apply_url: "https://example.com/apply2",
+                    status: "ACTIVE",
+                    created_at: new Date().toISOString()
+                },
+                {
+                    id: "d3",
+                    title: "Expired Example (Hidden Automatically)",
+                    type: "internship",
+                    provider: "Old Company",
+                    location: "Remote",
+                    tags: ["Expired"],
+                    source: "SCRAPED",
+                    deadline: "2025-01-10",
+                    apply_url: "https://example.com",
+                    status: "ACTIVE",
+                    created_at: "2025-01-01T00:00:00Z"
+                }
+            ];
+        }
+    </script>
+
+    <!-- Tiny non-module script (no admin/student anymore) -->
+    <script>
+        // Default page on load
+        window.addEventListener("DOMContentLoaded", () => {
+            // Keep landing visible by default
+            // If you want explorer first, uncomment:
+            // navTo('explorer');
+        });
+    </script>
+
 </body>
+
 </html>
