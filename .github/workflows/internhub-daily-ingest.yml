@@ -1,0 +1,27 @@
+name: InternHub Daily Ingest
+
+on:
+  schedule:
+    # Runs daily at 9:00 AM IST (03:30 UTC)
+    - cron: "30 3 * * *"
+  workflow_dispatch:
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run ingest script
+        env:
+          INTERNHUB_FUNCTION_URL: ${{ secrets.INTERNHUB_FUNCTION_URL }}
+          INTERNHUB_INGEST_KEY: ${{ secrets.INTERNHUB_INGEST_KEY }}
+        run: |
+          node scripts/sendToFunction.js
