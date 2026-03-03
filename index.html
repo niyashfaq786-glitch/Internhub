@@ -673,211 +673,203 @@
     </main>
 
     <!-- Supabase CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module">
+        import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-    <script>
-        // ✅ Your live public keys (safe for frontend)
         const SUPABASE_URL = "https://zyssuxxppcqsiwayptwo.supabase.co";
-        const SUPABASE_ANON_KEY = "sb_publishable_tmn2azEqCK2CZjFYwFFuHA_RxSvO0DW";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp5c3N1eHhwcGNxc2l3YXlwdHdvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyNDQyNDEsImV4cCI6MjA4NjgyMDI0MX0.mjUjJJh_EFvbp23vA7jcawiMCKV2XLeWkwDemnyLO4E";
 
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        const state = { all: [], filtered: [], tagList: [], activeChip: "all" };
-        const $ = (id) => document.getElementById(id);
+        const state = { all: [], loaded: false, loading: false };
 
-        function navTo(pageId) {
+        window.navTo = function (pageId) {
             document.querySelectorAll("main").forEach(m => m.classList.add("hidden"));
-            $("page-" + pageId).classList.remove("hidden");
+            document.getElementById("page-" + pageId).classList.remove("hidden");
             window.scrollTo(0, 0);
-            if (pageId === "browse") applyFilters();
+
+            // ✅ your page name is "browse"
+            if (pageId === "browse") {
+                if (!state.loaded) loadFromDB();
+                else render();
+            }
+        };
+
+        window.reloadData = function () {
+            loadFromDB(true);
+        };
+
+        window.clearFilters = function () {
+            document.getElementById("q").value = "";
+            document.getElementById("type").value = "all";
+            document.getElementById("tag").value = "all";
+            document.getElementById("sort").value = "newest";
+            render();
+        };
+
+        function todayISO() {
+            return new Date().toISOString().slice(0, 10);
         }
 
-        function esc(s) {
+        function isActive(o) {
+            if (!o) return false;
+            if (o.status && o.status !== "ACTIVE") return false;
+            if (!o.deadline) return true;
+            const d = new Date(o.deadline + "T00:00:00");
+            const now = new Date(); now.setHours(0, 0, 0, 0);
+            return d >= now;
+        }
+
+        function safe(s) {
             return String(s ?? "")
-                .replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
-                .replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;");
         }
 
-        function fmtDate(d) {
-            try { return new Date(d + "T00:00:00").toLocaleDateString(undefined, { year: "numeric", month: "short", day: "2-digit" }); }
-            catch { return d; }
+        function fmtDeadline(deadline) {
+            if (!deadline) return "N/A";
+            const d = new Date(deadline + "T00:00:00");
+            return d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "2-digit" });
         }
 
-        function renderSkeleton() {
-            const grid = $("grid");
-            grid.innerHTML = "";
-            for (let i = 0; i < 9; i++) {
-                const d = document.createElement("div");
-                d.className = "skeleton";
-                grid.appendChild(d);
-            }
-        }
+        async function loadFromDB(force = false) {
+            if (state.loading) return;
+            if (state.loaded && !force) return;
 
-        function uniqueTags(list) {
-            const set = new Set();
-            for (const o of list) {
-                if (Array.isArray(o.tags)) o.tags.forEach(t => set.add(String(t).toLowerCase()));
-            }
-            return Array.from(set).sort((a, b) => a.localeCompare(b));
-        }
+            state.loading = true;
+            document.getElementById("subLine").textContent = "Loading from Supabase…";
 
-        function buildTagUI() {
-            const tags = state.tagList;
-            $("tag").innerHTML = `<option value="all">All tags</option>` + tags.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join("");
+            // skeletons
+            const grid = document.getElementById("grid");
+            grid.innerHTML = Array.from({ length: 6 }).map(() => `<div class="skeleton"></div>`).join("");
 
-            const bar = $("chipbar");
-            bar.innerHTML = "";
+            const { data, error } = await supabase
+                .from("opportunities")
+                .select("id,title,type,provider,location,tags,source,deadline,apply_url,status,created_at,updated_at")
+                .eq("status", "ACTIVE")
+                .or(`deadline.is.null,deadline.gte.${todayISO()}`)
+                .order("created_at", { ascending: false })
+                .limit(300);
 
-            const mk = (val, label) => {
-                const b = document.createElement("button");
-                b.className = "chip" + (val === state.activeChip ? " active" : "");
-                b.textContent = label;
-                b.onclick = () => {
-                    state.activeChip = val;
-                    $("tag").value = val;
-                    applyFilters();
-                    document.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
-                    b.classList.add("active");
-                };
-                return b;
-            };
-
-            bar.appendChild(mk("all", "All"));
-            tags.slice(0, 12).forEach(t => bar.appendChild(mk(t, "#" + t)));
-        }
-
-        function render(list) {
-            const grid = $("grid");
-            grid.innerHTML = "";
-
-            if (!list.length) {
-                grid.innerHTML = `<div class="opp-card" style="grid-column:1/-1;">
-          <div class="pill"><i class="fa-solid fa-circle-info"></i> No results</div>
-          <div class="opp-title" style="margin-top:10px;">No active opportunities found</div>
-          <div class="opp-meta" style="margin-top:8px;">Try clearing filters or refresh.</div>
-        </div>`;
+            if (error) {
+                console.error(error);
+                document.getElementById("subLine").textContent = "Error loading. Check table + RLS.";
+                grid.innerHTML = `<div style="grid-column:1/-1;color:#ef4444;font-weight:900;">${safe(error.message)}</div>`;
+                state.loading = false;
                 return;
             }
 
-            for (const o of list) {
-                const type = String(o.type || "").toLowerCase();
-                const pillClass = type === "scholarship" ? "scholarship" : "internship";
-                const tags = Array.isArray(o.tags) ? o.tags.slice(0, 6) : [];
+            state.all = (data || []).filter(isActive);
+            state.loaded = true;
+            state.loading = false;
 
-                const card = document.createElement("div");
-                card.className = "opp-card";
-                card.innerHTML = `
-          <div class="flex" style="justify-content:space-between;align-items:center;gap:10px;">
-            <div class="pill ${pillClass}">
-              <i class="fa-solid ${type === "scholarship" ? "fa-graduation-cap" : "fa-briefcase"}"></i> ${esc(type)}
-            </div>
-            <div class="pill"><i class="fa-regular fa-calendar"></i> ${esc(fmtDate(o.deadline))}</div>
-          </div>
-
-          <div class="opp-title">${esc(o.title)}</div>
-          <div class="opp-meta">
-            <span><i class="fa-solid fa-building" style="color:#94a3b8;"></i> ${esc(o.provider)}</span>
-            <span><i class="fa-solid fa-location-dot" style="color:#94a3b8;"></i> ${esc(o.location)}</span>
-          </div>
-
-          <div class="tagrow">${tags.map(t => `<span class="tag">${esc(t)}</span>`).join("")}</div>
-
-          <div class="card-actions">
-            <a class="btn btn-primary apply" href="${esc(o.apply_url)}" target="_blank" rel="noopener noreferrer">
-              Apply <i class="fa-solid fa-arrow-up-right-from-square"></i>
-            </a>
-          </div>
-        `;
-                grid.appendChild(card);
-            }
+            render();
         }
 
-        function applyFilters() {
-            const q = $("q").value.trim().toLowerCase();
-            const type = $("type").value;
-            const tag = $("tag").value;
-            const sort = $("sort").value;
+        function render() {
+            const q = (document.getElementById("q").value || "").toLowerCase().trim();
+            const type = document.getElementById("type").value;
+            const tag = document.getElementById("tag").value;
+            const sort = document.getElementById("sort").value;
 
-            let out = [...state.all];
+            let rows = [...state.all];
 
-            if (type !== "all") out = out.filter(o => String(o.type).toLowerCase() === type);
-            if (tag !== "all") out = out.filter(o => Array.isArray(o.tags) && o.tags.map(x => String(x).toLowerCase()).includes(tag));
+            if (type !== "all") rows = rows.filter(r => (r.type || "").toLowerCase() === type);
+
+            if (tag !== "all") rows = rows.filter(r => Array.isArray(r.tags) && r.tags.map(String).includes(tag));
 
             if (q) {
-                out = out.filter(o => {
-                    const t = String(o.title || "").toLowerCase();
-                    const p = String(o.provider || "").toLowerCase();
-                    const l = String(o.location || "").toLowerCase();
-                    const tg = Array.isArray(o.tags) ? o.tags.join(" ").toLowerCase() : "";
-                    return t.includes(q) || p.includes(q) || l.includes(q) || tg.includes(q);
+                rows = rows.filter(r => {
+                    const t = (r.title || "").toLowerCase();
+                    const p = (r.provider || "").toLowerCase();
+                    const l = (r.location || "").toLowerCase();
+                    const tags = Array.isArray(r.tags) ? r.tags.join(" ").toLowerCase() : "";
+                    return t.includes(q) || p.includes(q) || l.includes(q) || tags.includes(q);
                 });
             }
 
-            if (sort === "newest") out.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-            if (sort === "deadline_soon") out.sort((a, b) => String(a.deadline).localeCompare(String(b.deadline)));
-            if (sort === "deadline_late") out.sort((a, b) => String(b.deadline).localeCompare(String(a.deadline)));
-            if (sort === "title_az") out.sort((a, b) => String(a.title).localeCompare(String(b.title)));
+            if (sort === "newest") rows.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+            if (sort === "title_az") rows.sort((a, b) => String(a.title || "").localeCompare(String(b.title || "")));
+            if (sort === "deadline_soon") rows.sort((a, b) => (a.deadline ? new Date(a.deadline) : new Date("9999-12-31")) - (b.deadline ? new Date(b.deadline) : new Date("9999-12-31")));
+            if (sort === "deadline_late") rows.sort((a, b) => (b.deadline ? new Date(b.deadline) : new Date("0001-01-01")) - (a.deadline ? new Date(a.deadline) : new Date("0001-01-01")));
 
-            state.filtered = out;
-            $("count").textContent = out.length;
-            $("subLine").textContent = `Showing ${out.length} active opportunities (Supabase live)`;
-            render(out);
-        }
+            // fill tags dropdown + chipbar from ALL active
+            const allTags = Array.from(new Set(state.all.flatMap(o => Array.isArray(o.tags) ? o.tags : []).map(String))).sort();
+            const tagSel = document.getElementById("tag");
+            const current = tagSel.value;
+            tagSel.innerHTML = `<option value="all">All tags</option>` + allTags.map(t => `<option value="${safe(t)}">${safe(t)}</option>`).join("");
+            if (allTags.includes(current)) tagSel.value = current;
 
-        function clearFilters() {
-            $("q").value = "";
-            $("type").value = "all";
-            $("tag").value = "all";
-            $("sort").value = "newest";
-            state.activeChip = "all";
-            buildTagUI();
-            applyFilters();
-        }
+            const chipbar = document.getElementById("chipbar");
+            chipbar.innerHTML = allTags.slice(0, 12).map(t =>
+                `<button class="chip ${current === t ? "active" : ""}" onclick="document.getElementById('tag').value='${safe(t)}';">${safe(t)}</button>`
+            ).join("");
 
-        async function reloadData() {
-            const statusLine = $("statusLine");
-            if (statusLine) statusLine.textContent = "Loading from Supabase…";
-            renderSkeleton();
+            document.getElementById("count").textContent = String(rows.length);
 
-            try {
-                const today = new Date().toISOString().slice(0, 10);
-                const { data, error } = await supabase
-                    .from("opportunities")
-                    .select("*")
-                    .eq("status", "ACTIVE")
-                    .gte("deadline", today)
-                    .order("created_at", { ascending: false });
+            const last = state.all
+                .map(o => o.updated_at || o.created_at)
+                .filter(Boolean)
+                .sort()
+                .slice(-1)[0];
 
-                if (error) throw error;
+            document.getElementById("last").textContent = "Last updated: " + (last ? new Date(last).toLocaleString() : "—");
 
-                state.all = data || [];
-                state.tagList = uniqueTags(state.all);
-                buildTagUI();
+            const grid = document.getElementById("grid");
+            document.getElementById("subLine").textContent = `Showing ${rows.length} active opportunities`;
 
-                $("last").textContent = "Last updated: " + new Date().toLocaleString();
-                if (statusLine) statusLine.textContent = `Connected ✅ Loaded ${state.all.length} active opportunities.`;
-
-                applyFilters();
-            } catch (err) {
-                if (statusLine) statusLine.textContent = "Failed to load. Check RLS policy & keys.";
-                $("subLine").textContent = "Could not load (check Supabase config + RLS).";
-                $("grid").innerHTML = `<div class="opp-card" style="grid-column:1/-1;">
-          <div class="pill"><i class="fa-solid fa-triangle-exclamation"></i> Error</div>
-          <div class="opp-title" style="margin-top:10px;">Failed to load data</div>
-          <div class="opp-meta" style="margin-top:8px;">${esc(err.message || String(err))}</div>
-        </div>`;
+            if (!rows.length) {
+                grid.innerHTML = `<div style="grid-column:1/-1;color:#64748b;font-weight:900;">No results. Try different filters.</div>`;
+                return;
             }
+
+            grid.innerHTML = rows.map(o => {
+                const pillClass = (o.type || "").toLowerCase();
+                const provider = o.provider ? safe(o.provider) : "Unknown";
+                const location = o.location ? safe(o.location) : "Not specified";
+                const deadline = fmtDeadline(o.deadline);
+                const tags = Array.isArray(o.tags) ? o.tags.slice(0, 6) : [];
+
+                return `
+        <div class="opp-card">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <span class="pill ${pillClass}">${pillClass === "internship" ? "Internship" : "Scholarship"}</span>
+            <span class="pill">${safe(o.source || "MANUAL")}</span>
+            <span class="pill"><i class="fa-solid fa-calendar"></i> ${deadline}</span>
+          </div>
+
+          <div class="opp-title">${safe(o.title)}</div>
+
+          <div class="opp-meta">
+            <span><i class="fa-solid fa-building"></i> ${provider}</span>
+            <span><i class="fa-solid fa-location-dot"></i> ${location}</span>
+          </div>
+
+          <div class="tagrow">
+            ${tags.length ? tags.map(t => `<span class="tag">${safe(t)}</span>`).join("") : `<span class="tag">Kerala Polytechnic</span>`}
+          </div>
+
+          <div class="card-actions">
+            <a class="btn btn-primary btn-sm apply" target="_blank" rel="noopener" href="${safe(o.apply_url)}">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Apply
+            </a>
+          </div>
+        </div>
+      `;
+            }).join("");
         }
 
-        ["q", "type", "tag", "sort"].forEach(id => {
-            const el = $(id);
-            el.addEventListener(id === "q" ? "input" : "change", applyFilters);
+        // wire filter events
+        const debounce = (fn, ms = 250) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
+        window.addEventListener("DOMContentLoaded", () => {
+            ["q", "type", "tag", "sort"].forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const ev = (id === "q") ? "input" : "change";
+                el.addEventListener(ev, debounce(render, 200));
+            });
         });
-
-        (function init() {
-            navTo("landing");
-            reloadData();
-        })();
     </script>
 </body>
 
