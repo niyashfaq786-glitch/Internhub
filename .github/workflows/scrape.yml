@@ -2,7 +2,8 @@ name: Scrape & Ingest Opportunities
 
 on:
   push:
-    branches: [web]
+    branches:
+      - web
   workflow_dispatch:
   schedule:
     - cron: "15 1 * * *" # daily 01:15 UTC
