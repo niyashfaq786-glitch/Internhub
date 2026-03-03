@@ -1,3 +1,8 @@
+on:
+   push:
+     branches: [web]
+
+
 name: Scrape & Ingest Opportunities
 
 on:
