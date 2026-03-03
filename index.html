@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>InternHub | Kerala Polytechnic Platform</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary: #0f172a;
+            --accent: #0ea5e9;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-body: #f8fafc;
+            --surface: #ffffff;
+            --surface-glass: rgba(255, 255, 255, .9);
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, .05);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, .1);
+            --radius-lg: 20px;
+            --radius-full: 9999px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            outline: none
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-body);
+            color: var(--secondary);
+            line-height: 1.5;
+            overflow-x: hidden
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit
+        }
+
+        button {
+            cursor: pointer;
+            font-family: inherit;
+            border: none;
+            background: none
+        }
+
+        .hidden {
+            display: none !important
+        }
+
+        .flex {
+            display: flex
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px
+        }
+
+        .ambient-bg {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(90px);
+            opacity: .4
+        }
+
+        .blob-1 {
+            top: -10%;
+            left: -10%;
+            width: 50vw;
+            height: 50vw;
+            background: #dbeafe
+        }
+
+        .blob-2 {
+            bottom: -10%;
+            right: -10%;
+            width: 40vw;
+            height: 40vw;
+            background: #dcfce7
+        }
+
+        .navbar {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 40px);
+            max-width: 1200px;
+            height: 70px;
+            background: var(--surface-glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, .8);
+            border-radius: var(--radius-full);
+            box-shadow: var(--shadow-sm);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px
+        }
+
+        .nav-logo {
+            font-weight: 800;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .nav-logo i {
+            color: var(--primary)
+        }
+
+        .btn {
+            padding: 10px 24px;
+            border-radius: var(--radius-full);
+            font-weight: 700;
+            font-size: .9rem;
+            transition: .3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, .3)
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, .35)
+        }
+
+        .btn-secondary {
+            background: #fff;
+            color: var(--secondary);
+            border: 1px solid var(--border)
+        }
+
+        .btn-sm {
+            padding: 6px 16px;
+            font-size: .85rem
+        }
+
+        .hero-section {
+            padding-top: 140px;
+            padding-bottom: 60px;
+            text-align: center;
+            position: relative;
+            overflow: hidden
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            line-height: 1.1;
+            font-weight: 900;
+            margin-bottom: 24px;
+            letter-spacing: -1px;
+            position: relative;
+            z-index: 2
+        }
+
+        .hero-desc {
+            font-size: 1.25rem;
+            color: #64748b;
+            max-width: 760px;
+            margin: 0 auto 24px;
+            position: relative;
+            z-index: 2
+        }
+
+        .bg-icon {
+            position: absolute;
+            font-size: 4rem;
+            color: var(--primary);
+            opacity: .05;
+            z-index: 1
+        }
+
+        .icon-1 {
+            top: 15%;
+            left: 10%;
+            animation: floatIcon 8s infinite ease-in-out
+        }
+
+        .icon-2 {
+            top: 25%;
+            right: 15%;
+            animation: floatIcon 9s infinite ease-in-out 1s
+        }
+
+        .icon-3 {
+            bottom: 20%;
+            left: 20%;
+            animation: floatIcon 10s infinite ease-in-out 2s
+        }
+
+        .icon-4 {
+            bottom: 30%;
+            right: 10%;
+            animation: floatIcon 7s infinite ease-in-out .5s
+        }
+
+        @keyframes floatIcon {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0)
+            }
+
+            50% {
+                transform: translateY(-30px) rotate(5deg)
+            }
+        }
+
+        .animation-frame-container {
+            max-width: 1000px;
+            margin: 0 auto 80px;
+            padding: 40px;
+            background: #fff;
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden
+        }
+
+        .tech-grid {
+            position: absolute;
+            inset: 0;
+            background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size: 30px 30px;
+            opacity: .3;
+            z-index: 0;
+            animation: moveGrid 20s linear infinite
+        }
+
+        @keyframes moveGrid {
+            0% {
+                transform: translateY(0)
+            }
+
+            100% {
+                transform: translateY(30px)
+            }
+        }
+
+        .process-title {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 40px;
+            position: relative;
+            z-index: 1
+        }
+
+        .anim-steps {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            position: relative;
+            z-index: 1
+        }
+
+        .anim-step {
+            text-align: center;
+            width: 170px
+        }
+
+        .anim-icon-box {
+            width: 52px;
+            height: 52px;
+            background: #fff;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 14px;
+            color: var(--primary);
+            box-shadow: 0 4px 10px rgba(37, 99, 235, .2)
+        }
+
+        .anim-text {
+            font-weight: 700;
+            font-size: .9rem;
+            color: #334155
+        }
+
+        .browse-shell {
+            padding-top: 120px;
+            padding-bottom: 60px
+        }
+
+        .panel {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden
+        }
+
+        .panel-head {
+            padding: 22px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+            align-items: center
+        }
+
+        .panel-head h2 {
+            font-size: 1.4rem;
+            font-weight: 900
+        }
+
+        .panel-head p {
+            color: #64748b;
+            font-weight: 600
+        }
+
+        .controls {
+            padding: 18px 22px;
+            display: grid;
+            gap: 12px;
+            border-bottom: 1px solid var(--border);
+            background: #fbfdff;
+            grid-template-columns: 1.2fr .7fr .7fr .7fr auto;
+        }
+
+        .field {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 10px 12px;
+            display: flex;
+            gap: 10px;
+            align-items: center
+        }
+
+        .field input,
+        .field select {
+            width: 100%;
+            border: none;
+            background: transparent;
+            font-weight: 700;
+            color: var(--secondary);
+            font-size: .92rem
+        }
+
+        .chipbar {
+            padding: 10px 22px 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px
+        }
+
+        .chip {
+            border: 1px solid var(--border);
+            background: #fff;
+            padding: 7px 12px;
+            border-radius: 9999px;
+            font-size: .85rem;
+            font-weight: 800;
+            color: #64748b;
+            transition: .2s
+        }
+
+        .chip.active {
+            background: #dbeafe;
+            border-color: #bfdbfe;
+            color: var(--primary-dark)
+        }
+
+        .opps-grid {
+            padding: 18px 22px 22px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 18px
+        }
+
+        .opp-card {
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 18px;
+            background: #fff;
+            box-shadow: var(--shadow-sm);
+            transition: .25s
+        }
+
+        .opp-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+            border-color: #bfdbfe
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            border-radius: 9999px;
+            font-size: .75rem;
+            font-weight: 900;
+            border: 1px solid var(--border);
+            background: #f8fafc;
+            color: #475569
+        }
+
+        .pill.internship {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border-color: #bfdbfe
+        }
+
+        .pill.scholarship {
+            background: #ecfdf5;
+            color: #166534;
+            border-color: #bbf7d0
+        }
+
+        .opp-title {
+            margin-top: 10px;
+            font-size: 1.05rem;
+            font-weight: 900;
+            line-height: 1.25
+        }
+
+        .opp-meta {
+            margin-top: 8px;
+            color: #64748b;
+            font-size: .9rem;
+            font-weight: 700;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px
+        }
+
+        .tagrow {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px
+        }
+
+        .tag {
+            padding: 4px 10px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            font-size: .75rem;
+            font-weight: 900
+        }
+
+        .card-actions {
+            margin-top: 14px;
+            display: flex;
+            gap: 10px
+        }
+
+        .apply {
+            width: 100%;
+            justify-content: center;
+            text-align: center
+        }
+
+        .foot {
+            padding: 14px 22px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+            color: #64748b;
+            font-weight: 700;
+            background: #fbfdff
+        }
+
+        .skeleton {
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            height: 180px;
+            background: linear-gradient(110deg, #f1f5f9 8%, #e2e8f0 18%, #f1f5f9 33%);
+            background-size: 200% 100%;
+            animation: shimmer 1.2s linear infinite
+        }
+
+        @keyframes shimmer {
+            to {
+                background-position-x: -200%
+            }
+        }
+
+        @media (max-width:980px) {
+            .controls {
+                grid-template-columns: 1fr 1fr
+            }
+        }
+
+        @media (max-width:768px) {
+            .navbar {
+                top: 0;
+                width: 100%;
+                border-radius: 0
+            }
+
+            .hero-title {
+                font-size: 2.2rem
+            }
+
+            .anim-steps {
+                flex-direction: column;
+                gap: 22px;
+                align-items: center
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="ambient-bg">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <nav class="navbar">
+        <a href="#" class="nav-logo" onclick="navTo('landing')">
+            <i class="fa-solid fa-graduation-cap"></i> InternHub
+        </a>
+        <div class="flex" style="gap:10px;align-items:center">
+            <button class="btn btn-secondary btn-sm" onclick="navTo('landing')"><i class="fa-solid fa-house"></i>
+                Home</button>
+            <button class="btn btn-primary btn-sm" onclick="navTo('browse')"><i
+                    class="fa-solid fa-magnifying-glass"></i> Browse</button>
+        </div>
+    </nav>
+
+    <main id="page-landing">
+        <i class="fa-solid fa-robot bg-icon icon-1"></i>
+        <i class="fa-solid fa-briefcase bg-icon icon-2"></i>
+        <i class="fa-solid fa-graduation-cap bg-icon icon-3"></i>
+        <i class="fa-solid fa-microchip bg-icon icon-4"></i>
+
+        <div class="container hero-section">
+            <div
+                style="display:inline-block;padding:6px 16px;background:#dbeafe;color:var(--primary);border-radius:20px;font-weight:800;font-size:.85rem;margin-bottom:20px;">
+                <i class="fa-solid fa-check-circle"></i> Official Partner: Kerala Polytechnics
+            </div>
+
+            <h1 class="hero-title">AI-Powered Career Platform for <br><span class="text-gradient">Diploma
+                    Students</span></h1>
+            <p class="hero-desc">InternHub shows internships & scholarships with deadlines and direct apply links —
+                updated from Supabase automatically.</p>
+
+            <div class="flex" style="justify-content:center;gap:12px;flex-wrap:wrap;">
+                <button class="btn btn-primary" onclick="navTo('browse')"><i class="fa-solid fa-briefcase"></i> Browse
+                    Opportunities</button>
+                <button class="btn btn-secondary" onclick="reloadData()"><i class="fa-solid fa-rotate"></i>
+                    Refresh</button>
+            </div>
+
+            <p id="statusLine" style="margin-top:14px;color:#64748b;font-weight:800;"></p>
+        </div>
+
+        <div class="container">
+            <div class="animation-frame-container">
+                <div class="tech-grid"></div>
+                <h3 class="process-title">How InternHub Works</h3>
+                <div class="anim-steps">
+                    <div class="anim-step">
+                        <div class="anim-icon-box"><i class="fa-solid fa-globe"></i></div>
+                        <div class="anim-text">1. Sources Found</div>
+                    </div>
+                    <div class="anim-step">
+                        <div class="anim-icon-box"><i class="fa-solid fa-robot"></i></div>
+                        <div class="anim-text">2. Scrape + Clean</div>
+                    </div>
+                    <div class="anim-step">
+                        <div class="anim-icon-box"><i class="fa-solid fa-database"></i></div>
+                        <div class="anim-text">3. Save to Supabase</div>
+                    </div>
+                    <div class="anim-step">
+                        <div class="anim-icon-box"><i class="fa-solid fa-briefcase"></i></div>
+                        <div class="anim-text">4. Published Here</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <main id="page-browse" class="hidden">
+        <div class="container browse-shell">
+            <div class="panel">
+                <div class="panel-head">
+                    <div>
+                        <h2><i class="fa-solid fa-magnifying-glass" style="color:var(--primary)"></i> Browse
+                            Opportunities</h2>
+                        <p id="subLine">Loading from Supabase…</p>
+                    </div>
+                    <div class="flex" style="gap:10px;align-items:center">
+                        <button class="btn btn-secondary btn-sm" onclick="navTo('landing')"><i
+                                class="fa-solid fa-arrow-left"></i> Back</button>
+                        <button class="btn btn-primary btn-sm" onclick="reloadData()"><i class="fa-solid fa-rotate"></i>
+                            Reload</button>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <div class="field"><i class="fa-solid fa-magnifying-glass" style="color:#94a3b8"></i><input id="q"
+                            type="text" placeholder="Search title / provider / location / tags..." /></div>
+                    <div class="field"><i class="fa-solid fa-filter" style="color:#94a3b8"></i>
+                        <select id="type">
+                            <option value="all">All types</option>
+                            <option value="internship">Internships</option>
+                            <option value="scholarship">Scholarships</option>
+                        </select>
+                    </div>
+                    <div class="field"><i class="fa-solid fa-tags" style="color:#94a3b8"></i><select id="tag">
+                            <option value="all">All tags</option>
+                        </select></div>
+                    <div class="field"><i class="fa-solid fa-arrow-down-a-z" style="color:#94a3b8"></i>
+                        <select id="sort">
+                            <option value="newest">Newest</option>
+                            <option value="deadline_soon">Deadline Soon</option>
+                            <option value="deadline_late">Deadline Late</option>
+                            <option value="title_az">Title A–Z</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-secondary btn-sm" onclick="clearFilters()"><i class="fa-solid fa-eraser"></i>
+                        Clear</button>
+                </div>
+
+                <div class="chipbar" id="chipbar"></div>
+                <div class="opps-grid" id="grid"></div>
+
+                <div class="foot">
+                    <div><span id="count">0</span> results</div>
+                    <div id="last">Last updated: —</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        // ✅ Your live public keys (safe for frontend)
+        const SUPABASE_URL = "https://zyssuxxppcqsiwayptwo.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_tmn2azEqCK2CZjFYwFFuHA_RxSvO0DW";
+
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const state = { all: [], filtered: [], tagList: [], activeChip: "all" };
+        const $ = (id) => document.getElementById(id);
+
+        function navTo(pageId) {
+            document.querySelectorAll("main").forEach(m => m.classList.add("hidden"));
+            $("page-" + pageId).classList.remove("hidden");
+            window.scrollTo(0, 0);
+            if (pageId === "browse") applyFilters();
+        }
+
+        function esc(s) {
+            return String(s ?? "")
+                .replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+        }
+
+        function fmtDate(d) {
+            try { return new Date(d + "T00:00:00").toLocaleDateString(undefined, { year: "numeric", month: "short", day: "2-digit" }); }
+            catch { return d; }
+        }
+
+        function renderSkeleton() {
+            const grid = $("grid");
+            grid.innerHTML = "";
+            for (let i = 0; i < 9; i++) {
+                const d = document.createElement("div");
+                d.className = "skeleton";
+                grid.appendChild(d);
+            }
+        }
+
+        function uniqueTags(list) {
+            const set = new Set();
+            for (const o of list) {
+                if (Array.isArray(o.tags)) o.tags.forEach(t => set.add(String(t).toLowerCase()));
+            }
+            return Array.from(set).sort((a, b) => a.localeCompare(b));
+        }
+
+        function buildTagUI() {
+            const tags = state.tagList;
+            $("tag").innerHTML = `<option value="all">All tags</option>` + tags.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join("");
+
+            const bar = $("chipbar");
+            bar.innerHTML = "";
+
+            const mk = (val, label) => {
+                const b = document.createElement("button");
+                b.className = "chip" + (val === state.activeChip ? " active" : "");
+                b.textContent = label;
+                b.onclick = () => {
+                    state.activeChip = val;
+                    $("tag").value = val;
+                    applyFilters();
+                    document.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
+                    b.classList.add("active");
+                };
+                return b;
+            };
+
+            bar.appendChild(mk("all", "All"));
+            tags.slice(0, 12).forEach(t => bar.appendChild(mk(t, "#" + t)));
+        }
+
+        function render(list) {
+            const grid = $("grid");
+            grid.innerHTML = "";
+
+            if (!list.length) {
+                grid.innerHTML = `<div class="opp-card" style="grid-column:1/-1;">
+          <div class="pill"><i class="fa-solid fa-circle-info"></i> No results</div>
+          <div class="opp-title" style="margin-top:10px;">No active opportunities found</div>
+          <div class="opp-meta" style="margin-top:8px;">Try clearing filters or refresh.</div>
+        </div>`;
+                return;
+            }
+
+            for (const o of list) {
+                const type = String(o.type || "").toLowerCase();
+                const pillClass = type === "scholarship" ? "scholarship" : "internship";
+                const tags = Array.isArray(o.tags) ? o.tags.slice(0, 6) : [];
+
+                const card = document.createElement("div");
+                card.className = "opp-card";
+                card.innerHTML = `
+          <div class="flex" style="justify-content:space-between;align-items:center;gap:10px;">
+            <div class="pill ${pillClass}">
+              <i class="fa-solid ${type === "scholarship" ? "fa-graduation-cap" : "fa-briefcase"}"></i> ${esc(type)}
+            </div>
+            <div class="pill"><i class="fa-regular fa-calendar"></i> ${esc(fmtDate(o.deadline))}</div>
+          </div>
+
+          <div class="opp-title">${esc(o.title)}</div>
+          <div class="opp-meta">
+            <span><i class="fa-solid fa-building" style="color:#94a3b8;"></i> ${esc(o.provider)}</span>
+            <span><i class="fa-solid fa-location-dot" style="color:#94a3b8;"></i> ${esc(o.location)}</span>
+          </div>
+
+          <div class="tagrow">${tags.map(t => `<span class="tag">${esc(t)}</span>`).join("")}</div>
+
+          <div class="card-actions">
+            <a class="btn btn-primary apply" href="${esc(o.apply_url)}" target="_blank" rel="noopener noreferrer">
+              Apply <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            </a>
+          </div>
+        `;
+                grid.appendChild(card);
+            }
+        }
+
+        function applyFilters() {
+            const q = $("q").value.trim().toLowerCase();
+            const type = $("type").value;
+            const tag = $("tag").value;
+            const sort = $("sort").value;
+
+            let out = [...state.all];
+
+            if (type !== "all") out = out.filter(o => String(o.type).toLowerCase() === type);
+            if (tag !== "all") out = out.filter(o => Array.isArray(o.tags) && o.tags.map(x => String(x).toLowerCase()).includes(tag));
+
+            if (q) {
+                out = out.filter(o => {
+                    const t = String(o.title || "").toLowerCase();
+                    const p = String(o.provider || "").toLowerCase();
+                    const l = String(o.location || "").toLowerCase();
+                    const tg = Array.isArray(o.tags) ? o.tags.join(" ").toLowerCase() : "";
+                    return t.includes(q) || p.includes(q) || l.includes(q) || tg.includes(q);
+                });
+            }
+
+            if (sort === "newest") out.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            if (sort === "deadline_soon") out.sort((a, b) => String(a.deadline).localeCompare(String(b.deadline)));
+            if (sort === "deadline_late") out.sort((a, b) => String(b.deadline).localeCompare(String(a.deadline)));
+            if (sort === "title_az") out.sort((a, b) => String(a.title).localeCompare(String(b.title)));
+
+            state.filtered = out;
+            $("count").textContent = out.length;
+            $("subLine").textContent = `Showing ${out.length} active opportunities (Supabase live)`;
+            render(out);
+        }
+
+        function clearFilters() {
+            $("q").value = "";
+            $("type").value = "all";
+            $("tag").value = "all";
+            $("sort").value = "newest";
+            state.activeChip = "all";
+            buildTagUI();
+            applyFilters();
+        }
+
+        async function reloadData() {
+            const statusLine = $("statusLine");
+            if (statusLine) statusLine.textContent = "Loading from Supabase…";
+            renderSkeleton();
+
+            try {
+                const today = new Date().toISOString().slice(0, 10);
+                const { data, error } = await supabase
+                    .from("opportunities")
+                    .select("*")
+                    .eq("status", "ACTIVE")
+                    .gte("deadline", today)
+                    .order("created_at", { ascending: false });
+
+                if (error) throw error;
+
+                state.all = data || [];
+                state.tagList = uniqueTags(state.all);
+                buildTagUI();
+
+                $("last").textContent = "Last updated: " + new Date().toLocaleString();
+                if (statusLine) statusLine.textContent = `Connected ✅ Loaded ${state.all.length} active opportunities.`;
+
+                applyFilters();
+            } catch (err) {
+                if (statusLine) statusLine.textContent = "Failed to load. Check RLS policy & keys.";
+                $("subLine").textContent = "Could not load (check Supabase config + RLS).";
+                $("grid").innerHTML = `<div class="opp-card" style="grid-column:1/-1;">
+          <div class="pill"><i class="fa-solid fa-triangle-exclamation"></i> Error</div>
+          <div class="opp-title" style="margin-top:10px;">Failed to load data</div>
+          <div class="opp-meta" style="margin-top:8px;">${esc(err.message || String(err))}</div>
+        </div>`;
+            }
+        }
+
+        ["q", "type", "tag", "sort"].forEach(id => {
+            const el = $(id);
+            el.addEventListener(id === "q" ? "input" : "change", applyFilters);
+        });
+
+        (function init() {
+            navTo("landing");
+            reloadData();
+        })();
+    </script>
+</body>
+
+</html>
