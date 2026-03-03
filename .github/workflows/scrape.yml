@@ -25,9 +25,11 @@ jobs:
         run: |
           npm install
           npx playwright install --with-deps chromium
-
+          
       - name: Run scraper
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          INTERNHUB_FUNCTION_URL: ${{ secrets.INTERNHUB_FUNCTION_URL }}
+          INTERNHUB_INGEST_KEY: ${{ secrets.INTERNHUB_INGEST_KEY }}
         run: npm run scrape
