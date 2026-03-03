@@ -1,7 +1,7 @@
 name: Scrape & Ingest Opportunities
 
 on:
-   push:
+  push:
     branches: [web]
   workflow_dispatch:
   schedule:
