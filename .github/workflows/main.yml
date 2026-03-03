@@ -1,11 +1,8 @@
-on:
-   push:
-     branches: [web]
-
-
 name: Scrape & Ingest Opportunities
 
 on:
+  push:
+    branches: [web]
   workflow_dispatch:
   schedule:
     - cron: "15 1 * * *" # daily 01:15 UTC
@@ -14,6 +11,7 @@ jobs:
   scrape:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
