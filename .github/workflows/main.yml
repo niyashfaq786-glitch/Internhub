@@ -8,7 +8,7 @@ on:
     - cron: "15 1 * * *" # daily 01:15 UTC
 
 jobs:
-  scrape:
+  scrape_and_ingest:
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
@@ -22,12 +22,10 @@ jobs:
           node-version: 20
 
       - name: Install deps
-        run: |
-          npm install
-          npx playwright install --with-deps chromium
+        run: npm install
 
-      - name: Run scraper
+      - name: Run scraper + send to Supabase function
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-        run: npm run scrape
+          INTERNHUB_FUNCTION_URL: ${{ secrets.INTERNHUB_FUNCTION_URL }}
+          INTERNHUB_INGEST_KEY: ${{ secrets.INTERNHUB_INGEST_KEY }}
+        run: node scripts/sendToFunction.js
