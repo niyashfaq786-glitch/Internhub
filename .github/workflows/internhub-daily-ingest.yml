@@ -1,27 +1,35 @@
-name: InternHub Daily Ingest
+name: Scrape & Ingest Opportunities
 
 on:
-  schedule:
-    # Runs daily at 9:00 AM IST (03:30 UTC)
-    - cron: "30 3 * * *"
+  push:
+    branches:
+      - Web
   workflow_dispatch:
+  schedule:
+    - cron: "15 1 * * *" # daily 01:15 UTC
 
 jobs:
-  ingest:
+  scrape:
     runs-on: ubuntu-latest
-
+    timeout-minutes: 20
     steps:
-      - name: Checkout repo
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: 20
 
-      - name: Run ingest script
+      - name: Install deps
+        run: |
+          npm install
+          npx playwright install --with-deps chromium
+          
+      - name: Run scraper
         env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           INTERNHUB_FUNCTION_URL: ${{ secrets.INTERNHUB_FUNCTION_URL }}
           INTERNHUB_INGEST_KEY: ${{ secrets.INTERNHUB_INGEST_KEY }}
-        run: |
-          node scripts/sendToFunction.js
+        run: npm run scrape
