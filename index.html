@@ -2,1112 +2,600 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>InternHub | Kerala Polytechnic Platform</title>
-    <!-- Fonts & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <style>
-        /* --- CSS VARIABLES --- */
-        :root {
-            --primary: #2563eb;
-            --primary-dark: #1e40af;
-            --secondary: #0f172a;
-            --accent: #0ea5e9;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-
-            --bg-body: #f8fafc;
-            --surface: #ffffff;
-            --surface-glass: rgba(255, 255, 255, 0.9);
-
-            --border: #e2e8f0;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-
-            --radius-md: 12px;
-            --radius-lg: 20px;
-            --radius-full: 9999px;
-        }
-
-        /* --- GLOBAL RESET --- */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            outline: none;
-        }
-
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-body);
-            color: var(--secondary);
-            line-height: 1.5;
-            -webkit-font-smoothing: antialiased;
-            overflow-x: hidden;
-        }
-
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
-
-        button {
-            cursor: pointer;
-            font-family: inherit;
-            border: none;
-            background: none;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .flex {
-            display: flex;
-        }
-
-        .grid {
-            display: grid;
-        }
-
-        .text-gradient {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        /* Container (needed, your HTML uses .container) */
-        .container {
-            width: calc(100% - 40px);
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        /* --- BACKGROUND --- */
-        .ambient-bg {
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-            overflow: hidden;
-            pointer-events: none;
-        }
-
-        .blob {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(90px);
-            opacity: 0.4;
-        }
-
-        .blob-1 {
-            top: -10%;
-            left: -10%;
-            width: 50vw;
-            height: 50vw;
-            background: #dbeafe;
-        }
-
-        .blob-2 {
-            bottom: -10%;
-            right: -10%;
-            width: 40vw;
-            height: 40vw;
-            background: #dcfce7;
-        }
-
-        /* --- NAVBAR --- */
-        .navbar {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: calc(100% - 40px);
-            max-width: 1200px;
-            height: 70px;
-            background: var(--surface-glass);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            border-radius: var(--radius-full);
-            box-shadow: var(--shadow-sm);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 24px;
-        }
-
-        .nav-logo {
-            font-weight: 800;
-            font-size: 1.25rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .nav-logo i {
-            color: var(--primary);
-        }
-
-        .btn {
-            padding: 10px 24px;
-            border-radius: var(--radius-full);
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
-        }
-
-        .btn-secondary {
-            background: white;
-            color: var(--secondary);
-            border: 1px solid var(--border);
-        }
-
-        .btn-sm {
-            padding: 6px 16px;
-            font-size: 0.85rem;
-        }
-
-        /* --- LANDING PAGE --- */
-        .hero-section {
-            padding-top: 140px;
-            padding-bottom: 60px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero-title {
-            font-size: 3.5rem;
-            line-height: 1.1;
-            font-weight: 800;
-            margin-bottom: 24px;
-            letter-spacing: -1px;
-            position: relative;
-            z-index: 2;
-        }
-
-        .hero-desc {
-            font-size: 1.25rem;
-            color: #64748b;
-            max-width: 700px;
-            margin: 0 auto 40px auto;
-            position: relative;
-            z-index: 2;
-        }
-
-        /* --- NEW: FLOATING BACKGROUND ICONS --- */
-        .bg-icon {
-            position: absolute;
-            font-size: 4rem;
-            color: var(--primary);
-            opacity: 0.05;
-            z-index: 1;
-        }
-
-        .icon-1 {
-            top: 15%;
-            left: 10%;
-            animation: floatIcon 8s infinite ease-in-out;
-        }
-
-        .icon-2 {
-            top: 25%;
-            right: 15%;
-            animation: floatIcon 9s infinite ease-in-out 1s;
-        }
-
-        .icon-3 {
-            bottom: 20%;
-            left: 20%;
-            animation: floatIcon 10s infinite ease-in-out 2s;
-        }
-
-        .icon-4 {
-            bottom: 30%;
-            right: 10%;
-            animation: floatIcon 7s infinite ease-in-out 0.5s;
-        }
-
-        @keyframes floatIcon {
-
-            0%,
-            100% {
-                transform: translateY(0) rotate(0deg);
-            }
-
-            50% {
-                transform: translateY(-30px) rotate(5deg);
-            }
-        }
-
-        /* --- NEW: ANIMATION FRAME SECTION --- */
-        .animation-frame-container {
-            max-width: 1000px;
-            margin: 0 auto 80px auto;
-            padding: 40px;
-            background: white;
-            border-radius: 24px;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow-lg);
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Tech Grid Background */
-        .tech-grid {
-            position: absolute;
-            inset: 0;
-            background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
-            background-size: 30px 30px;
-            opacity: 0.3;
-            z-index: 0;
-            animation: moveGrid 20s linear infinite;
-        }
-
-        @keyframes moveGrid {
-            0% {
-                transform: translateY(0);
-            }
-
-            100% {
-                transform: translateY(30px);
-            }
-        }
-
-        .process-title {
-            text-align: center;
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 40px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .anim-steps {
-            display: flex;
-            justify-content: space-between;
-            position: relative;
-            z-index: 1;
-        }
-
-        .anim-line-bg {
-            position: absolute;
-            top: 25px;
-            left: 50px;
-            right: 50px;
-            height: 4px;
-            background: #f1f5f9;
-            z-index: 0;
-        }
-
-        .anim-line-fill {
-            position: absolute;
-            top: 25px;
-            left: 50px;
-            height: 4px;
-            background: var(--primary);
-            z-index: 1;
-            width: 0%;
-            animation: fillLine 4s infinite linear;
-        }
-
-        .anim-step {
-            position: relative;
-            z-index: 2;
-            text-align: center;
-            width: 150px;
-        }
-
-        .anim-icon-box {
-            width: 50px;
-            height: 50px;
-            background: white;
-            border: 2px solid var(--primary);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 16px auto;
-            font-size: 1.2rem;
-            color: var(--primary);
-            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
-            transition: all 0.3s;
-        }
-
-        .step-1 .anim-icon-box {
-            animation: pulseIcon 4s infinite ease-in-out;
-            animation-delay: 0s;
-        }
-
-        .step-2 .anim-icon-box {
-            animation: pulseIcon 4s infinite ease-in-out;
-            animation-delay: 1s;
-        }
-
-        .step-3 .anim-icon-box {
-            animation: pulseIcon 4s infinite ease-in-out;
-            animation-delay: 2s;
-        }
-
-        .step-4 .anim-icon-box {
-            animation: pulseIcon 4s infinite ease-in-out;
-            animation-delay: 3s;
-        }
-
-        .anim-text {
-            font-weight: 600;
-            font-size: 0.9rem;
-            opacity: 0;
-            transform: translateY(10px);
-            animation: fadeUpText 4s infinite;
-        }
-
-        .step-1 .anim-text {
-            animation-delay: 0.2s;
-        }
-
-        .step-2 .anim-text {
-            animation-delay: 1.2s;
-        }
-
-        .step-3 .anim-text {
-            animation-delay: 2.2s;
-        }
-
-        .step-4 .anim-text {
-            animation-delay: 3.2s;
-        }
-
-        @keyframes fillLine {
-            0% {
-                width: 0%;
-                left: 50px;
-            }
-
-            100% {
-                width: 100%;
-                left: 50px;
-            }
-        }
-
-        @keyframes pulseIcon {
-
-            0%,
-            100% {
-                transform: scale(1);
-                box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4);
-            }
-
-            50% {
-                transform: scale(1.1);
-                box-shadow: 0 0 0 10px rgba(37, 99, 235, 0);
-            }
-        }
-
-        @keyframes fadeUpText {
-
-            0%,
-            10% {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            20%,
-            80% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-
-            90%,
-            100% {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-        }
-
-        /* --- FEATURES WITH ENTRANCE ANIMATION --- */
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 24px;
-            padding-bottom: 80px;
-        }
-
-        .feat-card {
-            background: white;
-            padding: 30px;
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border);
-            transition: 0.3s;
-            animation: slideUp 0.6s ease-out backwards;
-        }
-
-        .feat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-lg);
-            border-color: var(--primary);
-        }
-
-        .feat-card:nth-child(1) {
-            animation-delay: 0.1s;
-        }
-
-        .feat-card:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .feat-card:nth-child(3) {
-            animation-delay: 0.3s;
-        }
-
-        .feat-card:nth-child(4) {
-            animation-delay: 0.4s;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .feat-icon {
-            width: 50px;
-            height: 50px;
-            background: #eff6ff;
-            color: var(--primary);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            margin-bottom: 16px;
-        }
-
-        /* --- DASHBOARD SHELL (we reuse cards + grid for Explorer) --- */
-        .dash-card {
-            background: white;
-            padding: 24px;
-            border-radius: 20px;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow-sm);
-        }
-
-        /* Job Cards (used for Opportunity cards too) */
-        .job-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 24px;
-        }
-
-        .job-card {
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 24px;
-            transition: 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .job-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
-            border-color: #c7d2fe;
-        }
-
-        .job-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin: 12px 0 4px 0;
-        }
-
-        .tag {
-            padding: 4px 10px;
-            background: #f1f5f9;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--secondary);
-            margin-right: 6px;
-            display: inline-block;
-            margin-top: 6px;
-        }
-
-        /* Inputs (reused) */
-        .input-field {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            font-family: inherit;
-            background: white;
-        }
-
-        /* Explorer small extras */
-        .pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 12px;
-            border-radius: 999px;
-            background: #dbeafe;
-            color: var(--primary);
-            font-weight: 700;
-            font-size: 0.85rem;
-        }
-
-        .muted {
-            color: #64748b;
-        }
-
-        .loader {
-            padding: 30px;
-            text-align: center;
-            color: #64748b;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .empty {
-            padding: 30px;
-            text-align: center;
-            color: #64748b;
-            border: 1px dashed #cbd5e1;
-            border-radius: 20px;
-            background: white;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .navbar {
-                top: 0;
-                width: 100%;
-                border-radius: 0;
-            }
-
-            .hero-title {
-                font-size: 2.2rem;
-            }
-
-            .anim-steps {
-                flex-direction: column;
-                gap: 40px;
-            }
-
-            .anim-line-bg,
-            .anim-line-fill {
-                display: none;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>InternHub | Kerala Polytechnic Platform</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1e40af;
+      --secondary: #0f172a;
+      --accent: #0ea5e9;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --bg-body: #f8fafc;
+      --surface: #ffffff;
+      --surface-glass: rgba(255, 255, 255, .9);
+      --border: #e2e8f0;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, .05);
+      --shadow-lg: 0 10px 15px rgba(0, 0, 0, .1);
+      --radius-lg: 20px;
+      --radius-full: 9999px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; outline: none }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-body); color: var(--secondary); line-height: 1.5; overflow-x: hidden }
+    a { text-decoration: none; color: inherit }
+    button { cursor: pointer; font-family: inherit; border: none; background: none }
+    .hidden { display: none !important }
+    .flex { display: flex }
+    .text-gradient { background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px }
+
+    .ambient-bg { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none }
+    .blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: .4 }
+    .blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: #dbeafe }
+    .blob-2 { bottom: -10%; right: -10%; width: 40vw; height: 40vw; background: #dcfce7 }
+
+    .navbar {
+      position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+      width: calc(100% - 40px); max-width: 1200px; height: 70px;
+      background: var(--surface-glass); backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, .8);
+      border-radius: var(--radius-full);
+      box-shadow: var(--shadow-sm);
+      z-index: 1000;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px
+    }
+
+    .nav-logo { font-weight: 800; font-size: 1.25rem; display: flex; align-items: center; gap: 10px }
+    .nav-logo i { color: var(--primary) }
+
+    .btn {
+      padding: 10px 24px;
+      border-radius: var(--radius-full);
+      font-weight: 700;
+      font-size: .9rem;
+      transition: .3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(37, 99, 235, .3) }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(37, 99, 235, .35) }
+    .btn-secondary { background: #fff; color: var(--secondary); border: 1px solid var(--border) }
+    .btn-sm { padding: 6px 16px; font-size: .85rem }
+
+    .hero-section { padding-top: 140px; padding-bottom: 60px; text-align: center; position: relative; overflow: hidden }
+    .hero-title { font-size: 3.5rem; line-height: 1.1; font-weight: 900; margin-bottom: 24px; letter-spacing: -1px; position: relative; z-index: 2 }
+    .hero-desc { font-size: 1.25rem; color: #64748b; max-width: 760px; margin: 0 auto 24px; position: relative; z-index: 2 }
+
+    .bg-icon { position: absolute; font-size: 4rem; color: var(--primary); opacity: .05; z-index: 1 }
+    .icon-1 { top: 15%; left: 10%; animation: floatIcon 8s infinite ease-in-out }
+    .icon-2 { top: 25%; right: 15%; animation: floatIcon 9s infinite ease-in-out 1s }
+    .icon-3 { bottom: 20%; left: 20%; animation: floatIcon 10s infinite ease-in-out 2s }
+    .icon-4 { bottom: 30%; right: 10%; animation: floatIcon 7s infinite ease-in-out .5s }
+
+    @keyframes floatIcon {
+      0%, 100% { transform: translateY(0) rotate(0) }
+      50% { transform: translateY(-30px) rotate(5deg) }
+    }
+
+    .animation-frame-container {
+      max-width: 1000px;
+      margin: 0 auto 80px;
+      padding: 40px;
+      background: #fff;
+      border-radius: 24px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      overflow: hidden
+    }
+
+    .tech-grid {
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 30px 30px;
+      opacity: .3;
+      z-index: 0;
+      animation: moveGrid 20s linear infinite
+    }
+
+    @keyframes moveGrid { 0% { transform: translateY(0) } 100% { transform: translateY(30px) } }
+
+    .process-title { text-align: center; font-size: 1.5rem; font-weight: 800; margin-bottom: 40px; position: relative; z-index: 1 }
+    .anim-steps { display: flex; justify-content: space-between; gap: 16px; position: relative; z-index: 1 }
+    .anim-step { text-align: center; width: 170px }
+    .anim-icon-box {
+      width: 52px; height: 52px; background: #fff; border: 2px solid var(--primary);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 14px; color: var(--primary); box-shadow: 0 4px 10px rgba(37, 99, 235, .2)
+    }
+    .anim-text { font-weight: 700; font-size: .9rem; color: #334155 }
+
+    .browse-shell { padding-top: 120px; padding-bottom: 60px }
+
+    .panel { background: #fff; border: 1px solid var(--border); border-radius: 24px; box-shadow: var(--shadow-lg); overflow: hidden }
+    .panel-head {
+      padding: 22px; border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap; align-items: center
+    }
+    .panel-head h2 { font-size: 1.4rem; font-weight: 900 }
+    .panel-head p { color: #64748b; font-weight: 600 }
+
+    .controls {
+      padding: 18px 22px; display: grid; gap: 12px;
+      border-bottom: 1px solid var(--border);
+      background: #fbfdff;
+      grid-template-columns: 1.2fr .7fr .7fr .7fr auto;
+    }
+
+    .field {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 14px; padding: 10px 12px;
+      display: flex; gap: 10px; align-items: center
+    }
+    .field input, .field select {
+      width: 100%; border: none; background: transparent;
+      font-weight: 700; color: var(--secondary); font-size: .92rem
+    }
+
+    .chipbar { padding: 10px 22px 0; display: flex; flex-wrap: wrap; gap: 8px }
+    .chip {
+      border: 1px solid var(--border);
+      background: #fff;
+      padding: 7px 12px;
+      border-radius: 9999px;
+      font-size: .85rem;
+      font-weight: 800;
+      color: #64748b;
+      transition: .2s
+    }
+    .chip.active { background: #dbeafe; border-color: #bfdbfe; color: var(--primary-dark) }
+
+    .opps-grid {
+      padding: 18px 22px 22px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 18px
+    }
+
+    .opp-card {
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 18px;
+      background: #fff;
+      box-shadow: var(--shadow-sm);
+      transition: .25s
+    }
+    .opp-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: #bfdbfe }
+
+    .pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 10px; border-radius: 9999px;
+      font-size: .75rem; font-weight: 900;
+      border: 1px solid var(--border);
+      background: #f8fafc; color: #475569
+    }
+    .pill.internship { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe }
+    .pill.scholarship { background: #ecfdf5; color: #166534; border-color: #bbf7d0 }
+
+    .opp-title { margin-top: 10px; font-size: 1.05rem; font-weight: 900; line-height: 1.25 }
+    .opp-meta { margin-top: 8px; color: #64748b; font-size: .9rem; font-weight: 700; display: flex; flex-wrap: wrap; gap: 8px }
+    .tagrow { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px }
+    .tag { padding: 4px 10px; background: #f1f5f9; border-radius: 8px; font-size: .75rem; font-weight: 900 }
+    .card-actions { margin-top: 14px; display: flex; gap: 10px }
+    .apply { width: 100%; justify-content: center; text-align: center }
+
+    .foot {
+      padding: 14px 22px;
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+      color: #64748b; font-weight: 700;
+      background: #fbfdff
+    }
+
+    .skeleton {
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      height: 180px;
+      background: linear-gradient(110deg, #f1f5f9 8%, #e2e8f0 18%, #f1f5f9 33%);
+      background-size: 200% 100%;
+      animation: shimmer 1.2s linear infinite
+    }
+    @keyframes shimmer { to { background-position-x: -200% } }
+
+    @media (max-width:980px) { .controls { grid-template-columns: 1fr 1fr } }
+    @media (max-width:768px) {
+      .navbar { top: 0; width: 100%; border-radius: 0 }
+      .hero-title { font-size: 2.2rem }
+      .anim-steps { flex-direction: column; gap: 22px; align-items: center }
+    }
+  </style>
 </head>
 
 <body>
 
-    <!-- Background Ambient Light -->
-    <div class="ambient-bg">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
+  <div class="ambient-bg">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+  </div>
+
+  <nav class="navbar">
+    <a href="#" class="nav-logo" onclick="navTo('landing'); return false;">
+      <i class="fa-solid fa-graduation-cap"></i> InternHub
+    </a>
+    <div class="flex" style="gap:10px;align-items:center">
+      <button class="btn btn-secondary btn-sm" onclick="navTo('landing')">
+        <i class="fa-solid fa-house"></i> Home
+      </button>
+      <button class="btn btn-primary btn-sm" onclick="navTo('browse')">
+        <i class="fa-solid fa-magnifying-glass"></i> Browse
+      </button>
+    </div>
+  </nav>
+
+  <main id="page-landing">
+    <i class="fa-solid fa-robot bg-icon icon-1"></i>
+    <i class="fa-solid fa-briefcase bg-icon icon-2"></i>
+    <i class="fa-solid fa-graduation-cap bg-icon icon-3"></i>
+    <i class="fa-solid fa-microchip bg-icon icon-4"></i>
+
+    <div class="container hero-section">
+      <div
+        style="display:inline-block;padding:6px 16px;background:#dbeafe;color:var(--primary);border-radius:20px;font-weight:800;font-size:.85rem;margin-bottom:20px;">
+        <i class="fa-solid fa-check-circle"></i> Official Partner: Kerala Polytechnics
+      </div>
+
+      <h1 class="hero-title">AI-Powered Career Platform for <br><span class="text-gradient">Diploma Students</span></h1>
+      <p class="hero-desc">InternHub shows internships & scholarships with deadlines and direct apply links — updated
+        from Supabase automatically.</p>
+
+      <div class="flex" style="justify-content:center;gap:12px;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="navTo('browse')">
+          <i class="fa-solid fa-briefcase"></i> Browse Opportunities
+        </button>
+        <button class="btn btn-secondary" onclick="reloadData()">
+          <i class="fa-solid fa-rotate"></i> Refresh
+        </button>
+      </div>
+
+      <p id="statusLine" style="margin-top:14px;color:#64748b;font-weight:800;"></p>
     </div>
 
-    <!-- PERSISTENT NAVBAR (ONLY ONE BUTTON: BROWSE) -->
-    <nav class="navbar">
-        <a href="#" class="nav-logo" onclick="navTo('landing')">
-            <i class="fa-solid fa-graduation-cap"></i> InternHub
-        </a>
-        <button class="btn btn-primary btn-sm" onclick="navTo('explorer')">
-            <i class="fa-solid fa-magnifying-glass"></i> Browse
-        </button>
-    </nav>
+    <div class="container">
+      <div class="animation-frame-container">
+        <div class="tech-grid"></div>
+        <h3 class="process-title">How InternHub Works</h3>
+        <div class="anim-steps">
+          <div class="anim-step">
+            <div class="anim-icon-box"><i class="fa-solid fa-globe"></i></div>
+            <div class="anim-text">1. Sources Found</div>
+          </div>
+          <div class="anim-step">
+            <div class="anim-icon-box"><i class="fa-solid fa-robot"></i></div>
+            <div class="anim-text">2. Scrape + Clean</div>
+          </div>
+          <div class="anim-step">
+            <div class="anim-icon-box"><i class="fa-solid fa-database"></i></div>
+            <div class="anim-text">3. Save to Supabase</div>
+          </div>
+          <div class="anim-step">
+            <div class="anim-icon-box"><i class="fa-solid fa-briefcase"></i></div>
+            <div class="anim-text">4. Published Here</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
 
-    <!-- =======================
-         PAGE 1: LANDING PAGE
-    ======================== -->
-    <main id="page-landing">
-        <!-- Floating Background Icons for Animation -->
-        <i class="fa-solid fa-robot bg-icon icon-1"></i>
-        <i class="fa-solid fa-briefcase bg-icon icon-2"></i>
-        <i class="fa-solid fa-graduation-cap bg-icon icon-3"></i>
-        <i class="fa-solid fa-microchip bg-icon icon-4"></i>
-
-        <div class="container hero-section">
-            <div
-                style="display: inline-block; padding: 6px 16px; background: #dbeafe; color: var(--primary); border-radius: 20px; font-weight: 600; font-size: 0.85rem; margin-bottom: 20px;">
-                <i class="fa-solid fa-check-circle"></i> Official Partner: Kerala Polytechnics
-            </div>
-
-            <h1 class="hero-title">
-                AI-Powered Career Platform for <br>
-                <span class="text-gradient">Diploma Students</span>
-            </h1>
-
-            <p class="hero-desc">
-                InternHub connects Kerala Polytechnic students with global internships and scholarships through
-                AI-driven matching, automated web scraping, and real-time tracking.
-            </p>
-
-            <!-- BROWSE CTA (ONLY PUBLIC FLOW) -->
-            <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap; margin-bottom: 10px;">
-                <button class="btn btn-primary" onclick="navTo('explorer')">
-                    <i class="fa-solid fa-magnifying-glass"></i> Browse Opportunities
-                </button>
-            </div>
+  <main id="page-browse" class="hidden">
+    <div class="container browse-shell">
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <h2><i class="fa-solid fa-magnifying-glass" style="color:var(--primary)"></i> Browse Opportunities</h2>
+            <p id="subLine">Open Browse to load from Supabase…</p>
+          </div>
+          <div class="flex" style="gap:10px;align-items:center">
+            <button class="btn btn-secondary btn-sm" onclick="navTo('landing')">
+              <i class="fa-solid fa-arrow-left"></i> Back
+            </button>
+            <button class="btn btn-primary btn-sm" onclick="reloadData(true)">
+              <i class="fa-solid fa-rotate"></i> Reload
+            </button>
+          </div>
         </div>
 
-        <!-- =======================
-             ANIMATION FRAME
-        ======================== -->
-        <div class="container">
-            <div class="animation-frame-container">
-                <div class="tech-grid"></div>
-                <h3 class="process-title">How InternHub Works</h3>
-
-                <div class="anim-line-bg"></div>
-                <div class="anim-line-fill"></div>
-
-                <div class="anim-steps">
-                    <div class="anim-step step-1">
-                        <div class="anim-icon-box"><i class="fa-solid fa-id-card"></i></div>
-                        <div class="anim-text">1. Browse Listings</div>
-                    </div>
-                    <div class="anim-step step-2">
-                        <div class="anim-icon-box"><i class="fa-solid fa-filter"></i></div>
-                        <div class="anim-text">2. Search & Filter</div>
-                    </div>
-                    <div class="anim-step step-3">
-                        <div class="anim-icon-box"><i class="fa-solid fa-link"></i></div>
-                        <div class="anim-text">3. Open Official Link</div>
-                    </div>
-                    <div class="anim-step step-4">
-                        <div class="anim-icon-box"><i class="fa-solid fa-briefcase"></i></div>
-                        <div class="anim-text">4. Apply & Track</div>
-                    </div>
-                </div>
-            </div>
+        <div class="controls">
+          <div class="field">
+            <i class="fa-solid fa-magnifying-glass" style="color:#94a3b8"></i>
+            <input id="q" type="text" placeholder="Search title / provider / location / tags..." />
+          </div>
+          <div class="field">
+            <i class="fa-solid fa-filter" style="color:#94a3b8"></i>
+            <select id="type">
+              <option value="all">All types</option>
+              <option value="internship">Internships</option>
+              <option value="scholarship">Scholarships</option>
+            </select>
+          </div>
+          <div class="field">
+            <i class="fa-solid fa-tags" style="color:#94a3b8"></i>
+            <select id="tag">
+              <option value="all">All tags</option>
+            </select>
+          </div>
+          <div class="field">
+            <i class="fa-solid fa-arrow-down-a-z" style="color:#94a3b8"></i>
+            <select id="sort">
+              <option value="newest">Newest</option>
+              <option value="deadline_soon">Deadline Soon</option>
+              <option value="deadline_late">Deadline Late</option>
+              <option value="title_az">Title A–Z</option>
+            </select>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="clearFilters()">
+            <i class="fa-solid fa-eraser"></i> Clear
+          </button>
         </div>
 
-        <div class="container feature-grid">
-            <div class="feat-card">
-                <div class="feat-icon"><i class="fa-solid fa-graduation-cap"></i></div>
-                <h3>Scholarships</h3>
-                <p style="font-size: 0.9rem; color: #64748b;">Browse scholarship opportunities relevant for diploma
-                    students.</p>
-            </div>
-            <div class="feat-card">
-                <div class="feat-icon"><i class="fa-solid fa-briefcase"></i></div>
-                <h3>Internships</h3>
-                <p style="font-size: 0.9rem; color: #64748b;">Find internships and training programs from trusted
-                    sources.</p>
-            </div>
-            <div class="feat-card">
-                <div class="feat-icon"><i class="fa-solid fa-filter"></i></div>
-                <h3>Filters</h3>
-                <p style="font-size: 0.9rem; color: #64748b;">Search, filter by type/location, and sort instantly.</p>
-            </div>
-            <div class="feat-card">
-                <div class="feat-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
-                <h3>Auto Expiry</h3>
-                <p style="font-size: 0.9rem; color: #64748b;">Expired opportunities are hidden automatically.</p>
-            </div>
+        <div class="chipbar" id="chipbar"></div>
+        <div class="opps-grid" id="grid"></div>
+
+        <div class="foot">
+          <div><span id="count">0</span> results</div>
+          <div id="last">Last updated: —</div>
         </div>
-    </main>
+      </div>
+    </div>
+  </main>
 
-    <!-- =======================
-         PAGE 2: OPPORTUNITIES EXPLORER (PUBLIC)
-    ======================== -->
-    <main id="page-explorer" class="hidden">
-        <div class="container" style="padding-top: 120px; padding-bottom: 60px;">
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-            <div
-                style="display:flex; justify-content:space-between; align-items:flex-end; gap:16px; flex-wrap:wrap; margin-bottom: 18px;">
-                <div>
-                    <h2 style="font-size: 1.8rem; font-weight: 800; letter-spacing: -0.5px;">
-                        <span class="text-gradient">Opportunities</span> Explorer
-                    </h2>
-                    <p class="muted" style="margin-top: 6px;">
-                        Search, filter, sort. Apply opens the official website in a new tab. Expired listings are
-                        hidden.
-                    </p>
-                </div>
+    // ✅ Your project
+    const SUPABASE_URL = "https://zyssuxxppcqsiwayptwo.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp5c3N1eHhwcGNxc2l3YXlwdHdvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyNDQyNDEsImV4cCI6MjA4NjgyMDI0MX0.mjUjJJh_EFvbp23vA7jcawiMCKV2XLeWkwDemnyLO4E";
 
-                <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                    <button class="btn btn-secondary btn-sm" onclick="navTo('landing')">
-                        <i class="fa-solid fa-house"></i> Home
-                    </button>
-                    <button class="btn btn-primary btn-sm" onclick="refreshExplorer()">
-                        <i class="fa-solid fa-arrows-rotate"></i> Refresh
-                    </button>
-                </div>
+    const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const state = { all: [], loaded: false, loading: false };
+
+    // ✅ Global navigation (so buttons can call it)
+    window.navTo = function (pageId) {
+      document.querySelectorAll("main").forEach(m => m.classList.add("hidden"));
+      const target = document.getElementById("page-" + pageId);
+      if (target) target.classList.remove("hidden");
+      window.scrollTo(0, 0);
+
+      if (pageId === "browse") {
+        if (!state.loaded) loadFromDB(false);
+        else render();
+      }
+    };
+
+    window.reloadData = function () {
+      loadFromDB(true);
+    };
+
+    window.clearFilters = function () {
+      document.getElementById("q").value = "";
+      document.getElementById("type").value = "all";
+      document.getElementById("tag").value = "all";
+      document.getElementById("sort").value = "newest";
+      render();
+    };
+
+    function todayISO() {
+      return new Date().toISOString().slice(0, 10);
+    }
+
+    function isActive(o) {
+      if (!o) return false;
+      if (o.status && o.status !== "ACTIVE") return false;
+      if (!o.deadline) return true;
+      const d = new Date(o.deadline + "T00:00:00");
+      const now = new Date(); now.setHours(0, 0, 0, 0);
+      return d >= now;
+    }
+
+    function safe(s) {
+      return String(s ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function fmtDeadline(deadline) {
+      if (!deadline) return "N/A";
+      const d = new Date(deadline + "T00:00:00");
+      return d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "2-digit" });
+    }
+
+    async function loadFromDB(force = false) {
+      if (state.loading) return;
+      if (state.loaded && !force) return;
+
+      state.loading = true;
+
+      const sub = document.getElementById("subLine");
+      const statusLine = document.getElementById("statusLine");
+      const grid = document.getElementById("grid");
+
+      if (sub) sub.textContent = "Loading from Supabase…";
+      if (statusLine) statusLine.textContent = "Loading latest data…";
+
+      // skeletons
+      if (grid) grid.innerHTML = Array.from({ length: 6 }).map(() => `<div class="skeleton"></div>`).join("");
+
+      try {
+        const { data, error } = await sb
+          .from("opportunities")
+          .select("id,title,type,provider,location,tags,source,deadline,apply_url,status,created_at,updated_at")
+          .eq("status", "ACTIVE")
+          .or(`deadline.is.null,deadline.gte.${todayISO()}`)
+          .order("created_at", { ascending: false })
+          .limit(300);
+
+        if (error) throw error;
+
+        state.all = (data || []).filter(isActive);
+        state.loaded = true;
+
+        if (sub) sub.textContent = `Loaded ${state.all.length} active opportunities`;
+        if (statusLine) statusLine.textContent = `✅ Loaded ${state.all.length} active opportunities from Supabase.`;
+
+        render();
+
+      } catch (err) {
+        console.error(err);
+        if (sub) sub.textContent = "Error loading. Check table + RLS.";
+        if (statusLine) statusLine.textContent = "❌ Could not load data. Check Supabase RLS policy for anon SELECT.";
+        if (grid) grid.innerHTML = `
+          <div style="grid-column:1/-1;color:#ef4444;font-weight:900;">
+            ${safe(err?.message || "Unknown error")}
+            <div style="margin-top:8px;color:#64748b;font-weight:800;">
+              Fix: Supabase → Table <b>opportunities</b> → RLS must allow <b>anon SELECT</b>.
             </div>
+          </div>
+        `;
+      } finally {
+        state.loading = false;
+      }
+    }
 
-            <!-- Controls -->
-            <div class="dash-card" style="margin-bottom: 16px;">
-                <div style="display:grid; grid-template-columns: 1.4fr 0.8fr 0.8fr 0.8fr; gap: 12px;">
-                    <div style="position:relative;">
-                        <i class="fa-solid fa-magnifying-glass"
-                            style="position:absolute; left:14px; top:14px; color:#94a3b8;"></i>
-                        <input id="qSearch" class="input-field" placeholder="Search title, provider, tags..."
-                            style="padding-left: 40px;">
-                    </div>
+    function render() {
+      const q = (document.getElementById("q")?.value || "").toLowerCase().trim();
+      const type = document.getElementById("type")?.value || "all";
+      const tag = document.getElementById("tag")?.value || "all";
+      const sort = document.getElementById("sort")?.value || "newest";
 
-                    <select id="qType" class="input-field">
-                        <option value="all">All</option>
-                        <option value="scholarship">Scholarships</option>
-                        <option value="internship">Internships</option>
-                    </select>
+      let rows = [...state.all];
 
-                    <input id="qLocation" class="input-field" placeholder="Location (e.g., Kochi / Remote)">
+      if (type !== "all") rows = rows.filter(r => (r.type || "").toLowerCase() === type);
 
-                    <select id="qSort" class="input-field">
-                        <option value="latest">Latest</option>
-                        <option value="deadline">Deadline</option>
-                        <option value="title">Title</option>
-                    </select>
-                </div>
+      if (tag !== "all") rows = rows.filter(r => Array.isArray(r.tags) && r.tags.map(String).includes(tag));
 
-                <div
-                    style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-top: 14px;">
-                    <div class="pill">
-                        <i class="fa-solid fa-circle-check"></i>
-                        <span id="activeCount">0</span> Active
-                    </div>
-                    <div class="muted" id="dataNote">Loading…</div>
-                </div>
-            </div>
-
-            <!-- List -->
-            <div id="oppList" class="loader">
-                <i class="fa-solid fa-circle-notch fa-spin"></i> Loading opportunities…
-            </div>
-
-        </div>
-    </main>
-
-    <!-- =======================
-         JAVASCRIPT (Supabase + Explorer)
-    ======================== -->
-
-    <script type="module">
-        import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
-
-        // ✅ SET THESE 2 (Supabase Project Settings → API)
-        const SUPABASE_URL = "https://zyssuxxppcqsiwayptwo.supabase.co";
-        const SUPABASE_ANON_KEY = "sb_publishable_tmn2azEqCK2CZjFYwFFuHA_RxSvO0DW";
-
-        const ready = SUPABASE_URL.startsWith("http") && SUPABASE_ANON_KEY.length > 20;
-        const supabase = ready ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
-
-        const state = {
-            all: [],
-            loadedOnce: false,
-            loading: false
-        };
-
-        // --- Navigation (Landing <-> Explorer)
-        window.navTo = function (pageId) {
-            document.querySelectorAll("main").forEach(m => m.classList.add("hidden"));
-            document.getElementById("page-" + pageId).classList.remove("hidden");
-            window.scrollTo(0, 0);
-
-            if (pageId === "explorer") {
-                if (!state.loadedOnce) loadFromDB();
-                else applyFiltersAndRender();
-            }
-        };
-
-        // --- Refresh button
-        window.refreshExplorer = function () {
-            loadFromDB(true);
-        };
-
-        // --- Control events (debounced)
-        const debounce = (fn, ms = 250) => {
-            let t;
-            return (...args) => {
-                clearTimeout(t);
-                t = setTimeout(() => fn(...args), ms);
-            };
-        };
-
-        const onChange = debounce(() => applyFiltersAndRender(), 220);
-
-        window.addEventListener("DOMContentLoaded", () => {
-            const s = document.getElementById("qSearch");
-            const t = document.getElementById("qType");
-            const l = document.getElementById("qLocation");
-            const so = document.getElementById("qSort");
-
-            s.addEventListener("input", onChange);
-            l.addEventListener("input", onChange);
-            t.addEventListener("change", onChange);
-            so.addEventListener("change", onChange);
+      if (q) {
+        rows = rows.filter(r => {
+          const t = (r.title || "").toLowerCase();
+          const p = (r.provider || "").toLowerCase();
+          const l = (r.location || "").toLowerCase();
+          const tags = Array.isArray(r.tags) ? r.tags.join(" ").toLowerCase() : "";
+          return t.includes(q) || p.includes(q) || l.includes(q) || tags.includes(q);
         });
+      }
 
-        function todayISO() {
-            return new Date().toISOString().slice(0, 10);
-        }
+      if (sort === "newest") rows.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+      if (sort === "title_az") rows.sort((a, b) => String(a.title || "").localeCompare(String(b.title || "")));
+      if (sort === "deadline_soon") rows.sort((a, b) => (a.deadline ? new Date(a.deadline) : new Date("9999-12-31")) - (b.deadline ? new Date(b.deadline) : new Date("9999-12-31")));
+      if (sort === "deadline_late") rows.sort((a, b) => (b.deadline ? new Date(b.deadline) : new Date("0001-01-01")) - (a.deadline ? new Date(a.deadline) : new Date("0001-01-01")));
 
-        function isActiveClient(o) {
-            if (!o) return false;
-            if (o.status && o.status !== "ACTIVE") return false;
-            if (!o.deadline) return true;
-            const d = new Date(o.deadline + "T00:00:00");
-            const now = new Date();
-            now.setHours(0, 0, 0, 0);
-            return d.getTime() >= now.getTime();
-        }
+      // tags from ALL loaded
+      const allTags = Array.from(new Set(
+        state.all.flatMap(o => Array.isArray(o.tags) ? o.tags : []).map(String)
+      )).sort();
 
-        function safe(s) {
-            return String(s ?? "")
-                .replaceAll("&", "&amp;")
-                .replaceAll("<", "&lt;")
-                .replaceAll(">", "&gt;");
-        }
+      const tagSel = document.getElementById("tag");
+      const current = tagSel?.value || "all";
+      if (tagSel) {
+        tagSel.innerHTML = `<option value="all">All tags</option>` + allTags.map(t => `<option value="${safe(t)}">${safe(t)}</option>`).join("");
+        if (allTags.includes(current)) tagSel.value = current;
+      }
 
-        function fmtDeadline(deadline) {
-            if (!deadline) return "N/A";
-            const d = new Date(deadline + "T00:00:00");
-            return d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "2-digit" });
-        }
+      const chipbar = document.getElementById("chipbar");
+      if (chipbar) {
+        chipbar.innerHTML = allTags.slice(0, 12).map(t => {
+          const active = (tagSel?.value === t) ? "active" : "";
+          return `<button class="chip ${active}" onclick="document.getElementById('tag').value='${safe(t)}'; render();">${safe(t)}</button>`;
+        }).join("");
+      }
 
-        async function loadFromDB(force = false) {
-            const listEl = document.getElementById("oppList");
-            const noteEl = document.getElementById("dataNote");
+      document.getElementById("count").textContent = String(rows.length);
 
-            if (state.loading) return;
-            if (state.loadedOnce && !force) return;
+      const last = state.all
+        .map(o => o.updated_at || o.created_at)
+        .filter(Boolean)
+        .sort()
+        .slice(-1)[0];
 
-            state.loading = true;
-            listEl.className = "loader";
-            listEl.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Loading opportunities…`;
+      document.getElementById("last").textContent = "Last updated: " + (last ? new Date(last).toLocaleString() : "—");
+      const subLine = document.getElementById("subLine");
+      if (subLine) subLine.textContent = `Showing ${rows.length} active opportunities`;
 
-            try {
-                let rows = [];
+      const grid = document.getElementById("grid");
+      if (!grid) return;
 
-                if (!ready) {
-                    noteEl.textContent = "Supabase not configured yet — showing demo data. (Paste URL + publishable key.)";
-                    rows = demoData().filter(isActiveClient);
-                } else {
-                    noteEl.textContent = "Loading from database…";
+      if (!rows.length) {
+        grid.innerHTML = `<div style="grid-column:1/-1;color:#64748b;font-weight:900;">No results. Try different filters.</div>`;
+        return;
+      }
 
-                    const { data, error } = await supabase
-                        .from("opportunities")
-                        .select("id,title,type,provider,location,tags,source,deadline,apply_url,status,created_at")
-                        .eq("status", "ACTIVE")
-                        .or(`deadline.is.null,deadline.gte.${todayISO()}`)
-                        .limit(300);
+      grid.innerHTML = rows.map(o => {
+        const pillClass = (o.type || "").toLowerCase();
+        const provider = o.provider ? safe(o.provider) : "Unknown";
+        const location = o.location ? safe(o.location) : "Not specified";
+        const deadline = fmtDeadline(o.deadline);
+        const tags = Array.isArray(o.tags) ? o.tags.slice(0, 6) : [];
 
-                    if (error) throw error;
-                    rows = (data || []).filter(isActiveClient);
+        return `
+          <div class="opp-card">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+              <span class="pill ${pillClass}">${pillClass === "internship" ? "Internship" : "Scholarship"}</span>
+              <span class="pill">${safe(o.source || "MANUAL")}</span>
+              <span class="pill"><i class="fa-solid fa-calendar"></i> ${deadline}</span>
+            </div>
 
-                    noteEl.textContent = `Loaded ${rows.length} active opportunities (expired auto-hidden).`;
-                }
+            <div class="opp-title">${safe(o.title)}</div>
 
-                state.all = rows;
-                state.loadedOnce = true;
-                applyFiltersAndRender();
+            <div class="opp-meta">
+              <span><i class="fa-solid fa-building"></i> ${provider}</span>
+              <span><i class="fa-solid fa-location-dot"></i> ${location}</span>
+            </div>
 
-            } catch (e) {
-                console.error(e);
-                noteEl.textContent = "Error loading data. Check Supabase keys + table + RLS.";
-                listEl.className = "empty";
-                listEl.innerHTML = `
-                    <div style="font-weight:800; font-size:1.05rem; color:#0f172a;">Could not load opportunities</div>
-                    <div style="margin-top:8px;">Fix Supabase URL/key, table name <b>opportunities</b>, and RLS select policy.</div>
-                `;
-            } finally {
-                state.loading = false;
-            }
-        }
+            <div class="tagrow">
+              ${tags.length ? tags.map(t => `<span class="tag">${safe(t)}</span>`).join("") : `<span class="tag">Kerala Polytechnic</span>`}
+            </div>
 
-        function applyFiltersAndRender() {
-            const qSearch = (document.getElementById("qSearch")?.value || "").trim().toLowerCase();
-            const qType = document.getElementById("qType")?.value || "all";
-            const qLocation = (document.getElementById("qLocation")?.value || "").trim().toLowerCase();
-            const qSort = document.getElementById("qSort")?.value || "latest";
+            <div class="card-actions">
+              <a class="btn btn-primary btn-sm apply" target="_blank" rel="noopener" href="${safe(o.apply_url)}">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> Apply
+              </a>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
 
-            let rows = [...state.all];
+    // Filter events
+    const debounce = (fn, ms = 250) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
 
-            // Filter: type
-            if (qType !== "all") {
-                rows = rows.filter(r => (r.type || "").toLowerCase() === qType);
-            }
+    window.addEventListener("DOMContentLoaded", () => {
+      ["q", "type", "tag", "sort"].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const ev = (id === "q") ? "input" : "change";
+        el.addEventListener(ev, debounce(render, 200));
+      });
 
-            // Filter: location contains
-            if (qLocation) {
-                rows = rows.filter(r => (r.location || "").toLowerCase().includes(qLocation));
-            }
-
-            // Search: title/provider/tags/location
-            if (qSearch) {
-                rows = rows.filter(r => {
-                    const t = (r.title || "").toLowerCase();
-                    const p = (r.provider || "").toLowerCase();
-                    const l = (r.location || "").toLowerCase();
-                    const tags = Array.isArray(r.tags) ? r.tags.join(" ").toLowerCase() : "";
-                    return t.includes(qSearch) || p.includes(qSearch) || l.includes(qSearch) || tags.includes(qSearch);
-                });
-            }
-
-            // Sort
-            if (qSort === "latest") {
-                rows.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
-            } else if (qSort === "deadline") {
-                rows.sort((a, b) => {
-                    const ad = a.deadline ? new Date(a.deadline) : new Date("9999-12-31");
-                    const bd = b.deadline ? new Date(b.deadline) : new Date("9999-12-31");
-                    return ad - bd;
-                });
-            } else if (qSort === "title") {
-                rows.sort((a, b) => String(a.title || "").localeCompare(String(b.title || "")));
-            }
-
-            render(rows);
-        }
-
-        function render(rows) {
-            const listEl = document.getElementById("oppList");
-            const countEl = document.getElementById("activeCount");
-
-            countEl.textContent = String(rows.length);
-
-            if (!rows.length) {
-                listEl.className = "empty";
-                listEl.innerHTML = `
-                    <div style="font-weight:800; font-size:1.05rem; color:#0f172a;">No opportunities found</div>
-                    <div style="margin-top:8px;">Try different search / filters, or press Refresh.</div>
-                `;
-                return;
-            }
-
-            listEl.className = "job-grid";
-            listEl.innerHTML = rows.map(o => {
-                const typeLabel = (o.type || "").toLowerCase() === "internship" ? "Internship" : "Scholarship";
-                const provider = o.provider ? safe(o.provider) : "Unknown Provider";
-                const location = o.location ? safe(o.location) : "Location not specified";
-                const deadline = fmtDeadline(o.deadline);
-                const tags = Array.isArray(o.tags) ? o.tags.slice(0, 6) : [];
-
-                return `
-                    <div class="job-card">
-                        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
-                            <div class="tag" style="background:#eff6ff; color:var(--primary);">${typeLabel}</div>
-                            <div class="tag" title="Source">${safe(o.source || "MANUAL")}</div>
-                        </div>
-
-                        <div class="job-title">${safe(o.title)}</div>
-
-                        <div style="font-size:0.9rem; color:#64748b; margin-top:6px;">
-                            <i class="fa-solid fa-building"></i> ${provider}
-                        </div>
-                        <div style="font-size:0.9rem; color:#64748b; margin-top:6px;">
-                            <i class="fa-solid fa-location-dot"></i> ${location}
-                        </div>
-
-                        <div style="margin-top:12px;">
-                            ${tags.length ? tags.map(t => `<span class="tag">${safe(t)}</span>`).join("") : `<span class="tag">Kerala Polytechnic</span>`}
-                        </div>
-
-                        <div style="margin-top:16px; display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
-                            <div class="tag" style="background:#f8fafc; border:1px solid var(--border);">
-                                <i class="fa-solid fa-calendar"></i> Deadline: ${deadline}
-                            </div>
-
-                            <button class="btn btn-primary btn-sm" onclick="window.open('${safe(o.apply_url)}','_blank','noopener')">
-                                <i class="fa-solid fa-arrow-up-right-from-square"></i> Apply
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }).join("");
-        }
-
-        function demoData() {
-            // Demo (used only if you didn't paste supabase keys)
-            return [
-                {
-                    id: "d1",
-                    title: "Scholarship for Diploma Excellence 2026",
-                    type: "scholarship",
-                    provider: "Kerala Education Board",
-                    location: "Kerala",
-                    tags: ["Merit", "Diploma", "2026"],
-                    source: "SCRAPED",
-                    deadline: "2026-04-15",
-                    apply_url: "https://example.com/apply",
-                    status: "ACTIVE",
-                    created_at: new Date().toISOString()
-                },
-                {
-                    id: "d2",
-                    title: "Internship: Junior Web Developer",
-                    type: "internship",
-                    provider: "Tech Park Kochi",
-                    location: "Kochi",
-                    tags: ["HTML", "CSS", "JavaScript"],
-                    source: "SCRAPED",
-                    deadline: "2026-03-25",
-                    apply_url: "https://example.com/apply2",
-                    status: "ACTIVE",
-                    created_at: new Date().toISOString()
-                },
-                {
-                    id: "d3",
-                    title: "Expired Example (Hidden Automatically)",
-                    type: "internship",
-                    provider: "Old Company",
-                    location: "Remote",
-                    tags: ["Expired"],
-                    source: "SCRAPED",
-                    deadline: "2025-01-10",
-                    apply_url: "https://example.com",
-                    status: "ACTIVE",
-                    created_at: "2025-01-01T00:00:00Z"
-                }
-            ];
-        }
-    </script>
-
-    <!-- Tiny non-module script (no admin/student anymore) -->
-    <script>
-        // Default page on load
-        window.addEventListener("DOMContentLoaded", () => {
-            // Keep landing visible by default
-            // If you want explorer first, uncomment:
-            // navTo('explorer');
-        });
-    </script>
-
+      // Start on landing
+      navTo("landing");
+      document.getElementById("statusLine").textContent = "Ready. Click Browse to load opportunities.";
+    });
+  </script>
 </body>
 
 </html>
-
-
